@@ -3,7 +3,6 @@
 from unittest import TestCase
 
 from inputvalidation import InvalidDataError
-from inputvalidation.api import NoValueSet
 from inputvalidation.validators import IntegerValidator
 
 
