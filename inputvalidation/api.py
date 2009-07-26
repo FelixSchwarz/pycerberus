@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 # Goals:
 #  - Independend from the context (useful for web applications as well as servers)
@@ -10,29 +10,12 @@
 #  - Validator objects are stateless
 #  - you can programmatically see from the exception which error was thrown. 
 
-class ValidationError(Exception):
-    def __init__(self, msg):
-        super(ValidationError, self).__init__(msg)
-        self.msg = msg
-        
-    
-class InvalidDataError(ValidationError):
-    def __init__(self, msg, value, key=None, state=None):
-        super(InvalidDataError, self).__init__(msg)
-        self.value = value
-        self.key = key
-        self.state = state
-    
-    def __repr__(self):
-        cls_name = self.__class__.__name__
-        values = (cls_name, repr(msg), repr(value), repr(self.key), repr(self.state))
-        return '%s(%s, %s, key=%s, state=%s)' % values
 
-class EmptyError(InvalidDataError):
-    pass
+from inputvalidation.errors import *
 
+__all__ = ['BaseValidator', 'Validator']
 
-class InvalidArgumentsError(ValidationError):
+class NoValueSet(object):
     pass
 
 
@@ -47,10 +30,6 @@ class BaseValidator(object):
     def as_string(self, value, state=None):
         "Return the value as string"
         return str(value)
-
-
-class NoValueSet(object):
-    pass
 
 
 class Validator(BaseValidator):
@@ -144,69 +123,4 @@ class Validator(BaseValidator):
         converted_value = self.convert(value, state)
         self.validate(converted_value, state)
         return converted_value
-
-
-from unittest import TestCase
-
-class DummyValidator(Validator):
-    _empty_value = 'empty'
-    
-    def __init__(self, default=42, *args, **kwargs):
-        super(DummyValidator, self).__init__(default=default, *args, **kwargs)
-
-    def is_empty(self, value, state):
-        return value == self._empty_value
-
-
-class ValidatorTest(TestCase):
-    class AttributeHolder(object): pass
-    
-    def setUp(self):
-        self._validator = self.validator()
-    
-    def validator(self, *args, **kwargs):
-        return DummyValidator(*args, **kwargs)
-    
-    def not_implemented(self, *args, **kwargs):
-        raise NotImplementedError()
-    
-    def test_have_special_value_for_no_value_set(self):
-        self.assertEqual(NoValueSet, NoValueSet)
-        self.assertNotEqual(True, NoValueSet)
-   
-    def test_can_detect_empty_values_and_return_special_value_before_validation(self):
-        self._validator.convert = self.not_implemented
-        self.assertEqual(42, self.validator(required=False).process('empty'))
-        self.assertNotEqual(self.not_implemented, self.validator().convert)
-    
-    def test_validator_provides_empty_dict_if_no_state_was_given(self):
-        dummy = self.AttributeHolder()
-        dummy.given_state = None
-        
-        def store_empty(state):
-            dummy.given_state = state
-            return 21
-        validator = self.validator(required=False)
-        validator.empty_value = store_empty
-        self.assertEqual(21, validator.process('empty'))
-        self.assertEqual({}, dummy.given_state)
-        self.assertNotEqual(store_empty, self.validator().empty_value)
-    
-    def test_can_set_default_value_for_empty_values(self):
-        self.assertEqual(23, Validator(default=23, required=False).process(None))
-    
-    def test_raise_exception_if_required_value_is_missing(self):
-        self.assertEqual(42,  Validator(required=True).process(42))
-        self.assertEqual(None,  Validator(required=False).process(None))
-        self.assertRaises(EmptyError, Validator(required=True).process, None)
-        self.assertRaises(EmptyError, Validator().process, None)
-    
-    def test_raise_exception_if_value_is_required_but_default_is_set_to_prevent_errors(self):
-        self.assertRaises(InvalidArgumentsError, Validator, required=True, default=12)
-        
-
-# Handle i18n:
-#   - Basic infrastructure
-#   - How to add new messages for your own validators?
-
 
