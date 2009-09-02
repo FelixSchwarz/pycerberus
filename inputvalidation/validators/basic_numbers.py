@@ -7,13 +7,20 @@ __all__ = ['IntegerValidator']
 
 
 class IntegerValidator(Validator):
+    
+    
+    
+    messages = {
+                'invalid_type': _('Validator got unexpected input (expected string, got %s).'),
+                'invalid_number': _('Please enter a number.'),
+               }
+
     def convert(self, value, state=None):
         if not isinstance(value, (int, basestring)):
-            msg = 'Validator got unexpected input (expected string, got %s).' % value.__class__.__name__
-            raise InvalidDataError(msg, value, key='invalid_type', state=state)
+            self.error('invalid_type', value, state)
         try:
             return int(value)
         except ValueError:
-            raise InvalidDataError('Please enter a number.', value, key='invalid_number', state=state)
+            self.error('invalid_number', value, state)
 
 

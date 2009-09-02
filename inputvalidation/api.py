@@ -24,6 +24,12 @@ class BaseValidator(object):
     users probably want to use the Validator class which already implements some
     commonly used features."""
     
+    messages = {}
+    
+    def error(self, key, value, state):
+        msg = self.messages[key]
+        raise InvalidDataError(msg, value, key, state)
+    
     def process(self, value, state=None):
         return value
     
@@ -103,6 +109,15 @@ class Validator(BaseValidator):
         This method must not modify the converted_value."""
         pass
     
+    def translate_message(text, state):
+        return text
+    
+    def message(self, key, state):
+        return translate_message('Value must not be empty.', state)
+    
+    def error(self, key, value, state):
+        raise EmptyError(self.message(key, state), value, key=key, state=state)
+    
     def process(self, value, state=None):
         """Apply the validator on value and return the validated value. Raise 
         an InvalidDataError if the input is malformed.
@@ -118,9 +133,23 @@ class Validator(BaseValidator):
         value = super(Validator, self).process(value, state)
         if self.is_empty(value, state) == True:
             if self.is_required() == True:
-                raise EmptyError('Value must not be empty.', value, key='empty', state=state)
+                self.error('empty', value, state)
             return self.empty_value(state)
         converted_value = self.convert(value, state)
         self.validate(converted_value, state)
         return converted_value
+
+
+class Schema(Validator):
+    remove_extra_values = True
+    
+    def validator_for_field(self):
+        pass
+    
+    def fieldnames(self):
+        pass
+    
+    def add_validator(self, fieldname, validator):
+        pass
+
 
