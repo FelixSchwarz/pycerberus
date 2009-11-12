@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import gettext
+import os
 import sys
 import threading
 
@@ -16,15 +17,22 @@ class NullTranslation(object):
 
 
 class TranslationProxy(object):
-    def __init__(self):
+    def __init__(self, localedir=None):
         self._current = threading.local()
+        self.localedir = localedir or self.default_localedir()
+    
+    def default_localedir(self):
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(this_dir, 'locales')
     
     def get_locale_from_state(self):
         frame = sys._getframe(2)
         locals_ = frame.f_locals
         if 'state' in locals_:
-            locale_name = locals_['state']
-            return locale_name
+            state = locals_['state']
+            if state is not None and 'locale' in state:
+                return state['locale']
+            return 'en'
         return None
     
     def activate(self, locale):
@@ -32,7 +40,7 @@ class TranslationProxy(object):
             self._current.translation = NullTranslation()
             self._current.active_locale = None
         elif getattr(self._current, 'active_locale', None) != locale:
-            self._current.translation = gettext.translation("messages", localedir, languages=[locale])
+            self._current.translation = gettext.translation("messages", self.localedir, languages=[locale])
             self._current.active_locale = locale
     
     def __getattr__(self, name):
@@ -43,7 +51,7 @@ class TranslationProxy(object):
         return getattr(self._current.translation, name)
 
 proxy = TranslationProxy()
-def _():
-    return proxy._
+def _(message):
+    return proxy.gettext(message)
 
 

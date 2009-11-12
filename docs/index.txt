@@ -1,12 +1,20 @@
-.. pyinputvalidation documentation master file, created by
-   sphinx-quickstart on Wed Sep  2 22:52:29 2009.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
 pyinputvalidation
 =================
 
-(one minute introduction)
+pyinputvalidation is a framework to check user data thoroughly so that you're 
+application is protected from malicious inputs. Also the input is (usually) 
+converted from strings to real python data types (e.g. the IntegerValidator 
+converts '1' to 1) which can save you some conversion code.
+
+Besides these fairly basic features, you might want to give pyinputvalidation a 
+try because....
+ * documentation is a top priority.
+ * writing custom validators is straigtforward and works without Python magic.
+ * the library is independent from its context - you can use it for web 
+   applications as well as for any other software that needs to check their 
+   input data.
+
 
 Contents:
 
@@ -15,6 +23,12 @@ Contents:
 
 About
 =====
+
+In every software you must protect yourself from user input data which was not 
+checked carefully. However many checks are repetitive and validation logic tend
+tend to be scattered all around the code. Eventually there is often also some 
+code to convert the input data (usually strings) to more convenient Python data
+types like int or bool.
 
 
 Using, Options, Exceptions
@@ -28,6 +42,12 @@ Writing your own validators
 
 BaseValidator
 --------------------
+
+.. autoclass:: pyinputvalidation.api.BaseValidator
+
+   211    :members:
+
+
 Validator
 --------------------
 convert/validate

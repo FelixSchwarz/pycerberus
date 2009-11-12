@@ -72,6 +72,8 @@ class Validator(BaseValidator):
         self._required = required
         self._check_argument_consistency()
     
+    __messages__ = {'empty': 'Value must not be empty.'}
+    
     def _check_argument_consistency(self):
         if self.is_required(set_explicitely=True) and self._has_default_value_set():
             msg = 'Set default value (%s) has no effect because a value is required.' % repr(self._default)
@@ -109,14 +111,24 @@ class Validator(BaseValidator):
         This method must not modify the converted_value."""
         pass
     
-    def translate_message(text, state):
-        return text
+    def translate_message(self, text, state):
+        from inputvalidation.i18n import proxy
+        return proxy.gettext(text)
     
     def message(self, key, state):
-        return translate_message('Value must not be empty.', state)
+        if getattr(self, 'messages') and key in self.messages:
+            print self.messages
+            english_message = self.messages[key]
+        else:
+            english_message = self.__messages__[key]
+        return self.translate_message(english_message, state)
     
-    def error(self, key, value, state):
-        raise EmptyError(self.message(key, state), value, key=key, state=state)
+    def locale(self, state):
+        """Extract the locale for the given state."""
+        return state.get('locale', 'en')
+    
+    def error(self, key, value, state, errorclass=InvalidDataError):
+        raise errorclass(self.message(key, state), value, key=key, state=state)
     
     def process(self, value, state=None):
         """Apply the validator on value and return the validated value. Raise 
@@ -133,7 +145,7 @@ class Validator(BaseValidator):
         value = super(Validator, self).process(value, state)
         if self.is_empty(value, state) == True:
             if self.is_required() == True:
-                self.error('empty', value, state)
+                self.error('empty', value, state, errorclass=EmptyError)
             return self.empty_value(state)
         converted_value = self.convert(value, state)
         self.validate(converted_value, state)

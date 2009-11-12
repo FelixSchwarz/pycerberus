@@ -21,7 +21,7 @@ class InvalidDataError(ValidationError):
     
     def __repr__(self):
         cls_name = self.__class__.__name__
-        values = (cls_name, repr(msg), repr(value), repr(self.key), repr(self.state))
+        values = (cls_name, repr(self.msg), repr(self.value), repr(self.key), repr(self.state))
         return '%s(%s, %s, key=%s, state=%s)' % values
 
 
