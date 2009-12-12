@@ -61,5 +61,5 @@ class ValidatorTest(TestCase):
     
     def test_raise_exception_if_value_is_required_but_default_is_set_to_prevent_errors(self):
         self.assertRaises(InvalidArgumentsError, Validator, required=True, default=12)
-        
+
 

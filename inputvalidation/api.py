@@ -10,8 +10,10 @@
 #  - Validator objects are stateless
 #  - you can programmatically see from the exception which error was thrown. 
 
+import inspect
 
 from inputvalidation.errors import *
+from inputvalidation.i18n import _
 
 __all__ = ['BaseValidator', 'Validator']
 
@@ -19,15 +21,43 @@ class NoValueSet(object):
     pass
 
 
+class EarlyBindForMethods(type):
+    def __new__(cls, classname, direct_superclasses, class_attributes_dict):
+        validator_class = type.__new__(cls, classname, direct_superclasses, class_attributes_dict)
+        cls._simulate_early_binding_for_message_methods(validator_class)
+        return validator_class
+    
+    @classmethod
+    def _simulate_early_binding_for_message_methods(cls, validator_class):
+        # We need to simulate 'early binding' so that we can reference the 
+        # messages() method which is defined in the class to be created!
+        def keys(self):
+            return validator_class.messages(self)
+        def message_for_key(self, key, state):
+            return validator_class.messages(self)[key]
+        validator_class.keys = keys
+        validator_class.message_for_key = message_for_key
+
+
 class BaseValidator(object):
     """The BaseValidator implements only the minimally required methods. Most
     users probably want to use the Validator class which already implements some
     commonly used features."""
     
-    messages = {}
+    __metaclass__ = EarlyBindForMethods
+    
+    # TODO: final name
+    def messages(self):
+        return {}
+    
+    def message_for_key(self, key, state):
+        raise NotImplementedError('message_for_key() should have been replaced by a metaclass')
+    
+    def keys(self):
+        raise NotImplementedError('keys() should have been replaced by a metaclass')
     
     def error(self, key, value, state):
-        msg = self.messages[key]
+        msg = self.messages()[key]
         raise InvalidDataError(msg, value, key, state)
     
     def process(self, value, state=None):
@@ -71,8 +101,35 @@ class Validator(BaseValidator):
         self._default = default
         self._required = required
         self._check_argument_consistency()
+        self._implementations, self._implementation_by_class = self._freeze_implementations_for_class()
     
-    __messages__ = {'empty': 'Value must not be empty.'}
+    def _freeze_implementations_for_class(self):
+        class_for_key = {}
+        implementations_for_class = {}
+        known_functions = set()
+        for cls in reversed(inspect.getmro(self.__class__)):
+            if self._class_defines_custom_keys(cls, known_functions):
+                known_functions.add(cls.keys)
+                for key in cls.keys(self):
+                    class_for_key[key] = self._find_implementations_for_class(cls)
+                    implementations_for_class[cls] = class_for_key[key]
+        return class_for_key, implementations_for_class
+    
+    def _find_implementations_for_class(self, cls):
+        implementations_by_key = dict()
+        for name in ['gettextargs', 'keys', 'message_for_key', 'translate_message']:
+            implementations_by_key[name] = getattr(cls, name)
+        return implementations_by_key
+    
+    def _class_defines_custom_keys(self, cls, known_functions):
+        # TODO: How to find out which keys are really new if you don't have to
+        # define a custom method (pull from messages)?
+        # TODO: Check messages attribute as well
+        return hasattr(cls, 'keys') and cls.keys not in known_functions
+    
+    # TODO: final name
+    def messages(self):
+        return {'empty': _('Value must not be empty.')}
     
     def _check_argument_consistency(self):
         if self.is_required(set_explicitely=True) and self._has_default_value_set():
@@ -111,24 +168,9 @@ class Validator(BaseValidator):
         This method must not modify the converted_value."""
         pass
     
-    def translate_message(self, text, state):
-        from inputvalidation.i18n import proxy
-        return proxy.gettext(text)
-    
-    def message(self, key, state):
-        if getattr(self, 'messages') and key in self.messages:
-            print self.messages
-            english_message = self.messages[key]
-        else:
-            english_message = self.__messages__[key]
-        return self.translate_message(english_message, state)
-    
-    def locale(self, state):
-        """Extract the locale for the given state."""
-        return state.get('locale', 'en')
-    
-    def error(self, key, value, state, errorclass=InvalidDataError):
-        raise errorclass(self.message(key, state), value, key=key, state=state)
+    def error(self, key, value, state, errorclass=InvalidDataError, **values):
+        translated_message = self.message(key, state, **values)
+        raise errorclass(translated_message, value, key=key, state=state)
     
     def process(self, value, state=None):
         """Apply the validator on value and return the validated value. Raise 
@@ -150,6 +192,62 @@ class Validator(BaseValidator):
         converted_value = self.convert(value, state)
         self.validate(converted_value, state)
         return converted_value
+    
+    # - i18n --------------------------------------------------------------
+    
+    # TODO: Use a more technology-agnostic name
+    def gettextargs(self, state):
+        return {'domain': 'pyinputvalidator'}
+    
+    def translate_message(self, native_message, gettextargs, key, state):
+        # This method can be overriden on a by-class basis to get translations 
+        # to support non-gettext translation mechanisms (e.g. from a db)
+        from inputvalidation.i18n import proxy
+        return proxy.gettext(native_message)
+#        return native_message
+    
+    # TODO: This method also needs the value to interpolate it into the final
+    # message somehow...
+    def message(self, key, state, **values):
+        # This method can be overriden globally to use a different message 
+        # lookup / translation mechanism alltogether
+        # TODO: Test
+        # improve syntax later
+        native_message = self._implementation_for_key(key, 'message_for_key')(key, state)
+        gettextargs = self.args_for_gettext(key, state)
+        translation_function = self._implementation_for_key(key, 'translate_message')
+        # every function should get key as first parameter so I can unify some 
+        # things.
+        translated_template_message = translation_function(native_message, gettextargs, key, state)
+        return translated_template_message % values
+#        # if key was defined by me, use translate_message which can be overwritten
+#        # otherwise, use default translation
+#        if getattr(self, 'messages') and key in self.messages:
+#            english_message = self.messages[key]
+#        else:
+#            english_message = self.messages()__messages__[key]
+#        return self.translate_message_with_default_settings(english_message, state)
+        
+    # TODO: add *args, **kwargs
+    # TODO: always add state as last parameter
+    def _implementation_for_key(self, key, methodname):
+        method = self._implementations[key][methodname]
+        return lambda *args, **kwargs: method(self, *args, **kwargs)
+    
+    def _implementation_for_class(self, cls, methodname):
+        method = self._implementations_by_cls[cls][methodname]
+        return lambda *args, **kwargs: method(self, *args, **kwargs)
+    
+    
+    # TODO: get rid of that special method
+    def args_for_gettext(self, key, state):
+        return self._implementation_for_key(key, 'gettextargs')(state)
+    
+    def locale(self, state):
+        """Extract the locale for the given state."""
+        return state.get('locale', 'en')
+    
+    # -------------------------------------------------------------------------
 
 
 class Schema(Validator):

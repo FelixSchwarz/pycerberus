@@ -51,7 +51,8 @@ class TranslationProxy(object):
         return getattr(self._current.translation, name)
 
 proxy = TranslationProxy()
-def _(message):
+# If we name that method '_' pygettext will choke on that...
+def some_name_which_is_not_reserved_by_gettext(message):
     return proxy.gettext(message)
-
+_ = some_name_which_is_not_reserved_by_gettext
 

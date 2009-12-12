@@ -5,25 +5,25 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2009-11-12 21:19+CET\n"
+"POT-Creation-Date: 2009-12-02 13:21+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: ./inputvalidation/validators/basic_numbers.py:13
-msgid "Validator got unexpected input (expected string, got %s)."
+#: ./inputvalidation/api.py:139
+msgid "Value must not be empty."
 msgstr ""
 
 #: ./inputvalidation/validators/basic_numbers.py:14
-msgid "Please enter a number."
+msgid "Validator got unexpected input (expected string, got %s)."
 msgstr ""
 
-#: ./tests/i18n_test.py:45
-msgid "Please enter a number bigger or equal to zero."
+#: ./inputvalidation/validators/basic_numbers.py:15
+msgid "Please enter a number."
 msgstr ""
 

@@ -1,15 +1,21 @@
 # -*- coding: UTF-8 -*-
 
 from inputvalidation.api import Validator
-from inputvalidation.errors import InvalidDataError
+from inputvalidation.i18n import _
+
 
 __all__ = ['StringValidator']
 
 
 class StringValidator(Validator):
+    
+    def messages(self):
+        return {
+                'invalid_type': _('Validator got unexpected input (expected string, got %s).'),
+               }
+    
     def validate(self, value, state=None):
         if not isinstance(value, basestring):
-            msg = 'Validator got unexpected input (expected string, got %s).' % value.__class__.__name__
-            raise InvalidDataError(msg, value, key='invalid_type', state=state)
+            self.error('invalid_type', value, state)
 
 

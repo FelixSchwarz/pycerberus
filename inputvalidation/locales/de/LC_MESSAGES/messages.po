@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2009-11-12 21:19+CET\n"
+"POT-Creation-Date: 2009-12-02 13:21+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,16 +14,17 @@ msgstr ""
 "Content-Transfer-Encoding: ENCODING\n"
 "Generated-By: pygettext.py 1.5\n"
 
+#: inputvalidation/api.py:139
+msgid "Value must not be empty."
+msgstr "Bitte geben Sie einen Wert ein."
 
-#: ./inputvalidation/validators/basic_numbers.py:13
+#: inputvalidation/validators/basic_numbers.py:14
 msgid "Validator got unexpected input (expected string, got %s)."
 msgstr "Unerwartete Eingabe für Validator (String erwartet, %s erhalten)."
 
-#: ./inputvalidation/validators/basic_numbers.py:14
+#: inputvalidation/validators/basic_numbers.py:15
 msgid "Please enter a number."
 msgstr "Bitte geben Sie eine Zahl ein."
 
-#: ./tests/i18n_test.py:45
-msgid "Please enter a number bigger or equal to zero."
-msgstr "Bitte geben Sie eine Zahl größer oder gleich Null ein."
-
+#~ msgid "Please enter a number bigger or equal to zero."
+#~ msgstr "Bitte geben Sie eine Zahl größer oder gleich Null ein."
