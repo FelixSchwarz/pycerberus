@@ -2,18 +2,20 @@
 pyinputvalidation
 =================
 
-pyinputvalidation is a framework to check user data thoroughly so that you're 
+pyinputvalidation is a framework to check user data thoroughly so that your 
 application is protected from malicious inputs. Also the input is (usually) 
 converted from strings to real python data types (e.g. the IntegerValidator 
 converts '1' to 1) which can save you some conversion code.
 
 Besides these fairly basic features, you might want to give pyinputvalidation a 
-try because....
+try because...
  * documentation is a top priority.
  * writing custom validators is straigtforward and works without Python magic.
  * the library is independent from its context - you can use it for web 
    applications as well as for any other software that needs to check their 
    input data.
+ * the framework is highly flexible - translations can be retrieved from gettext
+   or any other mechanism Python supports (e.g. a database).
 
 
 Contents:
@@ -29,6 +31,11 @@ checked carefully. However many checks are repetitive and validation logic tend
 tend to be scattered all around the code. Eventually there is often also some 
 code to convert the input data (usually strings) to more convenient Python data
 types like int or bool.
+
+pyinputvalidation is a framework that tackles these common problems and allows
+you to write tailored validators to perform additional checks. Furthermore the 
+framework also has built-in support for less common (but important) use cases
+like internationalization.
 
 
 Using, Options, Exceptions
@@ -55,12 +62,45 @@ convert/validate
 
 Internationalization
 ==============================
+
+Modern applications must be able to handle different languages. 
+Internationalization (i18n) in pyinputvalidation refers to validating 
+locale-dependent input data (e.g. different decimal separator characters) as 
+well as validation errors in different languages. The former aspect is not yet
+covered by default but you should be able to write custom validators easily. 
+
+All messages from validators included in pyinputvalidation are translated in 
+different languages using the standard gettext library. The language of 
+validation error messages will be chosen depending on the locale which is given 
+in the state dictionary,
+
+i18n support in pyinputvalidation is a bit broader than just translating 
+existing error messages:
+ * Using slightly different options for the built-in gettext lookup (e.g. a 
+   different domain or a different locale dir) is just a matter of overwriting
+   one method.
+ * With overwriting another method you can retrieve translations from other 
+   sources than a gettext catalog (e.g. a database or an XML file).
+ * If you extend an existing validator class, you can still reuse all existing
+   translations for the super class without any effort and any influence how you
+   want to handle translations in your subclass.
+ * Changing all (or just some) messages from a super class is done by 
+   redefining the IDs ('key') in your subclass.
+
+All i18n support in pyinputvalidator aims to provide custom validators with a
+nice, simple-to-use API while maintaining the flexibility that serious 
+applications need.
+
+
 Domains, Translations
 ---------------------
+
 Locale dirs
 --------------------
+
 Custom Messages
 --------------------
+
 
 Getting Help
 ==============================
