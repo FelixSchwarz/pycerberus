@@ -11,20 +11,23 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: ENCODING\n"
+"Content-Transfer-Encoding: UTF-\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: inputvalidation/api.py:139
+
+#: ./inputvalidation/api.py:137
 msgid "Value must not be empty."
 msgstr "Bitte geben Sie einen Wert ein."
 
-#: inputvalidation/validators/basic_numbers.py:14
-msgid "Validator got unexpected input (expected string, got %s)."
-msgstr "Unerwartete Eingabe für Validator (String erwartet, %s erhalten)."
+#: ./inputvalidation/validators/basic_numbers.py:13
+msgid "Validator got unexpected input (expected string, got %(typename)s)."
+msgstr "Unerwartete Eingabe für Validator (String erwartet, %(typename)s erhalten)."
 
-#: inputvalidation/validators/basic_numbers.py:15
+#: ./inputvalidation/validators/basic_numbers.py:14
 msgid "Please enter a number."
 msgstr "Bitte geben Sie eine Zahl ein."
 
-#~ msgid "Please enter a number bigger or equal to zero."
-#~ msgstr "Bitte geben Sie eine Zahl größer oder gleich Null ein."
+#: ./inputvalidation/validators/string.py:14
+msgid "Validator got unexpected input (expected string, got %s)."
+msgstr "Unerwartete Eingabe für Validator (String erwartet, %s erhalten)."
+

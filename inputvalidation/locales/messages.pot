@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2009-12-02 13:21+CET\n"
+"POT-Creation-Date: 2009-12-15 00:28+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,15 +15,19 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: ./inputvalidation/api.py:139
+#: ./inputvalidation/api.py:137
 msgid "Value must not be empty."
 msgstr ""
 
-#: ./inputvalidation/validators/basic_numbers.py:14
-msgid "Validator got unexpected input (expected string, got %s)."
+#: ./inputvalidation/validators/basic_numbers.py:13
+msgid "Validator got unexpected input (expected string, got %%(typename)s)."
 msgstr ""
 
-#: ./inputvalidation/validators/basic_numbers.py:15
+#: ./inputvalidation/validators/basic_numbers.py:14
 msgid "Please enter a number."
+msgstr ""
+
+#: ./inputvalidation/validators/string.py:14
+msgid "Validator got unexpected input (expected string, got %s)."
 msgstr ""
 

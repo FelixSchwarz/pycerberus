@@ -23,15 +23,24 @@ class VariablePartsInErrorMessages(TestCase):
         except exception, e:
             return e
     
+    def get_error(self, value, locale='en', *args, **kwargs):
+        state = {'locale': locale}
+        try:
+            self.validator.process(value, state=state, *args, **kwargs)
+            self.fail('Expected error!')
+        except InvalidDataError, e:
+            return e
+    
     def message_for_inputvalue(self, value, locale='en'):
-        error = self.assert_raises(InvalidDataError, self.validator.process, value, {'locale': locale})
-        return error.msg
+        return self.get_error(value, locale=locale).msg
     
     def test_error_messages_can_contain_variable_parts(self):
-        self.assertTrue('got list)' in self.message_for_inputvalue([]))
+        self.assertTrue('got list)' in self.get_error([]).msg)
     
-    def _test_variable_parts_are_added_after_translation(self):
-        pass
+    def test_variable_parts_are_added_after_translation(self):
+        expected_message = 'String erwartet, list erhalten)'
+        translated_message = self.get_error([], locale='de').msg
+        self.assertTrue(expected_message in translated_message, translated_message)
     
     # TODO: Test ngettext?
     
