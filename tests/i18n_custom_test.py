@@ -42,10 +42,10 @@ class ValidatorWithNonGettextTranslation(FrameworkValidator):
         return {'inactive': 'Untranslated message'}
 
 
-class MyApplicationValidator(FrameworkValidator):
-    # a class that does not declare any method - test that no method must be
-    # implemented.
-    pass
+#class MyApplicationValidator(FrameworkValidator):
+#    # a class that does not declare any method - test that no method must be
+#    # implemented.
+#    pass
 
 
 class CustomizedI18NBehaviorTest(TestCase):

@@ -38,9 +38,9 @@ class VariablePartsInErrorMessages(TestCase):
         self.assertTrue('got list)' in self.get_error([]).msg)
     
     def test_variable_parts_are_added_after_translation(self):
-        expected_message = 'String erwartet, list erhalten)'
+        expected_part = 'String erwartet, list erhalten)'
         translated_message = self.get_error([], locale='de').msg
-        self.assertTrue(expected_message in translated_message, translated_message)
+        self.assertTrue(expected_part in translated_message, translated_message)
     
     # TODO: Test ngettext?
     
