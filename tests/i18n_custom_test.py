@@ -10,6 +10,7 @@ class FrameworkValidator(IntegerValidator):
     def gettextargs(self, state):
         return {'domain': 'framework'}
 
+
 class ValidatorWithAdditionalKeys(FrameworkValidator):
     
     def messages(self):
@@ -22,6 +23,11 @@ class ValidatorWithAdditionalKeys(FrameworkValidator):
         assert key == 'foo'
         return 'A message from an application validator.'
 
+
+class SimpleDerivedValidator(ValidatorWithAdditionalKeys):
+    pass
+
+
 class ValidatorRedefiningKeys(FrameworkValidator):
     
     def messages(self):
@@ -29,6 +35,7 @@ class ValidatorRedefiningKeys(FrameworkValidator):
     
     def gettextargs(self, state):
         return {'domain': 'application'}
+
 
 class ValidatorWithNonGettextTranslation(FrameworkValidator):
     
@@ -41,11 +48,6 @@ class ValidatorWithNonGettextTranslation(FrameworkValidator):
     def messages(self):
         return {'inactive': 'Untranslated message'}
 
-
-#class MyApplicationValidator(FrameworkValidator):
-#    # a class that does not declare any method - test that no method must be
-#    # implemented.
-#    pass
 
 
 class CustomizedI18NBehaviorTest(TestCase):
@@ -78,6 +80,16 @@ class CustomizedI18NBehaviorTest(TestCase):
         self.assertEqual('pyinputvalidator', self.domain_for_key('empty'))
         self.assertEqual('fnord', self.domain_for_key('foo'))
     
+    def test_parameters_for_translation_are_inherited_from_super_class(self):
+        self.assertEqual('fnord', self.domain_for_key('foo'))
+        self.init(SimpleDerivedValidator())
+        self.assertEqual('fnord', self.domain_for_key('foo'))
+    
+    def test_use_parameters_for_translation_from_class_where_key_is_defined(self):
+        self.init(SimpleDerivedValidator())
+        self.assertEqual('framework', self.domain_for_key('invalid_type'))
+        self.assertEqual('fnord', self.domain_for_key('foo'))
+    
     def test_validators_can_use_their_own_translations_for_existing_keys(self):
         self.assertEqual('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
         self.init(ValidatorRedefiningKeys())
@@ -88,7 +100,4 @@ class CustomizedI18NBehaviorTest(TestCase):
         self.assertEqual('db translation', self.message_for_key('inactive', locale='en'))
         self.assertEqual(u'db Übersetzung', self.message_for_key('inactive', locale='de'))
 
-
-# TODO: Test you can use your own keys
-# TODO: Test you can have your own message_for_key (e.g. depending on state)
 
