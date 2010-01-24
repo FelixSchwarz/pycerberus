@@ -8,14 +8,15 @@ converted from strings to real python data types (e.g. the IntegerValidator
 converts '1' to 1) which can save you some conversion code.
 
 Besides these fairly basic features, you might want to give pyinputvalidation a 
-try because...
- * documentation is a top priority.
- * writing custom validators is straigtforward and works without Python magic.
- * the library is independent from its context - you can use it for web 
-   applications as well as for any other software that needs to check their 
-   input data.
- * the framework is highly flexible - translations can be retrieved from gettext
-   or any other mechanism Python supports (e.g. a database).
+try because:
+
+* documentation is a top priority.
+* writing custom validators is straigtforward and works without Python magic.
+* the library is independent from its context - you can use it for web 
+  applications as well as for any other software that needs to check their 
+  input data.
+* the framework is highly flexible - translations can be retrieved from gettext
+  or any other mechanism Python supports (e.g. a database).
 
 
 Contents:
@@ -50,7 +51,7 @@ Writing your own validators
 BaseValidator
 --------------------
 
-.. autoclass:: pyinputvalidation.api.BaseValidator
+.. autoclass:: inputvalidation.api.BaseValidator
 
    211    :members:
 
@@ -59,6 +60,15 @@ Validator
 --------------------
 convert/validate
 --------------------
+
+Miscellaenous
+--------------------
+
+pyinputvalidation uses `simple_super <http://www.häcker.net/trac/browser/open-source/python-simple-super/trunk/simple_super.py>`_
+so you can just say 'self.super()' in your custom validator classes. This will
+call the super implementation with just the same paramters as your method was
+called.
+
 
 Internationalization
 ==============================
@@ -76,16 +86,17 @@ in the state dictionary,
 
 i18n support in pyinputvalidation is a bit broader than just translating 
 existing error messages:
- * Using slightly different options for the built-in gettext lookup (e.g. a 
-   different domain or a different locale dir) is just a matter of overwriting
-   one method.
- * With overwriting another method you can retrieve translations from other 
-   sources than a gettext catalog (e.g. a database or an XML file).
- * If you extend an existing validator class, you can still reuse all existing
-   translations for the super class without any effort and any influence how you
-   want to handle translations in your subclass.
- * Changing all (or just some) messages from a super class is done by 
-   redefining the IDs ('key') in your subclass.
+
+* Using slightly different options for the built-in gettext lookup (e.g. a 
+  different domain or a different locale dir) is just a matter of overwriting
+  one method.
+* With overwriting another method you can retrieve translations from other 
+  sources than a gettext catalog (e.g. a database or an XML file).
+* If you extend an existing validator class, you can still reuse all existing
+  translations for the super class without any effort and any influence how you
+  want to handle translations in your subclass.
+* Changing all (or just some) messages from a super class is done by 
+  redefining the IDs ('key') in your subclass.
 
 All i18n support in pyinputvalidator aims to provide custom validators with a
 nice, simple-to-use API while maintaining the flexibility that serious 

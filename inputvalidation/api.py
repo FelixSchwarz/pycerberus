@@ -14,6 +14,7 @@ import inspect
 
 from inputvalidation.errors import *
 from inputvalidation.i18n import _
+from inputvalidation.simple_super import SuperProxy
 
 __all__ = ['BaseValidator', 'Validator']
 
@@ -49,6 +50,7 @@ class BaseValidator(object):
     commonly used features."""
     
     __metaclass__ = EarlyBindForMethods
+    super = SuperProxy()
     
     # TODO: final name
     def messages(self):
@@ -103,7 +105,7 @@ class Validator(BaseValidator):
         All exceptions thrown by validators must be derived from ValidationError.
         Exceptions caused by invalid user input should use InvalidDataError or
         one of the subclasses."""
-        super(Validator, self).__init__(*args, **kwargs)
+        self.super()
         self._default = default
         self._required = required
         self._check_argument_consistency()
