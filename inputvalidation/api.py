@@ -14,7 +14,7 @@ import inspect
 
 from inputvalidation.errors import *
 from inputvalidation.i18n import _
-from inputvalidation.simple_super import SuperProxy
+from inputvalidation.lib import SuperProxy
 
 __all__ = ['BaseValidator', 'Validator']
 

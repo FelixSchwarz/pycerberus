@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation.simple_super import SuperProxy
+from inputvalidation.lib import SuperProxy
 
 __all__ = ['EmptyError', 'InvalidArgumentsError', 'InvalidDataError', 
            'ValidationError']

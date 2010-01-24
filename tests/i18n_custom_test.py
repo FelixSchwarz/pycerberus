@@ -1,8 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from unittest import TestCase
-
 from inputvalidation import InvalidDataError
+from inputvalidation.lib import PythonicTestCase
 from inputvalidation.validators import IntegerValidator
 
 
@@ -50,20 +49,14 @@ class ValidatorWithNonGettextTranslation(FrameworkValidator):
 
 
 
-class CustomizedI18NBehaviorTest(TestCase):
+class CustomizedI18NBehaviorTest(PythonicTestCase):
     
     def setUp(self):
+        self.super()
         self.init(ValidatorWithAdditionalKeys())
     
     def init(self, validator):
         self.validator = validator
-    
-    def assert_raises(self, exception, method, *args, **kwargs):
-        try:
-            method(*args, **kwargs)
-            self.fail()
-        except exception, e:
-            return e
     
     def domain_for_key(self, key):
         return self.validator.args_for_gettext(key, {})['domain']
@@ -73,31 +66,31 @@ class CustomizedI18NBehaviorTest(TestCase):
         return error.msg
     
     def test_validator_can_define_more_translations_while_keeping_existing_ones(self):
-        self.assertEqual('A message from an application validator.', self.message_for_key('foo'))
-        self.assertEqual('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
+        self.assert_equals('A message from an application validator.', self.message_for_key('foo'))
+        self.assert_equals('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
     
     def test_validator_can_define_custom_parameters_for_translation_mechanism(self):
-        self.assertEqual('pyinputvalidator', self.domain_for_key('empty'))
-        self.assertEqual('fnord', self.domain_for_key('foo'))
+        self.assert_equals('pyinputvalidator', self.domain_for_key('empty'))
+        self.assert_equals('fnord', self.domain_for_key('foo'))
     
     def test_parameters_for_translation_are_inherited_from_super_class(self):
-        self.assertEqual('fnord', self.domain_for_key('foo'))
+        self.assert_equals('fnord', self.domain_for_key('foo'))
         self.init(SimpleDerivedValidator())
-        self.assertEqual('fnord', self.domain_for_key('foo'))
+        self.assert_equals('fnord', self.domain_for_key('foo'))
     
     def test_use_parameters_for_translation_from_class_where_key_is_defined(self):
         self.init(SimpleDerivedValidator())
-        self.assertEqual('framework', self.domain_for_key('invalid_type'))
-        self.assertEqual('fnord', self.domain_for_key('foo'))
+        self.assert_equals('framework', self.domain_for_key('invalid_type'))
+        self.assert_equals('fnord', self.domain_for_key('foo'))
     
     def test_validators_can_use_their_own_translations_for_existing_keys(self):
-        self.assertEqual('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
+        self.assert_equals('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
         self.init(ValidatorRedefiningKeys())
-        self.assertEqual('fnord', self.message_for_key('empty'))
+        self.assert_equals('fnord', self.message_for_key('empty'))
     
     def test_validators_can_use_other_translation_systems_than_gettext(self):
         self.init(ValidatorWithNonGettextTranslation())
-        self.assertEqual('db translation', self.message_for_key('inactive', locale='en'))
-        self.assertEqual(u'db Übersetzung', self.message_for_key('inactive', locale='de'))
+        self.assert_equals('db translation', self.message_for_key('inactive', locale='en'))
+        self.assert_equals(u'db Übersetzung', self.message_for_key('inactive', locale='de'))
 
 
