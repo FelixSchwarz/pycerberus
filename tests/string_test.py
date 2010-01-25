@@ -1,26 +1,23 @@
 # -*- coding: UTF-8 -*-
 
 from inputvalidation import InvalidDataError
-from inputvalidation.lib import PythonicTestCase
+from inputvalidation.test_util import ValidationTest
 from inputvalidation.validators import StringValidator
 
 
-class StringValidatorTest(PythonicTestCase):
-    def setUp(self):
-        self.super()
-        self.validator = StringValidator()
+
+class StringValidatorTest(ValidationTest):
     
-    def validate(self, *args, **kwargs):
-        return self.validator.process(*args, **kwargs)
+    validator_class = StringValidator
     
     def test_accept_string_and_unicode(self):
-        self.assert_equals('foo', self.validate('foo'))
-        self.assert_equals(u'bär', self.validate(u'bär'))
+        self.assert_equals('foo', self.process('foo'))
+        self.assert_equals(u'bär', self.process(u'bär'))
     
     def test_validator_rejects_bad_types(self):
-        self.assert_raises(InvalidDataError, self.validate, [])
-        self.assert_raises(InvalidDataError, self.validate, {})
-        self.assert_raises(InvalidDataError, self.validate, object)
-        self.assert_raises(InvalidDataError, self.validate, 5)
+        self.assert_raises(InvalidDataError, self.process, [])
+        self.assert_raises(InvalidDataError, self.process, {})
+        self.assert_raises(InvalidDataError, self.process, object)
+        self.assert_raises(InvalidDataError, self.process, 5)
 
 

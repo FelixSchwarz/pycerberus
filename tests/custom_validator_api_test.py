@@ -1,8 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation import InvalidDataError
 from inputvalidation.api import Validator
-from inputvalidation.lib import PythonicTestCase
+from inputvalidation.test_util import ValidationTest
 
 
 class ValidatorWithCustomMessageForKey(Validator):
@@ -19,15 +18,10 @@ class ValidatorWithCustomMessageForKey(Validator):
 
 
 
-class CustomValidatorAPITest(PythonicTestCase):
-    def setUp(self):
-        self.super()
-        self.validator = ValidatorWithCustomMessageForKey()
+class CustomValidatorAPITest(ValidationTest):
     
-    def message_for_key(self, key, locale='de'):
-        error = self.assert_raises(InvalidDataError, self.validator.error, key, None, {'locale': locale})
-        return error.msg
-
+    validator_class = ValidatorWithCustomMessageForKey
+    
     def test_validators_can_custom_lookup_mechanism_for_messages(self):
         self.assert_equals('message from custom lookup', self.message_for_key('inactive', locale='en'))
 
