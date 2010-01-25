@@ -11,8 +11,10 @@ if __name__ == '__main__':
         author          = 'Felix Schwarz',
         author_email    = 'felix.schwarz@oss.schwarz.eu',
         url             = 'http://www.schwarz.eu/oss/projects/pycerberus/',
-        packages        = ['inputvalidation'],
+        packages        = ('inputvalidation',),
         license         = 'MIT',
+        
+        install_requires = ('setuptools',)
     )
 
 

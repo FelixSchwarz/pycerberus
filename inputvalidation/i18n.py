@@ -4,11 +4,12 @@ import gettext
 import os
 import sys
 
+from pkg_resources import resource_filename
+
 __all__ = ['_']
 
 
 class GettextTranslation(object):
-    # default localedir?
     
     def __init__(self, domain='messages', **kwargs):
         self._gettext_domain = domain
@@ -18,8 +19,13 @@ class GettextTranslation(object):
         return self._gettext_domain
     
     def _default_localedir(self):
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-        return os.path.join(this_dir, 'locales')
+        locale_dir_in_egg = resource_filename(__name__, "/locales")
+        if os.path.exists(locale_dir_in_egg):
+            return locale_dir_in_egg
+        locale_dir_on_filesystem = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'locales')
+        if os.path.exists(locale_dir_on_filesystem):
+            return locale_dir_on_filesystem
+        return os.path.normpath('/usr/share/locale')
     
     def _locale(self, state):
         return (state or {}).get('locale', 'en')
