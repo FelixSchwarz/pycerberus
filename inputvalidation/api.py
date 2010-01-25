@@ -1,15 +1,5 @@
 # -*- coding: UTF-8 -*-
 
-# Goals:
-#  - Independend from the context (useful for web applications as well as servers)
-#  - Simple API, no magic behind the scenes
-#  - as few dependencies as possible
-#  - 
-#  - great docs
-#  - no global state/variables
-#  - Validator objects are stateless
-#  - you can programmatically see from the exception which error was thrown. 
-
 import inspect
 
 from inputvalidation.errors import *
@@ -208,17 +198,17 @@ class Validator(BaseValidator):
         return {'domain': 'pyinputvalidator'}
     
     def translate_message(self, native_message, gettextargs, key, state):
-        # This method can be overriden on a by-class basis to get translations 
+        # This method can be overridden on a by-class basis to get translations 
         # to support non-gettext translation mechanisms (e.g. from a db)
-        from inputvalidation.i18n import proxy
-        return proxy.gettext(native_message)
-#        return native_message
+        from inputvalidation.i18n import GettextTranslation
+        # TODO: How to specify 
+        return GettextTranslation(**gettextargs).gettext(native_message)
     
     # TODO: This method also needs the value to interpolate it into the final
     # message somehow...
     def message(self, key, state, **values):
-        # This method can be overriden globally to use a different message 
-        # lookup / translation mechanism alltogether
+        # This method can be overridden globally to use a different message 
+        # lookup / translation mechanism altogether
         # TODO: Test
         # improve syntax later
         native_message = self._implementation_for_key(key, 'message_for_key')(key, state)

@@ -3,56 +3,52 @@
 import gettext
 import os
 import sys
-import threading
 
 __all__ = ['_']
 
 
-class NullTranslation(object):
-    def noop_translation(self, text):
-        return text
+class GettextTranslation(object):
+    # default localedir?
     
-    def __getattr__(self, name):
-        return self.noop_translation
-
-
-class TranslationProxy(object):
-    def __init__(self, localedir=None):
-        self._current = threading.local()
-        self.localedir = localedir or self.default_localedir()
+    def __init__(self, domain='messages', **kwargs):
+        self._gettext_domain = domain
+        self._gettext_args = kwargs
     
-    def default_localedir(self):
+    def _domain(self):
+        return self._gettext_domain
+    
+    def _default_localedir(self):
         this_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(this_dir, 'locales')
     
-    def get_locale_from_state(self):
+    def _locale(self, state):
+        return (state or {}).get('locale', 'en')
+    
+    def _args(self, state):
+        args = self._gettext_args.copy()
+        args.setdefault('localedir', self._default_localedir())
+        args['languages'] = [self._locale(state)]
+        return args
+    
+    def translation(self, state):
+        return gettext.translation(self._domain(), **self._args(state))
+    
+    def _state_from_stack(self):
         frame = sys._getframe(2)
         locals_ = frame.f_locals
-        if 'state' in locals_:
-            state = locals_['state']
-            if state is not None and 'locale' in state:
-                return state['locale']
-            return 'en'
-        return None
-    
-    def activate(self, locale):
-        if locale is None:
-            self._current.translation = NullTranslation()
-            self._current.active_locale = None
-        elif getattr(self._current, 'active_locale', None) != locale:
-            self._current.translation = gettext.translation("messages", self.localedir, languages=[locale])
-            self._current.active_locale = locale
+        if 'state' not in locals_:
+            return {}
+        return locals_['state'] or {}
     
     def __getattr__(self, name):
-        if 'gettext' not in name:
+        if name not in ('gettext', ):
             raise AttributeError(name)
-        locale_name = self.get_locale_from_state()
-        self.activate(locale_name)
-        return getattr(self._current.translation, name)
+        translation = self.translation(self._state_from_stack())
+        return getattr(translation, name)
 
-proxy = TranslationProxy()
+
 # If we name that method '_' pygettext will choke on that...
 def some_name_which_is_not_reserved_by_gettext(message):
-    return proxy.gettext(message)
+    return message
 _ = some_name_which_is_not_reserved_by_gettext
 

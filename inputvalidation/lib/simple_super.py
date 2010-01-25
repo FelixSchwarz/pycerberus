@@ -248,7 +248,10 @@ class SuperTests(unittest.TestCase):
         
         self.assertTrue(Lower().did_call_super)
     
-    def test_do_not_pass_arguments_by_default_if_lower_uses_kwargs(self):
+    def test_do_not_pass_arguments_by_default_if_lower_doesnt_have_any(self):
+        # In order to have a nice API using self.super(), we need to be smart
+        # so we can can detect the case where no arguments should be passed
+        # as opposed to the case where all original arguments should be passed.
         class Upper(Super):
             def foo(self):
                 return self.super.method()

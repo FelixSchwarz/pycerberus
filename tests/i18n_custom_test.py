@@ -32,10 +32,19 @@ class ValidatorRedefiningKeys(FrameworkValidator):
         return {'empty': 'fnord'}
     
     def gettextargs(self, state):
-        return {'domain': 'application'}
+        # We need to change back the domain as this validator is used to get
+        # a real message - if the .mo file for the gettext domain does not 
+        # exist, gettext will raise an error.
+        return {'domain': 'pyinputvalidator'}
 
 
 class ValidatorWithNonGettextTranslation(FrameworkValidator):
+    
+    def gettextargs(self, state):
+        # we change the domain here on purpose - if gettext would check for 
+        # locale files for this domain, it would raise an exception because the
+        # file is not there...
+        return {'domain': 'application'}
     
     def translate_message(self, native_message, gettextargs, key, state):
         assert key == 'inactive'
@@ -53,11 +62,12 @@ class CustomizedI18NBehaviorTest(ValidationTest):
     validator_class = ValidatorWithAdditionalKeys
     
     def domain_for_key(self, key):
-        return self.validator().args_for_gettext(key, {})['domain']
+        gettext_args = self.validator().args_for_gettext(key, {})
+        return gettext_args.get('domain')
     
     def test_validator_can_define_more_translations_while_keeping_existing_ones(self):
-        self.assert_equals('A message from an application validator.', self.message_for_key('foo'))
         self.assert_equals('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
+        self.assert_equals('A message from an application validator.', self.message_for_key('foo'))
     
     def test_validator_can_define_custom_parameters_for_translation_mechanism(self):
         self.assert_equals('pyinputvalidator', self.domain_for_key('empty'))
