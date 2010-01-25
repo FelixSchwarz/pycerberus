@@ -2,8 +2,8 @@
 
 import os
 
-from inputvalidation.test_util import PythonicTestCase
-from inputvalidation.i18n import GettextTranslation
+from pycerberus.test_util import PythonicTestCase
+from pycerberus.i18n import GettextTranslation
 
 
 class GettextTranslationInfrastructureTest(PythonicTestCase):

@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation import InvalidDataError
-from inputvalidation.test_util import ValidationTest
-from inputvalidation.validators import IntegerValidator
+from pycerberus import InvalidDataError
+from pycerberus.test_util import ValidationTest
+from pycerberus.validators import IntegerValidator
 
 
 class IntegerValidatorTest(ValidationTest):

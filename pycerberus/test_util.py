@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation import InvalidDataError
-from inputvalidation.lib import PythonicTestCase
+from pycerberus import InvalidDataError
+from pycerberus.lib import PythonicTestCase
 
 
 class ValidationTest(PythonicTestCase):

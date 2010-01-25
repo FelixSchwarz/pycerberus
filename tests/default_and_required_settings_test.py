@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation import EmptyError, InvalidArgumentsError, Validator
-from inputvalidation.api import NoValueSet
-from inputvalidation.test_util import ValidationTest
+from pycerberus import EmptyError, InvalidArgumentsError, Validator
+from pycerberus.api import NoValueSet
+from pycerberus.test_util import ValidationTest
 
 
 class DummyValidator(Validator):

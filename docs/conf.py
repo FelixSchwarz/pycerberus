@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# pyinputvalidation documentation build configuration file, created by
+# pycerberus documentation build configuration file, created by
 # sphinx-quickstart on Wed Sep  2 22:52:29 2009.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -11,7 +11,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -37,8 +36,8 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'pyinputvalidation'
-copyright = u'2009, Felix Schwarz'
+project = 'pycerberus'
+copyright = u'2009-2010, Felix Schwarz'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -164,7 +163,7 @@ html_static_path = ['_static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pyinputvalidationdoc'
+htmlhelp_basename = 'pycerberusdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -178,7 +177,7 @@ htmlhelp_basename = 'pyinputvalidationdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'pyinputvalidation.tex', u'pyinputvalidation Documentation',
+  ('index', 'pycerberus.tex', u'pycerberus Documentation',
    u'Felix Schwarz', 'manual'),
 ]
 

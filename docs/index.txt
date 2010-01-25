@@ -1,17 +1,17 @@
 
-pyinputvalidation
+pycerberus
 =================
 
-pyinputvalidation is a framework to check user data thoroughly so that your 
+pycerberus is a framework to check user data thoroughly so that your 
 application is protected from malicious inputs. Also the input is (usually) 
 converted from strings to real python data types (e.g. the IntegerValidator 
 converts '1' to 1) which can save you some conversion code.
 
-Besides these fairly basic features, you might want to give pyinputvalidation a 
+Besides these fairly basic features, you might want to give pycerberus a 
 try because:
 
 * documentation is a top priority.
-* writing custom validators is straigtforward and works without Python magic.
+* writing custom validators is straightforward and works without Python magic.
 * the library is independent from its context - you can use it for web 
   applications as well as for any other software that needs to check their 
   input data.
@@ -33,7 +33,7 @@ tend to be scattered all around the code. Eventually there is often also some
 code to convert the input data (usually strings) to more convenient Python data
 types like int or bool.
 
-pyinputvalidation is a framework that tackles these common problems and allows
+pycerberus is a framework that tackles these common problems and allows
 you to write tailored validators to perform additional checks. Furthermore the 
 framework also has built-in support for less common (but important) use cases
 like internationalization.
@@ -51,7 +51,7 @@ Writing your own validators
 BaseValidator
 --------------------
 
-.. autoclass:: inputvalidation.api.BaseValidator
+.. autoclass:: pycerberus.api.BaseValidator
 
    211    :members:
 
@@ -61,12 +61,12 @@ Validator
 convert/validate
 --------------------
 
-Miscellaenous
+Miscellaneous
 --------------------
 
-pyinputvalidation uses `simple_super <http://www.häcker.net/trac/browser/open-source/python-simple-super/trunk/simple_super.py>`_
+pycerberus uses `simple_super <http://www.häcker.net/trac/browser/open-source/python-simple-super/trunk/simple_super.py>`_
 so you can just say 'self.super()' in your custom validator classes. This will
-call the super implementation with just the same paramters as your method was
+call the super implementation with just the same parameters as your method was
 called.
 
 
@@ -74,17 +74,17 @@ Internationalization
 ==============================
 
 Modern applications must be able to handle different languages. 
-Internationalization (i18n) in pyinputvalidation refers to validating 
+Internationalization (i18n) in pycerberus refers to validating 
 locale-dependent input data (e.g. different decimal separator characters) as 
 well as validation errors in different languages. The former aspect is not yet
 covered by default but you should be able to write custom validators easily. 
 
-All messages from validators included in pyinputvalidation are translated in 
+All messages from validators included in pycerberus are translated in 
 different languages using the standard gettext library. The language of 
 validation error messages will be chosen depending on the locale which is given 
 in the state dictionary,
 
-i18n support in pyinputvalidation is a bit broader than just translating 
+i18n support in pycerberus is a bit broader than just translating 
 existing error messages:
 
 * Using slightly different options for the built-in gettext lookup (e.g. a 
@@ -98,7 +98,7 @@ existing error messages:
 * Changing all (or just some) messages from a super class is done by 
   redefining the IDs ('key') in your subclass.
 
-All i18n support in pyinputvalidator aims to provide custom validators with a
+All i18n support in pycerberus aims to provide custom validators with a
 nice, simple-to-use API while maintaining the flexibility that serious 
 applications need.
 
@@ -108,6 +108,13 @@ Domains, Translations
 
 Locale dirs
 --------------------
+
+Every validator object can have its own directory where translations (.mo files
+for gettext) are stored. By default pycerberus looks in ''pycerberus.locales''
+and falls back to the system-wide locale dir ''/usr/share/locale''. However you
+can specify arbitrary directories by returning another value for the key 
+'localedir' when you overwrite gettextargs().
+
 
 Custom Messages
 --------------------

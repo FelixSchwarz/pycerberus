@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation.test_util import ValidationTest
-from inputvalidation.validators import IntegerValidator
+from pycerberus.test_util import ValidationTest
+from pycerberus.validators import IntegerValidator
 
 
 class MessagesFromBuiltInValidatorsAreTranslatedTest(ValidationTest):

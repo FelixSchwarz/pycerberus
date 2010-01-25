@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation.lib import SuperProxy
+from pycerberus.lib import SuperProxy
 
 __all__ = ['EmptyError', 'InvalidArgumentsError', 'InvalidDataError', 
            'ValidationError']

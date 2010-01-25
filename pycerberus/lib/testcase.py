@@ -8,7 +8,7 @@ API and some convenience functionality."""
 
 from unittest import TestCase
 
-from simple_super import SuperProxy
+from pycerberus.lib.simple_super import SuperProxy
 
 
 __all__ = ['PythonicTestCase']

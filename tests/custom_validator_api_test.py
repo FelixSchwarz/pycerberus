@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation.api import Validator
-from inputvalidation.test_util import ValidationTest
+from pycerberus.api import Validator
+from pycerberus.test_util import ValidationTest
 
 
 class ValidatorWithCustomMessageForKey(Validator):

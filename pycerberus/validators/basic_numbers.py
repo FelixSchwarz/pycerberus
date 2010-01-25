@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation.api import Validator
-from inputvalidation.i18n import _
+from pycerberus.api import Validator
+from pycerberus.i18n import _
 
 __all__ = ['IntegerValidator']
 

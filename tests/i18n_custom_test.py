@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from inputvalidation.test_util import ValidationTest
-from inputvalidation.validators import IntegerValidator
+from pycerberus.test_util import ValidationTest
+from pycerberus.validators import IntegerValidator
 
 
 class FrameworkValidator(IntegerValidator):
@@ -35,7 +35,7 @@ class ValidatorRedefiningKeys(FrameworkValidator):
         # We need to change back the domain as this validator is used to get
         # a real message - if the .mo file for the gettext domain does not 
         # exist, gettext will raise an error.
-        return {'domain': 'pyinputvalidator'}
+        return {'domain': 'pycerberus'}
 
 
 class ValidatorWithNonGettextTranslation(FrameworkValidator):
@@ -70,7 +70,7 @@ class CustomizedI18NBehaviorTest(ValidationTest):
         self.assert_equals('A message from an application validator.', self.message_for_key('foo'))
     
     def test_validator_can_define_custom_parameters_for_translation_mechanism(self):
-        self.assert_equals('pyinputvalidator', self.domain_for_key('empty'))
+        self.assert_equals('pycerberus', self.domain_for_key('empty'))
         self.assert_equals('fnord', self.domain_for_key('foo'))
     
     def test_parameters_for_translation_are_inherited_from_super_class(self):

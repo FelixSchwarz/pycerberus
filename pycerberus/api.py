@@ -2,11 +2,12 @@
 
 import inspect
 
-from inputvalidation.errors import *
-from inputvalidation.i18n import _
-from inputvalidation.lib import SuperProxy
+from pycerberus.errors import *
+from pycerberus.i18n import _, GettextTranslation
+from pycerberus.lib import SuperProxy
 
 __all__ = ['BaseValidator', 'Validator']
+
 
 class NoValueSet(object):
     pass
@@ -195,13 +196,11 @@ class Validator(BaseValidator):
     
     # TODO: Use a more technology-agnostic name
     def gettextargs(self, state):
-        return {'domain': 'pyinputvalidator'}
+        return {'domain': 'pycerberus'}
     
     def translate_message(self, native_message, gettextargs, key, state):
         # This method can be overridden on a by-class basis to get translations 
         # to support non-gettext translation mechanisms (e.g. from a db)
-        from inputvalidation.i18n import GettextTranslation
-        # TODO: How to specify 
         return GettextTranslation(**gettextargs).gettext(native_message)
     
     # TODO: This method also needs the value to interpolate it into the final
