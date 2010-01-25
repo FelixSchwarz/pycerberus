@@ -2,3 +2,6 @@
 \.mo$
 pyinputvalidation\.egg-info
 build
+.project
+.pydevproject
+.settings
