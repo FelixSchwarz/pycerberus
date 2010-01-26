@@ -26,15 +26,15 @@ class ValidationTest(PythonicTestCase):
         return self.init_validator()
     
     def process(self, *args, **kwargs):
-        if len(args) == 1 and 'state' not in kwargs:
-            kwargs['state'] = {}
+        if len(args) == 1 and 'context' not in kwargs:
+            kwargs['context'] = {}
         return self._validator.process(*args, **kwargs)
     
     def get_error(self, value, locale='en', *args, **kwargs):
         """Process the given value and assert that this raises a validation
         exception - return that exception."""
-        state = {'locale': locale}
-        return self.assert_raises(InvalidDataError, self.process, value, state=state, *args, **kwargs)
+        context = {'locale': locale}
+        return self.assert_raises(InvalidDataError, self.process, value, context=context, *args, **kwargs)
     
     def message_for_key(self, key, locale='de'):
         "Return the error message for the given key."

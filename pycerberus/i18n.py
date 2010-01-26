@@ -27,29 +27,29 @@ class GettextTranslation(object):
             return locale_dir_on_filesystem
         return os.path.normpath('/usr/share/locale')
     
-    def _locale(self, state):
-        return (state or {}).get('locale', 'en')
+    def _locale(self, context):
+        return (context or {}).get('locale', 'en')
     
-    def _args(self, state):
+    def _args(self, context):
         args = self._gettext_args.copy()
         args.setdefault('localedir', self._default_localedir())
-        args['languages'] = [self._locale(state)]
+        args['languages'] = [self._locale(context)]
         return args
     
-    def translation(self, state):
-        return gettext.translation(self._domain(), **self._args(state))
+    def translation(self, context):
+        return gettext.translation(self._domain(), **self._args(context))
     
-    def _state_from_stack(self):
+    def _context_from_stack(self):
         frame = sys._getframe(2)
         locals_ = frame.f_locals
-        if 'state' not in locals_:
+        if 'context' not in locals_:
             return {}
-        return locals_['state'] or {}
+        return locals_['context'] or {}
     
     def __getattr__(self, name):
         if name not in ('gettext', ):
             raise AttributeError(name)
-        translation = self.translation(self._state_from_stack())
+        translation = self.translation(self._context_from_stack())
         return getattr(translation, name)
 
 

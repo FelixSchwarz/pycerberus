@@ -14,8 +14,8 @@ class StringValidator(Validator):
                 'invalid_type': _('Validator got unexpected input (expected string, got %s).'),
                }
     
-    def validate(self, value, state=None):
+    def validate(self, value, context=None):
         if not isinstance(value, basestring):
-            self.error('invalid_type', value, state)
+            self.error('invalid_type', value, context)
 
 

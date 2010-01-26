@@ -5,7 +5,7 @@ from pycerberus.validators import IntegerValidator
 
 
 class FrameworkValidator(IntegerValidator):
-    def translation_parameters(self, state):
+    def translation_parameters(self, context):
         return {'domain': 'framework'}
 
 
@@ -14,10 +14,10 @@ class ValidatorWithAdditionalKeys(FrameworkValidator):
     def messages(self):
         return {'foo': 'bar'}
     
-    def translation_parameters(self, state):
+    def translation_parameters(self, context):
         return {'domain': 'fnord'}
     
-    def translate_message(self, key, native_message, translation_parameters, state):
+    def translate_message(self, key, native_message, translation_parameters, context):
         assert key == 'foo'
         return 'A message from an application validator.'
 
@@ -31,7 +31,7 @@ class ValidatorRedefiningKeys(FrameworkValidator):
     def messages(self):
         return {'empty': 'fnord'}
     
-    def translation_parameters(self, state):
+    def translation_parameters(self, context):
         # We need to change back the domain as this validator is used to get
         # a real message - if the .mo file for the gettext domain does not 
         # exist, gettext will raise an error.
@@ -40,15 +40,15 @@ class ValidatorRedefiningKeys(FrameworkValidator):
 
 class ValidatorWithNonGettextTranslation(FrameworkValidator):
     
-    def translation_parameters(self, state):
+    def translation_parameters(self, context):
         # we change the domain here on purpose - if gettext would check for 
         # locale files for this domain, it would raise an exception because the
         # file is not there...
         return {'domain': 'application'}
     
-    def translate_message(self, key, native_message, translation_parameters, state):
+    def translate_message(self, key, native_message, translation_parameters, context):
         assert key == 'inactive'
-        if state['locale'] == 'de':
+        if context['locale'] == 'de':
             return u'db Übersetzung'
         return 'db translation'
     

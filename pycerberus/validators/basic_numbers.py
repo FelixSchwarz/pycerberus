@@ -14,13 +14,13 @@ class IntegerValidator(Validator):
                 'invalid_number': _('Please enter a number.'),
                }
     
-    def convert(self, value, state=None):
+    def convert(self, value, context=None):
         if not isinstance(value, (int, basestring)):
             class_name = value.__class__.__name__
-            self.error('invalid_type', value, state, typename=class_name)
+            self.error('invalid_type', value, context, typename=class_name)
         try:
             return int(value)
         except ValueError:
-            self.error('invalid_number', value, state, )
+            self.error('invalid_number', value, context)
 
 

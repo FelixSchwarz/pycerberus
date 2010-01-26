@@ -11,7 +11,7 @@ class DummyValidator(Validator):
     def __init__(self, default=42, *args, **kwargs):
         self.super()
     
-    def is_empty(self, value, state):
+    def is_empty(self, value, context):
         return value == self._empty_value
 
 
@@ -34,17 +34,17 @@ class ValidatorTest(ValidationTest):
         self.assert_equals(42, self.process('empty'))
         self.assert_not_equals(self.not_implemented, self.validator().convert)
     
-    def test_validator_provides_empty_dict_if_no_state_was_given(self):
+    def test_validator_provides_empty_dict_if_no_context_was_given(self):
         dummy = self.AttributeHolder()
-        dummy.given_state = None
+        dummy.given_context = None
         
-        def store_empty(state):
-            dummy.given_state = state
+        def store_empty(context):
+            dummy.given_context = context
             return 21
         self.init_validator(required=False)
         self.validator().empty_value = store_empty
         self.assert_equals(21, self.process('empty'))
-        self.assert_equals({}, dummy.given_state)
+        self.assert_equals({}, dummy.given_context)
         # check that we did not change the real class used in other test cases
         self.assert_not_equals(store_empty, self.init_validator().empty_value)
     

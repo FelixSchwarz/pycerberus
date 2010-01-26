@@ -6,13 +6,13 @@ from pycerberus.test_util import ValidationTest
 
 class ValidatorWithCustomMessageForKey(Validator):
     
-    def validate(self, value, state):
-        self.error('inactive', value, state)
+    def validate(self, value, context):
+        self.error('inactive', value, context)
     
     def messages(self):
         return {'inactive': 'Untranslated message'}
     
-    def message_for_key(self, key, state):
+    def message_for_key(self, key, context):
         assert key == 'inactive'
         return 'message from custom lookup'
 

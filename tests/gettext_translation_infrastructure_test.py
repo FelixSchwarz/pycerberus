@@ -25,7 +25,7 @@ class GettextTranslationInfrastructureTest(PythonicTestCase):
         localedir = '/usr/share/locale'
         self.assert_equals(localedir, self._localedir(localedir=localedir))
     
-    def test_can_extract_locale_name_from_state(self):
+    def test_can_extract_locale_name_from_context(self):
         translation = GettextTranslation()
         self.assert_equals('en', translation._locale(None))
         self.assert_equals('en', translation._locale({}))
