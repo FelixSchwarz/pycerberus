@@ -1,68 +1,193 @@
 
-pycerberus
-=================
+pycerberus documentation
+************************
 
-pycerberus is a framework to check user data thoroughly so that your 
-application is protected from malicious inputs. Also the input is (usually) 
-converted from strings to real python data types (e.g. the IntegerValidator 
-converts '1' to 1) which can save you some conversion code.
+pycerberus is a framework to check user data thoroughly so that you can protect
+your application from malicious (or just garbled) input data.
 
-Besides these fairly basic features, you might want to give pycerberus a 
-try because:
+* **Remove stupid code which converts input values:** After values are validated, you 
+  can work with real Python types instead of strings - e.g. 42 instead of '42', 
+  convert database IDs to model objects transparently.
+* **Implement custom validation rules:** Writing custom validators is 
+  straightforward, everything is well documented and pycerberus only uses very 
+  little Python magic.
+* **Focus on your value-adding application code:** Save time by implementing every 
+  input validation rule only once, but 100% right instead of implementing a 
+  dozen different half-baked solutions.
+* **Ready for global business:** i18n support (based on GNU gettext) is built in, 
+  adding custom translations is easy.
+* **Tune it for your needs:** You can implement custom behavior in your validators,
+  e.g. fetch translations from a database instead of using gettext or define
+  custom translations for built-in validators.
+* **Use it wherever you like:** pycerberus does not depend on specific contexts
+  (e.g. web development) so you can also use it in every Python application. 
 
-* documentation is a top priority.
-* writing custom validators is straightforward and works without Python magic.
-* the library is independent from its context - you can use it for web 
-  applications as well as for any other software that needs to check their 
-  input data.
-* the framework is highly flexible - translations can be retrieved from gettext
-  or any other mechanism Python supports (e.g. a database).
-
+.. highlight:: python
 
 Contents:
+==================================
+
 
 .. toctree::
    :maxdepth: 2
 
-About
-=====
+
+Installation and Setup
+==================================
+
+pycerberus is just a Python library which uses setuptools so it does not require
+a special setup. It has no dependencies besides the standard Python library. 
+Python 2.4-2.6 is supported.
+
+
+Background
+==================================
 
 In every software you must protect yourself from user input data which was not 
 checked carefully. However many checks are repetitive and validation logic tend
-tend to be scattered all around the code. Eventually there is often also some 
-code to convert the input data (usually strings) to more convenient Python data
-types like int or bool.
+tend to be scattered all around the code. Because basic checks are duplicated 
+in the code, people tend to forget to check also for uncommon edge cases.
+Eventually there is often also some code to convert the input data (usually 
+strings) to more convenient Python data types like int or bool.
 
 pycerberus is a framework that tackles these common problems and allows
 you to write tailored validators to perform additional checks. Furthermore the 
 framework also has built-in support for less common (but important) use cases
 like internationalization.
 
+The framework itself is heavily inspired by `FormEncode <http://www.formencode.org>`_
+by Ian Bicking. Therefore most of `FormEncode's design rationale <http://www.formencode.org/Design.html>`_
+is directly applicable to pycerberus. However several things about FormEncode 
+annoyed me so much that I decided to write my own library when I needed one for 
+my SMTP server project `pymta <www.schwarz.eu/opensource/projects/pymta>`_.
 
-Using, Options, Exceptions
-==============================
+
+Development Status
+==================================
+
+Currently (February 2010, version 0.1) pycerberus is at a very basic stage - 
+though with very solid foundations. The API for single validators is basically
+complete, i18n support is built in and there is decent documentation covering
+all important aspects.
+
+The future development will focus on *compound validators* (Schema) and *repeating
+fields*. After that, I'll try to increase the number of *built-in validators for
+specific domains* (e.g. *correct* email address validation, validating host names,
+localized numbers). Another interesting topic will be *integration into different
+frameworks* like `TurboGears <http://www.turbogears.org>`_ and 
+`trac <http://trac.edgewall.org>`_.
+
+
+
+Using validators
+==================================
+
+Every basic validator validates a just single value (e.g. one specific input 
+field in a web application). When the validation was successful the validated 
+and converted value is returned. If something is wrong with the data, an 
+exception is raised::
+
+    from pycerberus.validators import IntegerValidator
+    IntegerValidator().process('42') # returns 42 as int
+
+pycerberus puts conversion and validation together in one call because of two
+main reasons:
+
+* As a user you need to convert input data (usually strings) anyway into a more
+  sensible format (e.g. int). These lines of code are redundant because you 
+  declared in the validator already what the value should be.
+* During the validation process, it is very easy to do also the conversion. In
+  fact many validations are done just by trying to do a conversion and catch
+  all exceptions that were raised during that process.
+
+
+
+Validation Errors
+----------------------------------
+
+Every validation error will trigger an exception, usually an ``InvalidDataError``.
+This exception will contain a translated error message which can be presented to
+the user, a key so you can identify the exact error programmatically and the 
+original, unmodified value::
+
+    from pycerberus.errors import InvalidDataError
+    from pycerberus.validators import IntegerValidator
+    try:
+        IntegerValidator().process('foo')
+    except InvalidDataError, e:
+        error_message = e.msg       # u'Please enter a number.'
+        original_value = e.value    # 'foo'
+        error_key = e.key           # 'invalid_number'
+
+
+Configuring Validators
+----------------------------------
+
+You can configure the behavior of the validator when instantiating it. For 
+example, if you pass ``required=False`` to the constructor, most validators will
+also accept ``None`` as a valid value::
+
+        IntegerValidator(required=True).process(None)  # -> validation error
+        IntegerValidator(required=False).process(None) # None
+
+Validators support different configuration options which are explained along the
+validator description.
+
+
+Context
+----------------------------------
+
+All validators support an optional ``context`` argument (which defaults to an
+emtpy dict). It is used to plug validators into your application and make
+them aware of the overall system state: For example a validator must know which
+locale it should use to translate an error message to the correct language 
+without relying on some global variables::
+
+    context = {'locale': 'de'}
+    validator = IntegerValidator()
+    validator.process('foo', context=context) # u'Bitte geben Sie eine Zahl ein.'
+
+The context variable is especially useful when writing custom validators - 
+locale is the only context information that pycerberus cares about.
+
 
 Available validators
---------------------
+==================================
+
 
 Writing your own validators
-==============================
+==================================
+
+After all, using only built-in validators won't help you much if: In the end 
+you need you custom validation rules which means that you need to write your
+own validators.
+
+pycerberus comes with two classes that can serve as a good base when you start
+writing a custom validator: The ``BaseValidator`` only provides the absolutely
+required set of API so you have maximum freedom. The ``Validator`` class itself
+is inherited from the ``BaseValidator`` and defines a more sophisticated API 
+and i18n support. Usually you should use the ``Validator`` class.
+
 
 BaseValidator
---------------------
+----------------------------------
 
 .. autoclass:: pycerberus.api.BaseValidator
-
-   211    :members:
+   :members:
 
 
 Validator
---------------------
+----------------------------------
+
+.. autoclass:: pycerberus.api.Validator
+   :members:
+
+
 convert/validate
---------------------
+----------------------------------
 
 Miscellaneous
---------------------
+----------------------------------
 
 pycerberus uses `simple_super <http://www.häcker.net/trac/browser/open-source/python-simple-super/trunk/simple_super.py>`_
 so you can just say 'self.super()' in your custom validator classes. This will
@@ -71,7 +196,7 @@ called.
 
 
 Internationalization
-==============================
+==================================
 
 Modern applications must be able to handle different languages. 
 Internationalization (i18n) in pycerberus refers to validating 
@@ -123,14 +248,10 @@ Custom Messages
 Getting Help
 ==============================
 
+
 License
 ==============================
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+pycerberus is licensed under the MIT license. As there are no other dependencies
+(besides Python itself), you can easily use pycerberus in 
 
