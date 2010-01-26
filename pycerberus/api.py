@@ -2,7 +2,7 @@
 
 import inspect
 
-from pycerberus.errors import *
+from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataError
 from pycerberus.i18n import _, GettextTranslation
 from pycerberus.lib import SuperProxy
 
@@ -43,7 +43,6 @@ class BaseValidator(object):
     __metaclass__ = EarlyBindForMethods
     super = SuperProxy()
     
-    # TODO: final name
     def messages(self):
         return {}
     
@@ -56,7 +55,7 @@ class BaseValidator(object):
         raise NotImplementedError('keys() should have been replaced by a metaclass')
     
     def error(self, key, value, state):
-        msg = self.message_for_key(key)
+        msg = self.message_for_key(key, state)
         raise InvalidDataError(msg, value, key, state)
     
     def process(self, value, state=None):
@@ -102,33 +101,8 @@ class Validator(BaseValidator):
         self._check_argument_consistency()
         self._implementations, self._implementation_by_class = self._freeze_implementations_for_class()
     
-    def _freeze_implementations_for_class(self):
-        class_for_key = {}
-        implementations_for_class = {}
-        known_functions = set()
-        for cls in reversed(inspect.getmro(self.__class__)):
-            if self._class_defines_custom_keys(cls, known_functions):
-                known_functions.add(cls.keys)
-                for key in cls.keys(self):
-                    class_for_key[key] = self._find_implementations_for_class(cls)
-                    implementations_for_class[cls] = class_for_key[key]
-        return class_for_key, implementations_for_class
-    
-    def _find_implementations_for_class(self, cls):
-        implementations_by_key = dict()
-        for name in ['gettextargs', 'keys', 'message_for_key', 'translate_message']:
-            implementations_by_key[name] = getattr(cls, name)
-        return implementations_by_key
-    
-    def _class_defines_custom_keys(self, cls, known_functions):
-        # TODO: How to find out which keys are really new if you don't have to
-        # define a custom method (pull from messages)?
-        # TODO: Check messages attribute as well
-        return hasattr(cls, 'keys') and cls.keys not in known_functions
-    
-    # TODO: final name
-    def messages(self):
-        return {'empty': _('Value must not be empty.')}
+    # --------------------------------------------------------------------------
+    # initialization
     
     def _check_argument_consistency(self):
         if self.is_required(set_explicitely=True) and self._has_default_value_set():
@@ -138,34 +112,32 @@ class Validator(BaseValidator):
     def _has_default_value_set(self):
         return (self._default is not NoValueSet)
     
-    def is_empty(self, value, state):
-        """Decide if the value is considered an empty value."""
-        return (value == None)
+    def _freeze_implementations_for_class(self):
+        class_for_key = {}
+        implementations_for_class = {}
+        known_functions = set()
+        for cls in reversed(inspect.getmro(self.__class__)):
+            if self._class_defines_custom_keys(cls, known_functions):
+                known_functions.add(cls.keys)
+                for key in cls.keys(self):
+                    class_for_key[key] = self._implementations_by_key(cls)
+                    implementations_for_class[cls] = class_for_key[key]
+        return class_for_key, implementations_for_class
     
-    def is_required(self, set_explicitely=False):
-        if self._required == True:
-            return True
-        elif (not set_explicitely) and (self._required == NoValueSet):
-            return True
-        return False
+    def _implementations_by_key(self, cls):
+        implementations_by_key = dict()
+        for name in ['translation_parameters', 'keys', 'message_for_key', 'translate_message']:
+            implementations_by_key[name] = getattr(cls, name)
+        return implementations_by_key
     
-    def empty_value(self, state):
-        """Return the 'empty' value for this validator."""
-        if self._default is NoValueSet:
-            return None
-        return self._default
+    def _class_defines_custom_keys(self, cls, known_functions):
+        return hasattr(cls, 'keys') and cls.keys not in known_functions
     
-    def convert(self, value, state):
-        """Convert the input value to a suitable Python instance which is 
-        returned. If the input is invalid, raise an InvalidDataError."""
-        return value
-   
-    def validate(self, converted_value, state):
-        """Perform additional checks on the value which was processed 
-        previously. Raise an InvalidDataError if the input data is invalid.
-        
-        This method must not modify the converted_value."""
-        pass
+    # --------------------------------------------------------------------------
+    # Implementation of BaseValidator API
+    
+    def messages(self):
+        return {'empty': _('Value must not be empty.')}
     
     def error(self, key, value, state, errorclass=InvalidDataError, **values):
         translated_message = self.message(key, state, **values)
@@ -192,71 +164,68 @@ class Validator(BaseValidator):
         self.validate(converted_value, state)
         return converted_value
     
-    # - i18n --------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # Defining a convenience API
     
-    # TODO: Use a more technology-agnostic name
-    def gettextargs(self, state):
+    def convert(self, value, state):
+        """Convert the input value to a suitable Python instance which is 
+        returned. If the input is invalid, raise an InvalidDataError."""
+        return value
+   
+    def validate(self, converted_value, state):
+        """Perform additional checks on the value which was processed 
+        successfully before (otherwise this method is not called). Raise an 
+        InvalidDataError if the input data is invalid.
+        
+        This method must not modify the converted_value."""
+        pass
+    
+    def empty_value(self, state):
+        """Return the 'empty' value for this validator."""
+        if self._default is NoValueSet:
+            return None
+        return self._default
+    
+    def is_empty(self, value, state):
+        """Decide if the value is considered an empty value."""
+        return (value is None)
+    
+    def is_required(self, set_explicitely=False):
+        if self._required == True:
+            return True
+        elif (not set_explicitely) and (self._required == NoValueSet):
+            return True
+        return False
+    
+    # -------------------------------------------------------------------------
+    # i18n: public API
+    
+    def translation_parameters(self, state):
         return {'domain': 'pycerberus'}
     
-    def translate_message(self, native_message, gettextargs, key, state):
+    def translate_message(self, key, native_message, translation_parameters, state):
         # This method can be overridden on a by-class basis to get translations 
         # to support non-gettext translation mechanisms (e.g. from a db)
-        return GettextTranslation(**gettextargs).gettext(native_message)
+        return GettextTranslation(**translation_parameters).gettext(native_message)
     
-    # TODO: This method also needs the value to interpolate it into the final
-    # message somehow...
     def message(self, key, state, **values):
         # This method can be overridden globally to use a different message 
         # lookup / translation mechanism altogether
-        # TODO: Test
-        # improve syntax later
-        native_message = self._implementation_for_key(key, 'message_for_key')(key, state)
-        gettextargs = self.args_for_gettext(key, state)
-        translation_function = self._implementation_for_key(key, 'translate_message')
-        # every function should get key as first parameter so I can unify some 
-        # things.
-        translated_template_message = translation_function(native_message, gettextargs, key, state)
-        return translated_template_message % values
-#        # if key was defined by me, use translate_message which can be overwritten
-#        # otherwise, use default translation
-#        if getattr(self, 'messages') and key in self.messages:
-#            english_message = self.messages[key]
-#        else:
-#            english_message = self.messages()__messages__[key]
-#        return self.translate_message_with_default_settings(english_message, state)
-        
-    # TODO: add *args, **kwargs
-    # TODO: always add state as last parameter
-    def _implementation_for_key(self, key, methodname):
-        method = self._implementations[key][methodname]
-        return lambda *args, **kwargs: method(self, *args, **kwargs)
-    
-    def _implementation_for_class(self, cls, methodname):
-        method = self._implementations_by_cls[cls][methodname]
-        return lambda *args, **kwargs: method(self, *args, **kwargs)
-    
-    
-    # TODO: get rid of that special method
-    def args_for_gettext(self, key, state):
-        return self._implementation_for_key(key, 'gettextargs')(state)
-    
-    def locale(self, state):
-        """Extract the locale for the given state."""
-        return state.get('locale', 'en')
+        native_message = self._implementation(key, 'message_for_key', state)(key)
+        translation_parameters = self._implementation(key, 'translation_parameters', state)()
+        translation_function = self._implementation(key, 'translate_message', state)
+        translated_template = translation_function(key, native_message, translation_parameters)
+        return translated_template % values
     
     # -------------------------------------------------------------------------
-
-
-class Schema(Validator):
-    remove_extra_values = True
+    # private 
     
-    def validator_for_field(self):
-        pass
-    
-    def fieldnames(self):
-        pass
-    
-    def add_validator(self, fieldname, validator):
-        pass
+    def _implementation(self, key, methodname, state):
+        def state_key_wrapper(*args):
+            method = self._implementations[key][methodname]
+            args = list(args) + [state]
+            return method(self, *args)
+        return state_key_wrapper
+    # -------------------------------------------------------------------------
 
 

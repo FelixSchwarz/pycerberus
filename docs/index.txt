@@ -113,7 +113,7 @@ Every validator object can have its own directory where translations (.mo files
 for gettext) are stored. By default pycerberus looks in ''pycerberus.locales''
 and falls back to the system-wide locale dir ''/usr/share/locale''. However you
 can specify arbitrary directories by returning another value for the key 
-'localedir' when you overwrite gettextargs().
+'localedir' when you overwrite ''translation_parameters()''.
 
 
 Custom Messages

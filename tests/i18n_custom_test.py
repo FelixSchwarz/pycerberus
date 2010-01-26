@@ -5,7 +5,7 @@ from pycerberus.validators import IntegerValidator
 
 
 class FrameworkValidator(IntegerValidator):
-    def gettextargs(self, state):
+    def translation_parameters(self, state):
         return {'domain': 'framework'}
 
 
@@ -14,10 +14,10 @@ class ValidatorWithAdditionalKeys(FrameworkValidator):
     def messages(self):
         return {'foo': 'bar'}
     
-    def gettextargs(self, state):
+    def translation_parameters(self, state):
         return {'domain': 'fnord'}
     
-    def translate_message(self, native_message, gettextargs, key, state):
+    def translate_message(self, key, native_message, translation_parameters, state):
         assert key == 'foo'
         return 'A message from an application validator.'
 
@@ -31,7 +31,7 @@ class ValidatorRedefiningKeys(FrameworkValidator):
     def messages(self):
         return {'empty': 'fnord'}
     
-    def gettextargs(self, state):
+    def translation_parameters(self, state):
         # We need to change back the domain as this validator is used to get
         # a real message - if the .mo file for the gettext domain does not 
         # exist, gettext will raise an error.
@@ -40,15 +40,15 @@ class ValidatorRedefiningKeys(FrameworkValidator):
 
 class ValidatorWithNonGettextTranslation(FrameworkValidator):
     
-    def gettextargs(self, state):
+    def translation_parameters(self, state):
         # we change the domain here on purpose - if gettext would check for 
         # locale files for this domain, it would raise an exception because the
         # file is not there...
         return {'domain': 'application'}
     
-    def translate_message(self, native_message, gettextargs, key, state):
+    def translate_message(self, key, native_message, translation_parameters, state):
         assert key == 'inactive'
-        if self.locale(state) == 'de':
+        if state['locale'] == 'de':
             return u'db Übersetzung'
         return 'db translation'
     
@@ -62,7 +62,7 @@ class CustomizedI18NBehaviorTest(ValidationTest):
     validator_class = ValidatorWithAdditionalKeys
     
     def domain_for_key(self, key):
-        gettext_args = self.validator().args_for_gettext(key, {})
+        gettext_args = self.validator()._implementation(key, 'translation_parameters', {})()
         return gettext_args.get('domain')
     
     def test_validator_can_define_more_translations_while_keeping_existing_ones(self):
