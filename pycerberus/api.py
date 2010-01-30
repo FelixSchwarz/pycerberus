@@ -51,7 +51,10 @@ class BaseValidator(object):
     def messages(self):
         """Return all messages which are defined by this validator as a 
         key/message dictionary. Calling this method might be costly when you 
-        have a lot of messages and returning them is expensive."""
+        have a lot of messages and returning them is expensive.
+        
+        You must declare all your messages in this function so that all keys
+        are known after this method was called."""
         return {}
     
     def message_for_key(self, key, context):
@@ -182,6 +185,9 @@ class Validator(BaseValidator):
         """Perform additional checks on the value which was processed 
         successfully before (otherwise this method is not called). Raise an 
         InvalidDataError if the input data is invalid.
+        
+        You can implement only this method in your validator if you just want to
+        add additional restrictions without touching the actual conversion.
         
         This method must not modify the ``converted_value``."""
         pass

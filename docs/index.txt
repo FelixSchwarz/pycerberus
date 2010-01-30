@@ -24,13 +24,6 @@ your application from malicious (or just garbled) input data.
 
 .. highlight:: python
 
-Contents:
-==================================
-
-
-.. toctree::
-   :maxdepth: 2
-
 
 Installation and Setup
 ==================================
@@ -43,12 +36,13 @@ Python 2.4-2.6 is supported.
 Background
 ==================================
 
-In every software you must protect yourself from user input data which was not 
-checked carefully. However many checks are repetitive and validation logic tend
-tend to be scattered all around the code. Because basic checks are duplicated 
-in the code, people tend to forget to check also for uncommon edge cases.
-Eventually there is often also some code to convert the input data (usually 
-strings) to more convenient Python data types like int or bool.
+In every software you must check carefully that untrusted user input data 
+matches your expectations. Unvalidated user input is a common source of security
+flaws. However many checks are repetitive and validation logic tend to be 
+scattered all around the code. Because basic checks are duplicated, developers 
+forget to check also for uncommon edge cases. Eventually there is often also 
+some code to convert the input data (usually strings) to more convenient Python 
+data types like int or bool.
 
 pycerberus is a framework that tackles these common problems and allows
 you to write tailored validators to perform additional checks. Furthermore the 
@@ -60,6 +54,33 @@ by Ian Bicking. Therefore most of `FormEncode's design rationale <http://www.for
 is directly applicable to pycerberus. However several things about FormEncode 
 annoyed me so much that I decided to write my own library when I needed one for 
 my SMTP server project `pymta <www.schwarz.eu/opensource/projects/pymta>`_.
+
+
+Philosophy and Design
+==================================
+
+Rules are declared explicitly: Separating policy from mechanism
+---------------------------------------------------------------
+
+pycerberus separates validation rules ("Validators") from the objects they 
+validate against. It might be tempting to derive the validation rules from 
+restrictions you specified earlier (e.g. from a class which is mapped by an ORM
+to a database). However that approach completely ignores that validation 
+typically depends on context: In an API you have typically a lot more freedom in
+regard to allowed values compared to a public web interface where input needs to
+conform to a lot more checks. With a model where you declare the validation 
+explicitly, this is possible. Also it is quite easy writing some code that 
+generates a bottom line of validation rules automatically based on your ORM 
+model and add additional restrictions depending on the context.
+
+As pycerberus is completely context-agnostic (not being bundled with a specific
+framework), you can use it in many different places (e.g. web applications with
+different frameworks, server applications, check parameters in a library, ...).
+
+
+Further reading: `FormEncode's design rationale <http://www.formencode.org/Design.html>`_ - 
+most of the design ideas are also present in pycerberus.
+
 
 
 Development Status
@@ -79,13 +100,14 @@ frameworks* like `TurboGears <http://www.turbogears.org>`_ and
 
 
 
-Using validators
+Using Validators
 ==================================
 
-Every basic validator validates a just single value (e.g. one specific input 
-field in a web application). When the validation was successful the validated 
-and converted value is returned. If something is wrong with the data, an 
-exception is raised::
+In pycerberus "Validators" are used to specify validation rules which ensure
+that the input matches your expectations. Every basic validator validates a 
+just single value (e.g. one specific input field in a web application). When 
+the validation was successful, the validated and converted value is returned. 
+If something is wrong with the data, an exception is raised::
 
     from pycerberus.validators import IntegerValidator
     IntegerValidator().process('42') # returns 42 as int
@@ -158,9 +180,8 @@ Available validators
 Writing your own validators
 ==================================
 
-After all, using only built-in validators won't help you much if: In the end 
-you need you custom validation rules which means that you need to write your
-own validators.
+After all, using only built-in validators won't help you much: You need  
+custom validation rules which means that you need to write your own validators.
 
 pycerberus comes with two classes that can serve as a good base when you start
 writing a custom validator: The ``BaseValidator`` only provides the absolutely
@@ -181,10 +202,14 @@ Validator
 
 .. autoclass:: pycerberus.api.Validator
    :members:
+   :exclude-members: keys, message_for_key
 
 
-convert/validate
-----------------------------------
+Putting all together - SimpleValidator
+--------------------------------------
+# TODO: show how to declare custom messages, variable interpolation
+# raise errors / keys, original value
+
 
 Miscellaneous
 ----------------------------------
@@ -210,43 +235,150 @@ validation error messages will be chosen depending on the locale which is given
 in the state dictionary,
 
 i18n support in pycerberus is a bit broader than just translating 
-existing error messages:
+existing error messages. i18n becomes interesting when you write your own 
+validators (based on the ones that come with pycerberus) and your translations
+need to play along with the built-in ones:
 
-* Using slightly different options for the built-in gettext lookup (e.g. a 
-  different domain or a different locale dir) is just a matter of overwriting
-  one method.
-* With overwriting another method you can retrieve translations from other 
-  sources than a gettext catalog (e.g. a database or an XML file).
-* If you extend an existing validator class, you can still reuse all existing
-  translations for the super class without any effort and any influence how you
-  want to handle translations in your subclass.
-* Changing all (or just some) messages from a super class is done by 
-  redefining the IDs ('key') in your subclass.
+* Translate only the messages you defined, keep the existing pycerberus translations.
+* If you don't like the existing pycerberus translations, you can define your 
+  own without even changing a single line or file in pycerberus.
+* Specify additional translation options per validator class (e.g. a different
+  gettext domain or a different directory where your translations are stored).
+* Even though pycerberus uses the well-known gettext mechanism to retrieve
+  translations, you can use any other source as well (e.g. a database or a XML 
+  file).
 
 All i18n support in pycerberus aims to provide custom validators with a
 nice, simple-to-use API while maintaining the flexibility that serious 
 applications need.
 
 
-Domains, Translations
----------------------
+Get translated error messages
+------------------------------
 
-Locale dirs
---------------------
+If you want to get translated error messages from a validator, you set the 
+correct ''context''. formencode looks for a key named 'locale' in the context
+dictionary::
 
-Every validator object can have its own directory where translations (.mo files
-for gettext) are stored. By default pycerberus looks in ''pycerberus.locales''
-and falls back to the system-wide locale dir ''/usr/share/locale''. However you
-can specify arbitrary directories by returning another value for the key 
-'localedir' when you overwrite ''translation_parameters()''.
+    validator = IntegerValidator()
+    validator.process('foo', context={'locale': 'en'}) # u'Please enter a number.'
+    validator.process('foo', context={'locale': 'de'}) # u'Bitte geben Sie eine Zahl ein.'
 
 
-Custom Messages
---------------------
+Internal gettext details
+------------------------------
+
+Usually you don't have to know much about how pycerberus uses gettext internally.
+Just for completeness: The default domain is 'pycerberus'. By default 
+translations (.mo files) are loaded from ``pycerberus.locales``, with a fall back
+to the system-wide locale dir ''/usr/share/locale''.
+
+
+Translate your custom messages
+------------------------------
+
+To translate messages from a custom validator, you need to declare them in
+the messages() method and mark the message strings as translatable::
+
+    from pycerberus.api import Validator
+    from pycerberus.i18n import _
+    
+    class MyValidator(Validator):
+        def messages(self):
+            return {
+                    'foo': _('A message.'),
+                    'bar': _('Another message.'),
+                   }
+        
+        # your validation logic ...
+
+Afterwards you just have to start the usual gettext process:
+
+* Collect the translatable strings in a po template (.pot file), e.g.
+  pygettext.py --output=mymessages.pot <py file>
+* Merge the pot file into individual po files for every locale, e.g.
+  msgmerge --update locales/de/LC_MESSAGES/mymessages.po mymessages.pot
+* Translate the messages for every locale.
+* Compile the final po file into a mo file, e.g.
+  msgfmt.py locales/en/LC_MESSAGES/pycerberus.po
+
+
+Override existing messages and translations
+------------------------------------------------------------
+
+Assume your custom validator is a subclass of a built-in validator but you 
+don't like the built-in translation. Of course you can replace pycerberus' mo
+files directly. However there is also another way where you don't have to change
+pycerberus itself::
+
+    class CustomValidatorThatOverridesTranslations(Validator):
+        
+        def messages(self):
+            return {'empty': _('My custom message if the value is empty'),
+                    'custom': _('A custom message')}
+        
+        # ...
+
+This validator will use a different message for the 'empty' error and you can
+define custom translations for this key in your own .po files.
+
+
+
+Modify gettext options (locale dir, domain)
+------------------------------------------------------------
+
+The gettext framework is configurable, e.g. in which directory your .mo files
+are located and which domain (.mo filename) should be used. In pycerberus this
+is configurable by validator::
+
+    class ValidatorWithCustomGettextOptions(Validator):
+        
+        def messages(self):
+            return {'custom': _('A custom message')}
+        
+        def translation_parameters(self, context):
+            return {'domain': 'myapp', 'localedir': '/home/foo/locale'}
+        
+        # ...
+
+These translation parameters are passed directly to the ''gettext'' call so you
+can read about the available options in the `gettext documentation <http://docs.python.org/library/gettext.html>`_.
+Your parameter will be applied for all messages which were declared in your 
+validator class (but not in others). So you can modify the parameters for your
+own validator but keep all the existing parameters (and translations) for 
+built-in validators.
+
+
+Retrieve translations from a different source (e.g. database)
+-------------------------------------------------------------
+
+Sometimes you don't want to use gettext. For instance you could store translations
+in a relational database so that your users can update the messages themselves
+without fiddling with gettext tools::
+
+    class ValidatorWithNonGettextTranslation(FrameworkValidator):
+        
+        def messages(self):
+            return {'custom': _('A custom message')}
+        
+        def translate_message(self, key, native_message, translation_parameters, context):
+            # fetch the translation for 'native_message' from somewhere
+            translated_message = get_translation_from_db(native_message)
+            return translated_message
+
+You can use this mechanism to plug in arbitrary translation systems into 
+gettext. Your translation mechanism is (again) only applied to keys which were
+defined by your specific validator class. If you want to use your translation
+system also for keys which were defined by built-in validators, you need to
+re-define these keys in your class as shown in the previous section.
 
 
 Getting Help
 ==============================
+
+Currently I did not bother setting up a mailing list. If you have questions,
+please send an email to Felix.Schwarz@oss.schwarz.eu. When there are some users
+for pycerberus, I'll set up a mailing list.
 
 
 License

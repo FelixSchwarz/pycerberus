@@ -84,7 +84,7 @@ class CustomizedI18NBehaviorTest(ValidationTest):
         self.assert_equals('fnord', self.domain_for_key('foo'))
     
     def test_validators_can_use_their_own_translations_for_existing_keys(self):
-        self.assert_equals('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
+        self.assert_equals(u'Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
         self.init_validator(ValidatorRedefiningKeys())
         self.assert_equals('fnord', self.message_for_key('empty'))
     
@@ -92,5 +92,11 @@ class CustomizedI18NBehaviorTest(ValidationTest):
         self.init_validator(ValidatorWithNonGettextTranslation())
         self.assert_equals('db translation', self.message_for_key('inactive', locale='en'))
         self.assert_equals(u'db Übersetzung', self.message_for_key('inactive', locale='de'))
+    
+    def test_different_translation_system_is_only_applied_to_messages_declared_in_that_class(self):
+        self.init_validator(ValidatorWithNonGettextTranslation())
+        # This translation is present in the included mo files but not returned
+        # by the custom translation method.
+        self.assert_equals(u'Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
 
 
