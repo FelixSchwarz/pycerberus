@@ -205,12 +205,6 @@ Validator
    :exclude-members: keys, message_for_key
 
 
-Putting all together - SimpleValidator
---------------------------------------
-# TODO: show how to declare custom messages, variable interpolation
-# raise errors / keys, original value
-
-
 Miscellaneous
 ----------------------------------
 
@@ -218,6 +212,33 @@ pycerberus uses `simple_super <http://www.häcker.net/trac/browser/open-source/p
 so you can just say 'self.super()' in your custom validator classes. This will
 call the super implementation with just the same parameters as your method was
 called.
+
+
+Putting all together - A simple validator
+-----------------------------------------
+
+Now it's time to put all together. This validator demonstrates most of the API
+as explained so far:
+
+.. literalinclude:: ./unicode_validator.py
+    :pyobject: UnicodeValidator
+
+The validator will convert all input to unicode strings (using the UTF-8 
+encoding). It also checks for a maximum length of the string.
+
+You can see that all the conversion is done in ``convert()`` while additional
+validation is encapsulated in ``validate()``. This can help you keeping your
+methods small.
+
+In case there is an error the ``error()`` method will raise an ``InvalidDataError``.
+You select the error message to show by passing a string constant ``key`` which
+identifies the message. The key can be used later to adapt the user interface
+without relying the message itself (e.g. show an additional help box in the user
+interface if the user typed in the wrong password). 
+
+The error messages are declared in the ``messages()``. You'll notice that the 
+message strings can also contain variable parts. You can use these variable
+parts to give the user some additional hints about what was wrong with the data.
 
 
 Internationalization
@@ -376,14 +397,15 @@ re-define these keys in your class as shown in the previous section.
 Getting Help
 ==============================
 
-Currently I did not bother setting up a mailing list. If you have questions,
+So far I did not bother setting up a mailing list. If you have questions,
 please send an email to Felix.Schwarz@oss.schwarz.eu. When there are some users
-for pycerberus, I'll set up a mailing list.
+for pycerberus, I'll create a mailing list.
 
 
 License
 ==============================
 
 pycerberus is licensed under the MIT license. As there are no other dependencies
-(besides Python itself), you can easily use pycerberus in 
+(besides Python itself), you can easily use pycerberus in proprietary as well
+as GPL applications.
 
