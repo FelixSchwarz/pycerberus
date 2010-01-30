@@ -1,0 +1,8 @@
+
+Changelog for pycerberus
+========================
+
+0.1 (30.01.2010)
+ - initial release
+
+
