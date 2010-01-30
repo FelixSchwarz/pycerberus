@@ -14,10 +14,14 @@ class StringValidatorTest(ValidationTest):
         self.assert_equals('foo', self.process('foo'))
         self.assert_equals(u'bär', self.process(u'bär'))
     
-    def test_validator_rejects_bad_types(self):
+    def test_reject_bad_types(self):
         self.assert_raises(InvalidDataError, self.process, [])
         self.assert_raises(InvalidDataError, self.process, {})
         self.assert_raises(InvalidDataError, self.process, object)
         self.assert_raises(InvalidDataError, self.process, 5)
+    
+    def test_show_class_name_in_error_message(self):
+        e = self.assert_raises(InvalidDataError, self.process, [])
+        self.assert_true(u'(expected string, got "list")' in e.msg, e.msg)
 
 

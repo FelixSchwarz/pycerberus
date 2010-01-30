@@ -10,14 +10,14 @@ class IntegerValidator(Validator):
     
     def messages(self):
         return {
-                'invalid_type': _('Validator got unexpected input (expected string, got %(typename)s).'),
-                'invalid_number': _('Please enter a number.'),
+                'invalid_type': _(u'Validator got unexpected input (expected string, got "%(classname)s").'),
+                'invalid_number': _(u'Please enter a number.'),
                }
     
     def convert(self, value, context=None):
         if not isinstance(value, (int, basestring)):
-            class_name = value.__class__.__name__
-            self.error('invalid_type', value, context, typename=class_name)
+            classname = value.__class__.__name__
+            self.error('invalid_type', value, context, classname=classname)
         try:
             return int(value)
         except ValueError:
