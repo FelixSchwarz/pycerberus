@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# -- Import project information ------------------------------------------------
+
+import os
+
+def get_release_info():
+    release_info = {}
+    execfile(os.path.join('..', 'pycerberus', 'release.py'), release_info)
+    return release_info
+release_info = get_release_info()
 
 # -- General configuration -----------------------------------------------------
 
@@ -20,17 +29,17 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = 'pycerberus'
-copyright = u'2009-2010, Felix Schwarz'
+project = release_info['name']
+copyright = release_info['copyright']
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '0.1'
+version = release_info['version']
 # The full version, including alpha/beta/rc tags.
-release = '0.1'
+release = version + ''
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.
