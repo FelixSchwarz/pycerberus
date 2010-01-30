@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.1dev'
+version = '0.1'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
