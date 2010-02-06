@@ -18,6 +18,8 @@ class UnicodeValidator(Validator):
                 'invalid_type': _(u'Validator got unexpected input (expected string, got %(classname)s).'),
                 'too_long': _(u'Please enter at maximum %(max_length) characters.')
                }
+    # Alternatively you could also declare a class-level variable:
+    # messages = {...}
     
     def convert(self, value, context):
         try:

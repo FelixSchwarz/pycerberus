@@ -43,6 +43,14 @@ class EarlyBindForMethods(type):
     
     @classmethod
     def _simulate_early_binding_for_message_methods(cls, validator_class):
+        # Need to create a dynamic method if messages are defined in a 
+        # class-level dict.
+        if not callable(validator_class.messages):
+            messages_dict = validator_class.messages.copy()
+            def messages(self):
+                return messages_dict
+            validator_class.messages = messages
+        
         # We need to simulate 'early binding' so that we can reference the 
         # messages() method which is defined in the class to be created!
         def keys(self):
@@ -72,11 +80,15 @@ class BaseValidator(object):
     
     def messages(self):
         """Return all messages which are defined by this validator as a 
-        key/message dictionary. Calling this method might be costly when you 
-        have a lot of messages and returning them is expensive.
+        key/message dictionary. Alternatives you can create a class-level
+        dictionary which contains these keys/messages.
         
-        You must declare all your messages in this function so that all keys
-        are known after this method was called."""
+        You must declare all your messages here so that all keys are known 
+        after this method was called.
+        
+        Calling this method might be costly when you have a lot of messages and 
+        returning them is expensive. You can reduce the overhead in some 
+        situations by implementing ``message_for_key()``"""
         return {}
     
     def message_for_key(self, key, context):
