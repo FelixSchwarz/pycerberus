@@ -4,6 +4,7 @@ Changelog for pycerberus
 
 0.2
 - You now can declare custom messages as a class-level dict
+- Added interface to retrieve error details from InvalidDataErrors
 
 0.1 (30.01.2010)
  - initial release

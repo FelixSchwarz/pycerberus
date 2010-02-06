@@ -137,9 +137,11 @@ original, unmodified value::
     try:
         IntegerValidator().process('foo')
     except InvalidDataError, e:
-        error_message = e.msg       # u'Please enter a number.'
-        original_value = e.value    # 'foo'
-        error_key = e.key           # 'invalid_number'
+        error = e.error()
+        error.msg           # u'Please enter a number.'
+        error.key           # 'invalid_number'
+        error.value         # 'foo'
+        error.context       # {}
 
 
 Configuring Validators

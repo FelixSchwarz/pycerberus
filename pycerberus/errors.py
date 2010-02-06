@@ -22,10 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pycerberus.lib import SuperProxy
+from pycerberus.lib import AttrDict, SuperProxy
 
 __all__ = ['EmptyError', 'InvalidArgumentsError', 'InvalidDataError', 
            'ValidationError']
+
+
 
 class ValidationError(Exception):
     "All exceptions thrown by this library must be derived from this base class"
@@ -42,14 +44,21 @@ class InvalidDataError(ValidationError):
     from this base class."""
     def __init__(self, msg, value, key=None, context=None):
         self.super(msg)
-        self.value = value
-        self.key = key
-        self.context = context
+        self._error = AttrDict(key=key, msg=msg, value=value, context=context)
     
     def __repr__(self):
         cls_name = self.__class__.__name__
-        values = (cls_name, repr(self.msg), repr(self.value), repr(self.key), repr(self.context))
+        e = self.error()
+        values = (cls_name, repr(e.msg), repr(e.value), repr(e.key), repr(e.context))
         return '%s(%s, %s, key=%s, context=%s)' % values
+    
+    def error(self):
+        """Return information about the first error."""
+        return self._error
+    
+    def errors(self):
+        "Return all errors as an iterable."
+        return (self.error(),)
 
 
 class EmptyError(InvalidDataError):
