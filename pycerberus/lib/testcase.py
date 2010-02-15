@@ -21,11 +21,11 @@ class PythonicTestCase(TestCase):
     def assert_raises(self, exception_type, callable, *args, **kwargs):
         try:
             callable(*args, **kwargs)
-            # We want the same error message as assertRaises but we must not 
-            # assume that callable is idempotent
-            self.assertRaises(exception_type, lambda: None)
         except exception_type, e:
             return e
+        # We want the same error message as assertRaises but we must not 
+        # assume that callable is idempotent
+        self.assertRaises(exception_type, lambda: None)
     
     def assert_false(self, actual, msg=None):
         self.assertEquals(False, actual, msg=msg)
@@ -50,5 +50,13 @@ class PythonicTestCase(TestCase):
     
     def assert_almost_equals(self, expected, actual, places=None, msg=None):
         self.assertAlmostEqual(expected, actual, places=places, msg=msg)
+    
+    def assert_isinstance(self, value, klass, msg=None):
+        if isinstance(value, klass):
+            return
+        if msg is None:
+            class_name = lambda klass: klass.__name__
+            msg = '%s is not an instance of %s' % (class_name(value.__class__), class_name(klass))
+        raise AssertionError(msg)
 
 
