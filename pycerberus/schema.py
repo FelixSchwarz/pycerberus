@@ -34,6 +34,7 @@ class SchemaValidator(Validator):
     def __init__(self, *args, **kwargs):
         self.super()
         self._fields = {}
+        self._formvalidators = []
     
     # -------------------------------------------------------------------------
     # additional public API 
@@ -46,6 +47,12 @@ class SchemaValidator(Validator):
     
     def validator_for(self, field_name):
         return self._fields[field_name]
+    
+    def add_formvalidator(self, formvalidator):
+        self._formvalidators.append(formvalidator)
+    
+    def formvalidators(self):
+        return tuple(self._formvalidators)
     
     # -------------------------------------------------------------------------
     # overridden public methods
@@ -77,19 +84,31 @@ class SchemaValidator(Validator):
             return fields[field_name]
         return validator.empty_value(context)
     
-    def _process_fields(self, fields, context):
+    def _process_field(self, key, validator, fields, context, validated_fields, exceptions):
+        try:
+            original_value = self._value_for_field(key, validator, fields, context)
+            converted_value = validator.process(original_value, context)
+            validated_fields[key] = converted_value
+        except InvalidDataError, e:
+            exceptions[key] = e
+    
+    def _process_field_validators(self, fields, context):
         validated_fields = {}
-        exception = {}
+        exceptions = {}
         for key, validator in self.validators_by_field().items():
-            try:
-                original_value = self._value_for_field(key, validator, fields, context)
-                converted_value = validator.process(original_value, context)
-                validated_fields[key] = converted_value
-            except InvalidDataError, e:
-                exception[key] = e
-        if len(exception) > 0:
-            self._raise_exception(exception, context)
+            self._process_field(key, validator, fields, context, validated_fields, exceptions)
+        if len(exceptions) > 0:
+            self._raise_exception(exceptions, context)
         return validated_fields
+    
+    def _process_form_validators(self, validated_fields, context):
+        for formvalidator in self.formvalidators():
+            validated_fields = formvalidator.process(validated_fields, context=context)
+        return validated_fields
+    
+    def _process_fields(self, fields, context):
+        validated_fields = self._process_field_validators(fields, context)
+        return self._process_form_validators(validated_fields, context)
     
     def _raise_exception(self, exceptions, context):
         first_field_with_error = exceptions.keys()[0]

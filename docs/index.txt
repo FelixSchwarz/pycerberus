@@ -461,6 +461,30 @@ Because of that you can display the user all errors at once::
         e.error_for('id') # id validation error
 
 
+Validating multiple fields in a Schema
+--------------------------------------
+
+Sometimes you need to validate multiple fields in a schema - e.g. you need to
+check in a 'change password' action that the password is entered the same twice.
+Or you need to check that a certain value is higher than another value in the 
+form. That's where *formvalidators* come into play.
+
+formvalidators are validators like all other field validators but they get the
+complete field dict as input, not a single item. Also formvalidators are run
+*after* all field validators successfully validated the input - therefore you
+have access to reasonably sane values, already converted to a handy Python data
+type. Opposite to simple field validators, the validation process fails 
+immediately if one formvalidator fails.
+
+You can add formvalidators to a form like this::
+
+    class NumbersMatch(Validator):
+        def validate(self, fields, context):
+            if fields['a'] != fields['b' ]:
+                self.error('no_match', fields, context=context)
+    schema.add_formvalidator(NumbersMatch)
+
+
 Getting Help
 ==============================
 

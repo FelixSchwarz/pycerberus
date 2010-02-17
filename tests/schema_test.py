@@ -1,21 +1,24 @@
 # -*- coding: UTF-8 -*-
 
-from pycerberus.lib import PythonicTestCase
+from pycerberus.api import Validator
+from pycerberus.errors import InvalidDataError
+from pycerberus.lib import AttrDict, PythonicTestCase
 from pycerberus.schema import SchemaValidator
 from pycerberus.validators import IntegerValidator, StringValidator
-from pycerberus.errors import InvalidDataError
 
 
 
 class SchemaTest(PythonicTestCase):
     
-    def _schema(self, fields=('id',)):
+    def _schema(self, fields=('id',), formvalidators=()):
         schema = SchemaValidator()
         assert set(fields).issubset(set(('id', 'key')))
         if 'id' in fields:
             schema.add('id', IntegerValidator())
         if 'key' in fields:
             schema.add('key', StringValidator())
+        for formvalidator in formvalidators:
+            schema.add_formvalidator(formvalidator)
         return schema
     
     # -------------------------------------------------------------------------
@@ -89,6 +92,7 @@ class SchemaTest(PythonicTestCase):
         schema = self._schema(('id', 'key'))
         exception = self.assert_raises(InvalidDataError, schema.process, 
                                        {'id': 'invalid', 'key': {}})
+        self.assert_equals(['id', 'key'], exception.error_dict().keys())
         id_error = exception.error_for('id').error()
         self.assert_equals('invalid', id_error.value)
         self.assert_equals('invalid_number', id_error.key)
@@ -97,5 +101,74 @@ class SchemaTest(PythonicTestCase):
         self.assert_equals({}, key_error.value)
         self.assert_equals('invalid_type', key_error.key)
     
+    # -------------------------------------------------------------------------
+    # form validators
+    
+    def test_can_add_form_validators(self):
+        self._schema().add_formvalidator(Validator())
+    
+    def test_can_retrieve_form_validators(self):
+        formvalidator = Validator()
+        schema = self._schema()
+        schema.add_formvalidator(formvalidator)
+        self.assert_equals(1, len(schema.formvalidators()))
+        self.assert_equals(formvalidator, schema.formvalidators()[0])
+    
+    def _failing_validator(self):
+        def mock_process(fields, context=None):
+            raise InvalidDataError('foo', fields, 'key', context)
+        return AttrDict(process=mock_process)
+    
+    def test_formvalidators_are_executed(self):
+        schema = self._schema(formvalidators=(self._failing_validator(), ))
+        self.assert_raises(Exception, schema.process, {'id': '42'})
+    
+    def test_formvalidators_can_modify_fields(self):
+        class FormValidator(Validator):
+            def convert(self, fields, context):
+                return {'new_field': True, }
+        schema = self._schema(formvalidators=(FormValidator(),))
+        self.assert_equals({'new_field': True}, schema.process({'id': '42'}))
+    
+    def test_formvalidators_are_not_executed_if_field_validator_failed(self):
+        schema = self._schema(formvalidators=(self._failing_validator(), ))
+        error = self.assert_raises(InvalidDataError, schema.process, {'id': 'invalid'})
+        self.assert_equals(['id'], error.error_dict().keys())
+    
+    def test_formvalidators_are_executed_after_field_validators(self):
+        def mock_process(fields, context=None):
+            assert fields == {'id': 42}
+        formvalidator = AttrDict(process=mock_process)
+        schema = self._schema(formvalidators=(formvalidator, ))
+        schema.process({'id': '42'})
+    
+    def test_can_have_multiple_formvalidators(self):
+        schema = self._schema()
+        def first_mock_process(fields, context):
+            assert context['state'] == 0
+            context['state'] = 1
+        first_validator = AttrDict(process=first_mock_process)
+        schema.add_formvalidator(first_validator)
+        
+        def second_mock_process(fields, context=None):
+            assert context['state'] == 1
+            context['state'] = 2
+        second_validator = AttrDict(process=second_mock_process)
+        schema.add_formvalidator(second_validator)
+        
+        context = {'state': 0}
+        schema.process({'id': '42'}, context)
+        self.assert_equals(2, context['state'])
+    
+    def test_execute_no_formvalidators_after_one_failed(self):
+        schema = self._schema()
+        def mock_process(fields, context=None):
+            raise InvalidDataError('a message', fields, key='expected', context=context)
+        first_validator = AttrDict(process=mock_process)
+        schema.add_formvalidator(first_validator)
+        schema.add_formvalidator(self._failing_validator())
+        
+        error = self.assert_raises(InvalidDataError, schema.process, {'id': '42'})
+        self.assert_equals('expected', error.error().key)
 
 
