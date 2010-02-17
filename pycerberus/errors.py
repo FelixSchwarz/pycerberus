@@ -42,9 +42,10 @@ class ValidationError(Exception):
 class InvalidDataError(ValidationError):
     """All exceptions which were caused by data to be validated must be derived 
     from this base class."""
-    def __init__(self, msg, value, key=None, context=None):
+    def __init__(self, msg, value, key=None, context=None, error_dict=None):
         self.super(msg)
         self._error = AttrDict(key=key, msg=msg, value=value, context=context)
+        self._error_dict = error_dict or {}
     
     def __repr__(self):
         cls_name = self.__class__.__name__
@@ -56,9 +57,12 @@ class InvalidDataError(ValidationError):
         """Return information about the first error."""
         return self._error
     
-    def errors(self):
+    def error_dict(self):
         "Return all errors as an iterable."
-        return (self.error(),)
+        return self._error_dict
+    
+    def error_for(self, field_name):
+        return self.error_dict()[field_name]
 
 
 class EmptyError(InvalidDataError):

@@ -1,0 +1,101 @@
+# -*- coding: UTF-8 -*-
+
+from pycerberus.lib import PythonicTestCase
+from pycerberus.schema import SchemaValidator
+from pycerberus.validators import IntegerValidator, StringValidator
+from pycerberus.errors import InvalidDataError
+
+
+
+class SchemaTest(PythonicTestCase):
+    
+    def _schema(self, fields=('id',)):
+        schema = SchemaValidator()
+        assert set(fields).issubset(set(('id', 'key')))
+        if 'id' in fields:
+            schema.add('id', IntegerValidator())
+        if 'key' in fields:
+            schema.add('key', StringValidator())
+        return schema
+    
+    # -------------------------------------------------------------------------
+    # setup / introspection
+    
+    def test_new_schema_has_no_validators_by_default(self):
+        self.assert_equals({}, SchemaValidator().validators_by_field())
+    
+    def test_process_smoke(self):
+        self.assert_equals({},SchemaValidator().process(None))
+        self.assert_equals({}, SchemaValidator().process({}))
+    
+    def test_can_add_validators(self):
+        schema = SchemaValidator()
+        id_validator = IntegerValidator()
+        schema.add('id', id_validator)
+        self.assert_equals({'id': id_validator}, schema.validators_by_field())
+    # protect against duplicate add
+    
+    def test_can_retrieve_validator_for_field(self):
+        schema = self._schema(('id', 'key'))
+        self.assert_isinstance(schema.validator_for('id'), IntegerValidator)
+        self.assert_isinstance(schema.validator_for('key'), StringValidator)
+    
+    # -------------------------------------------------------------------------
+    # processing / validation
+    
+    def test_non_dict_inputs_raise_invaliddataerror(self):
+        self.assert_raises(InvalidDataError, SchemaValidator().process, 'foo')
+        exception = self.assert_raises(InvalidDataError, SchemaValidator().process, [])
+        error = exception.error()
+        self.assert_equals('invalid_type', error.key)
+    
+    def test_can_process_single_value(self):
+        schema = self._schema()
+        self.assert_equals({'id': 42}, schema.process({'id': '42'}))
+    
+    def test_can_process_multiple_values(self):
+        schema = self._schema()
+        schema.add('amount', IntegerValidator())
+        self.assert_equals({'id': 42, 'amount': 21}, 
+                           schema.process({'id': '42', 'amount': '21'}))
+    
+    def test_can_retrieve_information_about_error(self):
+        schema = self._schema()
+        error = self.assert_raises(InvalidDataError, schema.process, {'id': 'invalid'}).error()
+        self.assert_equals('invalid', error.value)
+        self.assert_equals('invalid_number', error.key)
+        self.assert_equals('Please enter a number.', error.msg)
+    
+    def test_use_empty_value_from_validator_for_missing_fields(self):
+        schema = SchemaValidator()
+        schema.add('id', IntegerValidator(required=False))
+        self.assert_equals({'id': None}, schema.process({}))
+    
+    def test_missing_fields_are_validated_as_well(self):
+        schema = self._schema()
+        self.assert_raises(InvalidDataError, schema.process, {})
+    
+    def test_converted_dict_contains_only_validated_fields(self):
+        schema = self._schema()
+        self.assert_equals({'id': 42}, schema.process({'id': '42', 'foo': 'bar'}))
+    
+    def test_can_get_all_errors_at_once(self):
+        schema = self._schema(('id', 'key'))
+        exception = self.assert_raises(InvalidDataError, schema.process, 
+                                       {'id': 'invalid', 'key': None})
+        self.assert_equals(2, len(exception.error_dict()))
+    
+    def test_exception_contains_information_about_all_errrors(self):
+        schema = self._schema(('id', 'key'))
+        exception = self.assert_raises(InvalidDataError, schema.process, 
+                                       {'id': 'invalid', 'key': {}})
+        id_error = exception.error_for('id').error()
+        self.assert_equals('invalid', id_error.value)
+        self.assert_equals('invalid_number', id_error.key)
+        
+        key_error = exception.error_for('key').error()
+        self.assert_equals({}, key_error.value)
+        self.assert_equals('invalid_type', key_error.key)
+    
+
+
