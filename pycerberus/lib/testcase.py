@@ -73,5 +73,11 @@ class PythonicTestCase(TestCase):
         for key, value in subdict.items():
             self.assert_contains(key, a_dict)
             self.assert_equals(value, a_dict[key])
+    
+    def assert_length(self, expected_length, iterable):
+        self.assert_equals(expected_length, len(iterable))
+    
+    def assert_callable(self, a_callable):
+        self.assert_true(callable(a_callable), '%s is not callable' % repr(a_callable))
 
 

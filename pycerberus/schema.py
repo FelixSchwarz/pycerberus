@@ -22,19 +22,85 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pycerberus.api import Validator
+from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
 from pycerberus.i18n import _
 from pycerberus.errors import InvalidDataError
 
 __all__ = ['SchemaValidator']
 
 
+class SchemaMeta(EarlyBindForMethods):
+    def __new__(cls, classname, direct_superclasses, class_attributes_dict):
+        fields = cls.extract_fieldvalidators(class_attributes_dict)
+        formvalidators = cls.extract_formvalidators(class_attributes_dict)
+        cls.restore_overwritten_methods(direct_superclasses, class_attributes_dict)
+        schema_class = EarlyBindForMethods.__new__(cls, classname, direct_superclasses, class_attributes_dict)
+        schema_class._fields = fields
+        schema_class._formvalidators = formvalidators
+        return schema_class
+    
+    @classmethod
+    def is_validator(cls, value):
+        if isinstance(value, BaseValidator):
+            return True
+        elif isinstance(value, type) and issubclass(value, BaseValidator):
+            return True
+        return False
+    
+    @classmethod
+    def extract_fieldvalidators(cls, class_attributes_dict):
+        fields = {}
+        for key, value in tuple(class_attributes_dict.items()):
+            if not cls.is_validator(value):
+                continue
+            fields[key] = value
+            del class_attributes_dict[key]
+        return fields
+    
+    @classmethod
+    def extract_formvalidators(cls, class_attributes_dict):
+        if 'formvalidators' in class_attributes_dict:
+            value = class_attributes_dict['formvalidators']
+            if not callable(value):
+                return tuple(value)
+        return ()
+    
+    @classmethod
+    def restore_overwritten_methods(cls, direct_superclasses, class_attributes_dict):
+        super_class = direct_superclasses[0]
+        for name in dir(super_class):
+            if name not in class_attributes_dict:
+                continue
+            old_value = getattr(super_class, name)
+            new_value = class_attributes_dict[name]
+            if name != 'formvalidators' and not cls.is_validator(new_value):
+                continue
+            class_attributes_dict[name] = old_value
+
+
 class SchemaValidator(Validator):
+    
+    __metaclass__ = SchemaMeta
     
     def __init__(self, *args, **kwargs):
         self.super()
         self._fields = {}
         self._formvalidators = []
+        self._setup_fieldvalidators()
+        self._setup_formvalidators()
+    
+    def _init_validator(self, validator):
+        if isinstance(validator, type):
+            validator = validator()
+        return validator
+    
+    def _setup_fieldvalidators(self):
+        for name, validator in self.__class__._fields.items():
+            self.add(name, validator)
+    
+    def _setup_formvalidators(self):
+        for formvalidator in self.__class__._formvalidators:
+            self.add_formvalidator(formvalidator)
     
     # -------------------------------------------------------------------------
     # additional public API 
@@ -43,13 +109,16 @@ class SchemaValidator(Validator):
         return self._fields.copy()
     
     def add(self, fieldname, validator):
-        self._fields[fieldname] = validator
+        self._fields[fieldname] = self._init_validator(validator)
     
     def validator_for(self, field_name):
         return self._fields[field_name]
     
     def add_formvalidator(self, formvalidator):
-        self._formvalidators.append(formvalidator)
+        self._formvalidators.append(self._init_validator(formvalidator))
+    
+    # TODO: Get rid of validators_by_field
+    fieldvalidators = validators_by_field
     
     def formvalidators(self):
         return tuple(self._formvalidators)

@@ -445,6 +445,24 @@ dictionary contains only values that were validated. If you did not add a
 validator for a specific key, this key won't be included in the result.
 
 
+Declarative Schemas
+-----------------------------------
+
+Schemas can be an important part in your application security. Also they define
+some kind of interface (which parameters does your application expect). Besides
+the algorithmic way to build a schema there is a 'declarative' way so that you
+can review and audit your schemas easily::
+
+    class MySchema(SchemaValidator):
+        id   = IntegerValidator()
+        name = StringValidator()
+    
+    # using it...
+    schema = MySchema()
+
+It's absolutely the same schema but the definition is way easier to read.
+
+
 Schema Error Handling
 -----------------------------------
 

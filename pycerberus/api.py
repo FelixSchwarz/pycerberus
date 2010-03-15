@@ -36,6 +36,9 @@ class NoValueSet(object):
 
 
 class EarlyBindForMethods(type):
+    
+    super = SuperProxy()
+    
     def __new__(cls, classname, direct_superclasses, class_attributes_dict):
         validator_class = type.__new__(cls, classname, direct_superclasses, class_attributes_dict)
         cls._simulate_early_binding_for_message_methods(validator_class)
