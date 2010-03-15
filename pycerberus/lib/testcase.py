@@ -58,5 +58,20 @@ class PythonicTestCase(TestCase):
             class_name = lambda klass: klass.__name__
             msg = '%s is not an instance of %s' % (class_name(value.__class__), class_name(klass))
         raise AssertionError(msg)
+    
+    def assert_not_contains(self, expected_value, actual_iterable):
+        if expected_value not in actual_iterable:
+            return
+        raise AssertionError('%s in %s' % (repr(expected_value), repr(list(actual_iterable))))
+    
+    def assert_contains(self, expected_value, actual_iterable):
+        if expected_value in actual_iterable:
+            return
+        raise AssertionError('%s not in %s' % (repr(expected_value), repr(list(actual_iterable))))
+    
+    def assert_dict_contains(self, subdict, a_dict):
+        for key, value in subdict.items():
+            self.assert_contains(key, a_dict)
+            self.assert_equals(value, a_dict[key])
 
 
