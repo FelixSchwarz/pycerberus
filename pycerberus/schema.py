@@ -127,9 +127,6 @@ class SchemaValidator(Validator):
     # -------------------------------------------------------------------------
     # additional public API 
     
-    def validators_by_field(self):
-        return self._fields.copy()
-    
     def add(self, fieldname, validator):
         self._fields[fieldname] = self._init_validator(validator)
     
@@ -139,8 +136,8 @@ class SchemaValidator(Validator):
     def add_formvalidator(self, formvalidator):
         self._formvalidators.append(self._init_validator(formvalidator))
     
-    # TODO: Get rid of validators_by_field
-    fieldvalidators = validators_by_field
+    def fieldvalidators(self):
+        return self._fields.copy()
     
     def formvalidators(self):
         return tuple(self._formvalidators)
@@ -194,7 +191,7 @@ class SchemaValidator(Validator):
     def _process_field_validators(self, fields, context):
         validated_fields = {}
         exceptions = {}
-        for key, validator in self.validators_by_field().items():
+        for key, validator in self.fieldvalidators().items():
             self._process_field(key, validator, fields, context, validated_fields, exceptions)
         if len(exceptions) > 0:
             self._raise_exception(exceptions, context)

@@ -25,7 +25,7 @@ class SchemaTest(PythonicTestCase):
     # setup / introspection
     
     def test_new_schema_has_no_validators_by_default(self):
-        self.assert_equals({}, SchemaValidator().validators_by_field())
+        self.assert_equals({}, SchemaValidator().fieldvalidators())
     
     def test_process_smoke(self):
         self.assert_equals({},SchemaValidator().process(None))
@@ -35,7 +35,7 @@ class SchemaTest(PythonicTestCase):
         schema = SchemaValidator()
         id_validator = IntegerValidator()
         schema.add('id', id_validator)
-        self.assert_equals({'id': id_validator}, schema.validators_by_field())
+        self.assert_equals({'id': id_validator}, schema.fieldvalidators())
     # protect against duplicate add
     
     def test_can_retrieve_validator_for_field(self):
@@ -86,7 +86,7 @@ class SchemaTest(PythonicTestCase):
         schema = self._schema(('id', 'key'))
         exception = self.assert_raises(InvalidDataError, schema.process, 
                                        {'id': 'invalid', 'key': None})
-        self.assert_equals(2, len(exception.error_dict()))
+        self.assert_length(2, exception.error_dict())
     
     def test_exception_contains_information_about_all_errrors(self):
         schema = self._schema(('id', 'key'))
@@ -111,7 +111,7 @@ class SchemaTest(PythonicTestCase):
         formvalidator = Validator()
         schema = self._schema()
         schema.add_formvalidator(formvalidator)
-        self.assert_equals(1, len(schema.formvalidators()))
+        self.assert_length(1, schema.formvalidators())
         self.assert_equals(formvalidator, schema.formvalidators()[0])
     
     def _failing_validator(self):
