@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from pycerberus.lib import AttrDict, PythonicTestCase
+from pycerberus.api import Validator
+from pycerberus.lib import PythonicTestCase
 from pycerberus.schema import SchemaValidator
 from pycerberus.validators import IntegerValidator
 
@@ -11,7 +12,7 @@ class DeclarativeSchemaTest(PythonicTestCase):
     class DeclarativeSchema(SchemaValidator):
         id = IntegerValidator()
         amount = IntegerValidator
-        formvalidators = (AttrDict(process=lambda fields, context: None), )
+        formvalidators = (Validator(), )
     
     def schema(self, schema_class=None):
         if schema_class is None:

@@ -31,8 +31,8 @@ __all__ = ['SchemaValidator']
 
 class SchemaMeta(EarlyBindForMethods):
     def __new__(cls, classname, direct_superclasses, class_attributes_dict):
-        fields = cls.extract_fieldvalidators(class_attributes_dict)
-        formvalidators = cls.extract_formvalidators(class_attributes_dict)
+        fields = cls.extract_fieldvalidators(class_attributes_dict, direct_superclasses)
+        formvalidators = cls.extract_formvalidators(class_attributes_dict, direct_superclasses)
         cls.restore_overwritten_methods(direct_superclasses, class_attributes_dict)
         schema_class = EarlyBindForMethods.__new__(cls, classname, direct_superclasses, class_attributes_dict)
         schema_class._fields = fields
@@ -48,22 +48,44 @@ class SchemaMeta(EarlyBindForMethods):
         return False
     
     @classmethod
-    def extract_fieldvalidators(cls, class_attributes_dict):
-        fields = {}
-        for key, value in tuple(class_attributes_dict.items()):
-            if not cls.is_validator(value):
+    def _filter_validators(cls, items):
+        validators = []
+        for item in items:
+            validator = item
+            if isinstance(item, (tuple, list)):
+                validator = item[1]
+            if not cls.is_validator(validator):
                 continue
-            fields[key] = value
+            validators.append(item)
+        return validators
+    
+    @classmethod
+    def extract_fieldvalidators(cls, class_attributes_dict, superclasses):
+        fields = {}
+        for superclass in superclasses:
+            if not hasattr(superclass, '_fields'):
+                continue
+            fields.update(cls._filter_validators(superclass._fields.items()))
+        
+        new_validators = cls._filter_validators(class_attributes_dict.items())
+        for key, validator in new_validators:
+            fields[key] = validator
             del class_attributes_dict[key]
         return fields
     
     @classmethod
-    def extract_formvalidators(cls, class_attributes_dict):
+    def extract_formvalidators(cls, class_attributes_dict, superclasses):
+        formvalidators = []
+        for superclass in superclasses:
+            if not hasattr(superclass, '_formvalidators'):
+                continue
+            formvalidators.extend(cls._filter_validators(superclass._formvalidators))
+        
         if 'formvalidators' in class_attributes_dict:
-            value = class_attributes_dict['formvalidators']
-            if not callable(value):
-                return tuple(value)
-        return ()
+            validators = class_attributes_dict['formvalidators']
+            if not callable(validators):
+                formvalidators.extend(cls._filter_validators(validators))
+        return tuple(formvalidators)
     
     @classmethod
     def restore_overwritten_methods(cls, direct_superclasses, class_attributes_dict):
@@ -122,6 +144,14 @@ class SchemaValidator(Validator):
     
     def formvalidators(self):
         return tuple(self._formvalidators)
+    
+    def add_missing_validators(self, schema):
+        for name, validator in schema.fieldvalidators().items():
+            if name in self.fieldvalidators():
+                continue
+            self.add(name, validator)
+        for formvalidator in schema.formvalidators():
+            self.add_formvalidator(formvalidator)
     
     # -------------------------------------------------------------------------
     # overridden public methods
