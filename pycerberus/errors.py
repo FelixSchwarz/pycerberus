@@ -36,7 +36,10 @@ class ValidationError(Exception):
     
     def __init__(self, msg):
         self.super()
-        self.msg = msg
+        self._msg = msg
+    
+    def msg(self):
+        return self._msg
 
 
 class InvalidDataError(ValidationError):
@@ -44,25 +47,26 @@ class InvalidDataError(ValidationError):
     from this base class."""
     def __init__(self, msg, value, key=None, context=None, error_dict=None):
         self.super(msg)
-        self._error = AttrDict(key=key, msg=msg, value=value, context=context)
-        self._error_dict = error_dict or {}
+        self._details = AttrDict(key=lambda: key, msg=lambda: msg, 
+                               value=lambda: value, context=lambda: context)
+        self._details_dict = error_dict or {}
     
     def __repr__(self):
         cls_name = self.__class__.__name__
-        e = self.error()
-        values = (cls_name, repr(e.msg), repr(e.value), repr(e.key), repr(e.context))
+        e = self.details()
+        values = (cls_name, repr(e.msg()), repr(e.value()), repr(e.key()), repr(e.context()))
         return '%s(%s, %s, key=%s, context=%s)' % values
     
-    def error(self):
-        """Return information about the first error."""
-        return self._error
+    def details(self):
+        """Return information about the *first* error."""
+        return self._details
     
-    def error_dict(self):
+    def details_dict(self):
         "Return all errors as an iterable."
-        return self._error_dict
+        return self._details_dict
     
-    def error_for(self, field_name):
-        return self.error_dict()[field_name]
+    def details_for(self, field_name):
+        return self.details_dict()[field_name]
 
 
 class EmptyError(InvalidDataError):

@@ -49,8 +49,7 @@ class SchemaTest(PythonicTestCase):
     def test_non_dict_inputs_raise_invaliddataerror(self):
         self.assert_raises(InvalidDataError, SchemaValidator().process, 'foo')
         exception = self.assert_raises(InvalidDataError, SchemaValidator().process, [])
-        error = exception.error()
-        self.assert_equals('invalid_type', error.key)
+        self.assert_equals('invalid_type', exception.details().key())
     
     def test_can_process_single_value(self):
         schema = self._schema()
@@ -64,10 +63,10 @@ class SchemaTest(PythonicTestCase):
     
     def test_can_retrieve_information_about_error(self):
         schema = self._schema()
-        error = self.assert_raises(InvalidDataError, schema.process, {'id': 'invalid'}).error()
-        self.assert_equals('invalid', error.value)
-        self.assert_equals('invalid_number', error.key)
-        self.assert_equals('Please enter a number.', error.msg)
+        error = self.assert_raises(InvalidDataError, schema.process, {'id': 'invalid'}).details()
+        self.assert_equals('invalid', error.value())
+        self.assert_equals('invalid_number', error.key())
+        self.assert_equals('Please enter a number.', error.msg())
     
     def test_use_empty_value_from_validator_for_missing_fields(self):
         schema = SchemaValidator()
@@ -86,20 +85,20 @@ class SchemaTest(PythonicTestCase):
         schema = self._schema(('id', 'key'))
         exception = self.assert_raises(InvalidDataError, schema.process, 
                                        {'id': 'invalid', 'key': None})
-        self.assert_length(2, exception.error_dict())
+        self.assert_length(2, exception.details_dict())
     
     def test_exception_contains_information_about_all_errrors(self):
         schema = self._schema(('id', 'key'))
         exception = self.assert_raises(InvalidDataError, schema.process, 
                                        {'id': 'invalid', 'key': {}})
-        self.assert_equals(['id', 'key'], exception.error_dict().keys())
-        id_error = exception.error_for('id').error()
-        self.assert_equals('invalid', id_error.value)
-        self.assert_equals('invalid_number', id_error.key)
+        self.assert_equals(['id', 'key'], exception.details_dict().keys())
+        id_error = exception.details_for('id').details()
+        self.assert_equals('invalid', id_error.value())
+        self.assert_equals('invalid_number', id_error.key())
         
-        key_error = exception.error_for('key').error()
-        self.assert_equals({}, key_error.value)
-        self.assert_equals('invalid_type', key_error.key)
+        key_error = exception.details_for('key').details()
+        self.assert_equals({}, key_error.value())
+        self.assert_equals('invalid_type', key_error.key())
     
     # -------------------------------------------------------------------------
     # form validators
@@ -133,7 +132,7 @@ class SchemaTest(PythonicTestCase):
     def test_formvalidators_are_not_executed_if_field_validator_failed(self):
         schema = self._schema(formvalidators=(self._failing_validator(), ))
         error = self.assert_raises(InvalidDataError, schema.process, {'id': 'invalid'})
-        self.assert_equals(['id'], error.error_dict().keys())
+        self.assert_equals(['id'], error.details_dict().keys())
     
     def test_formvalidators_are_executed_after_field_validators(self):
         def mock_process(fields, context=None):
@@ -169,6 +168,6 @@ class SchemaTest(PythonicTestCase):
         schema.add_formvalidator(self._failing_validator())
         
         error = self.assert_raises(InvalidDataError, schema.process, {'id': '42'})
-        self.assert_equals('expected', error.error().key)
+        self.assert_equals('expected', error.details().key())
 
 

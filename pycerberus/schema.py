@@ -208,8 +208,8 @@ class SchemaValidator(Validator):
     
     def _raise_exception(self, exceptions, context):
         first_field_with_error = exceptions.keys()[0]
-        first_error = exceptions[first_field_with_error].error()
-        error = InvalidDataError(first_error.msg, first_error.value, first_error.key, 
+        first_error = exceptions[first_field_with_error].details()
+        error = InvalidDataError(first_error.msg(), first_error.value(), first_error.key(), 
                                  context, error_dict=exceptions)
         raise error
     
