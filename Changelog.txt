@@ -5,7 +5,10 @@ Changelog for pycerberus
 0.2
 - You now can declare custom messages as a class-level dict
 - Added interface to retrieve error details from InvalidDataErrors
-- Added validation schemas to validate a set of values (typically a web form)
+- Added validation schemas to validate a set of values (typically a web form).
+  Schemas can also inherit from other schemas to avoid code duplication.
+- Validators try to make thread-safety violations obvious
+- Nicer API to retrieve error details from an InvalidDataError
 
 0.1 (30.01.2010)
  - initial release
