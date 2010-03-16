@@ -138,11 +138,11 @@ original, unmodified value::
     try:
         IntegerValidator().process('foo')
     except InvalidDataError, e:
-        error = e.error()
-        error.msg           # u'Please enter a number.'
-        error.key           # 'invalid_number'
-        error.value         # 'foo'
-        error.context       # {}
+        details = e.details()
+        details.msg()         # u'Please enter a number.'
+        details.key()         # 'invalid_number'
+        details.value()       # 'foo'
+        details.context()     # {}
 
 
 Configuring Validators
@@ -482,8 +482,8 @@ Because of that you can display the user all errors at once::
     try:
         schema.process({'id': 'invalid', 'name': None})
     except InvalidDataError, e:
-        e.error_dict()    # {'id': <id validation error>, 'name': <id validation error>}
-        e.error_for('id') # id validation error
+        e.details_dict()    # {'id': <id validation error>, 'name': <id validation error>}
+        e.details_for('id') # id validation error
 
 
 Validating multiple fields in a Schema
