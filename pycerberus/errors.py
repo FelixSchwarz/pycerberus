@@ -25,7 +25,7 @@
 from pycerberus.lib import AttrDict, SuperProxy
 
 __all__ = ['EmptyError', 'InvalidArgumentsError', 'InvalidDataError', 
-           'ValidationError']
+           'ThreadSafetyError', 'ValidationError']
 
 
 
@@ -70,5 +70,9 @@ class EmptyError(InvalidDataError):
 
 
 class InvalidArgumentsError(ValidationError):
+    pass
+
+
+class ThreadSafetyError(ValidationError):
     pass
 

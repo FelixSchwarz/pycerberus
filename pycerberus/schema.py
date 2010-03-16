@@ -83,9 +83,9 @@ class SchemaValidator(Validator):
     __metaclass__ = SchemaMeta
     
     def __init__(self, *args, **kwargs):
-        self.super()
         self._fields = {}
         self._formvalidators = []
+        self.super()
         self._setup_fieldvalidators()
         self._setup_formvalidators()
     

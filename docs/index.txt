@@ -216,6 +216,13 @@ so you can just say 'self.super()' in your custom validator classes. This will
 call the super implementation with just the same parameters as your method was
 called.
 
+Validators need to be thread-safe as one instance might be used several times.
+Therefore you must not add additional attributes to your validator instance
+after you called Validator's constructor. To prevent unexperienced programmers
+falling in that trap, a Validator will raise an exception if you try to set
+an attribute. If you don't like this behavior, you can set 
+'_is_internal_state_frozen' to False before calling Validator's constructor.
+
 
 Putting all together - A simple validator
 -----------------------------------------

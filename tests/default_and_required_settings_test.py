@@ -9,6 +9,7 @@ class DummyValidator(Validator):
     _empty_value = 'empty'
     
     def __init__(self, default=42, *args, **kwargs):
+        self._is_internal_state_frozen = False
         self.super()
     
     def is_empty(self, value, context):
@@ -32,6 +33,7 @@ class ValidatorTest(ValidationTest):
         self.validator().convert = self.not_implemented
         self.init_validator(required=False)
         self.assert_equals(42, self.process('empty'))
+        # special check to ensure that other tests are not affected by this
         self.assert_not_equals(self.not_implemented, self.validator().convert)
     
     def test_validator_provides_empty_dict_if_no_context_was_given(self):

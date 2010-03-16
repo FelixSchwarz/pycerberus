@@ -24,7 +24,8 @@
 
 import inspect
 
-from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataError
+from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataError, \
+    ThreadSafetyError
 from pycerberus.i18n import _, GettextTranslation
 from pycerberus.lib import SuperProxy
 
@@ -155,6 +156,8 @@ class Validator(BaseValidator):
         self._required = required
         self._check_argument_consistency()
         self._implementations, self._implementation_by_class = self._freeze_implementations_for_class()
+        if self.is_internal_state_frozen() not in (True, False):
+            self._is_internal_state_frozen = True
     
     # --------------------------------------------------------------------------
     # initialization
@@ -280,6 +283,19 @@ class Validator(BaseValidator):
             args = list(args) + [context]
             return method(self, *args)
         return context_key_wrapper
+    
+    def is_internal_state_frozen(self):
+        is_frozen = getattr(self, '_is_internal_state_frozen', NoValueSet)
+        if is_frozen == NoValueSet:
+            return None
+        return bool(is_frozen)
+    
+    def __setattr__(self, name, value):
+        "Prevent non-threadsafe use of Validators by unexperienced developers"
+        if self.is_internal_state_frozen():
+            raise ThreadSafetyError('Do not store state in a validator instance as this violates thread safety.')
+        self.__dict__[name] = value
+    
     # -------------------------------------------------------------------------
 
 
