@@ -2,7 +2,7 @@
 Changelog for pycerberus
 ========================
 
-0.2
+0.2 (16.03.2010)
 - You now can declare custom messages as a class-level dict
 - Added interface to retrieve error details from InvalidDataErrors
 - Added validation schemas to validate a set of values (typically a web form).

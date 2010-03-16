@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.2dev'
+version = '0.2'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
@@ -29,7 +29,7 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
-0.2
+0.2 (16.03.2010)
 ==================
 - You now can declare custom messages as a class-level dict
 - Added interface to retrieve error details from InvalidDataErrors
