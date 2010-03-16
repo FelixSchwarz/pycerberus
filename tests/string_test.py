@@ -22,7 +22,6 @@ class StringValidatorTest(ValidationTest):
     
     def test_show_class_name_in_error_message(self):
         e = self.assert_raises(InvalidDataError, self.process, [])
-        msg = e.details().msg()
-        self.assert_true(u'(expected string, got "list")' in msg, msg)
+        self.assert_contains(u'(expected string, got "list")', e.details().msg())
 
 

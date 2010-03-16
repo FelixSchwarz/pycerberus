@@ -15,6 +15,6 @@ class MessagesFromBuiltInValidatorsAreTranslatedTest(ValidationTest):
     def test_variable_parts_are_added_after_translation(self):
         expected_message = u'(String erwartet, "list" erhalten)'
         translated_message = self.get_error([], locale='de').details().msg()
-        self.assert_true(expected_message in translated_message, repr(translated_message))
+        self.assert_contains(expected_message, translated_message)
 
 
