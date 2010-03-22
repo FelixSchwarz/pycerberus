@@ -2,6 +2,9 @@
 Changelog for pycerberus
 ========================
 
+0.3dev
+- Schema can raise error if unknown items are processed
+
 0.2 (16.03.2010)
 - You now can declare custom messages as a class-level dict
 - Added interface to retrieve error details from InvalidDataErrors

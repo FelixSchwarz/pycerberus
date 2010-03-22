@@ -290,6 +290,9 @@ class Validator(BaseValidator):
             return None
         return bool(is_frozen)
     
+    def set_internal_state_freeze(self, is_frozen):
+        self.__dict__['_is_internal_state_frozen'] = is_frozen
+    
     def __setattr__(self, name, value):
         "Prevent non-threadsafe use of Validators by unexperienced developers"
         if self.is_internal_state_frozen():

@@ -100,6 +100,14 @@ class SchemaTest(PythonicTestCase):
         self.assert_equals({}, key_error.value())
         self.assert_equals('invalid_type', key_error.key())
     
+    def test_schema_can_bail_out_if_additional_items_are_detected(self):
+        schema = self._schema(fields=())
+        self.assert_equals({}, schema.process(dict(foo=42)))
+        schema.set_internal_state_freeze(False)
+        schema.set_allow_additional_parameters(False)
+        self.assert_raises(InvalidDataError, schema.process, dict(foo=42))
+        
+    
     # -------------------------------------------------------------------------
     # form validators
     

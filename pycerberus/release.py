@@ -29,6 +29,11 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
+0.3
+==================
+- Schema can raise error if unknown items are processed
+
+
 0.2 (16.03.2010)
 ==================
 - You now can declare custom messages as a class-level dict

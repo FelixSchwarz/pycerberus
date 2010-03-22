@@ -451,6 +451,11 @@ Please note that Schemas are 'secure by default' which means that the returned
 dictionary contains only values that were validated. If you did not add a 
 validator for a specific key, this key won't be included in the result.
 
+If you need to ensure that no values with unknown keys are passed to the schema
+(even if those would be just dropped), you can call the method 
+''set_allow_additional_parameters(False)''. After that the schema will raise an 
+exception if it finds any unknown keys.
+
 
 Declarative Schemas
 -----------------------------------

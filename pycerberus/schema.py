@@ -107,6 +107,7 @@ class SchemaValidator(Validator):
     def __init__(self, *args, **kwargs):
         self._fields = {}
         self._formvalidators = []
+        self.allow_additional_parameters = True
         self.super()
         self._setup_fieldvalidators()
         self._setup_formvalidators()
@@ -156,6 +157,7 @@ class SchemaValidator(Validator):
     def messages(self):
         return {
                 'invalid_type': _(u'Validator got unexpected input (expected "dict", got "%(classname)s").'),
+                'additional_items': _(u'Additional fields detected: "%(additional_items)s".'),
                }
     
     def convert(self, fields, context):
@@ -195,6 +197,9 @@ class SchemaValidator(Validator):
             self._process_field(key, validator, fields, context, validated_fields, exceptions)
         if len(exceptions) > 0:
             self._raise_exception(exceptions, context)
+        if (not self.allow_additional_parameters) and (not set(fields).issubset(set(self.fieldvalidators()))):
+            additional_items = set(self.fieldvalidators()).difference(set(fields))
+            self.error('additional_items', None, context, additional_items=additional_items)
         return validated_fields
     
     def _process_form_validators(self, validated_fields, context):
@@ -212,6 +217,9 @@ class SchemaValidator(Validator):
         error = InvalidDataError(first_error.msg(), first_error.value(), first_error.key(), 
                                  context, error_dict=exceptions)
         raise error
+    
+    def set_allow_additional_parameters(self, value):
+        self.allow_additional_parameters = value
     
     # -------------------------------------------------------------------------
 
