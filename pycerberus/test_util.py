@@ -42,7 +42,7 @@ class ValidationTest(PythonicTestCase):
     
     def validator(self):
         """Return a validator instance (initializes a new one if none was 
-        created yet."""
+        created yet)."""
         if self._validator is not None:
             return self._validator
         return self.init_validator()
