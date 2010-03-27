@@ -52,14 +52,20 @@ class ValidationTest(PythonicTestCase):
             kwargs['context'] = {}
         return self._validator.process(*args, **kwargs)
     
-    def get_error(self, value, locale='en', *args, **kwargs):
+    def assert_error(self, value, *args, **kwargs):
+        call = lambda: self.process(value, *args, **kwargs)
+        return self.assert_raises(InvalidDataError, call)
+    
+    def assert_error_with_locale(self, value, locale='en', *args, **kwargs):
         """Process the given value and assert that this raises a validation
         exception - return that exception."""
         context = {'locale': locale}
-        return self.assert_raises(InvalidDataError, self.process, value, context=context, *args, **kwargs)
+        return self.assert_error(value, context=context, *args, **kwargs)
+    get_error = assert_error_with_locale
     
     def message_for_key(self, key, locale='de'):
         "Return the error message for the given key."
-        exception = self.assert_raises(InvalidDataError, self.validator().error, key, None, {'locale': locale})
+        call = lambda: self.validator().error(key, None, {'locale': locale})
+        exception = self.assert_raises(InvalidDataError, call)
         return exception.details().msg()
 

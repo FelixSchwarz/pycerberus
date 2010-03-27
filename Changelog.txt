@@ -2,8 +2,10 @@
 Changelog for pycerberus
 ========================
 
-0.3dev
+0.3
+- Python 2.3 compatibility
 - Schema can raise error if unknown items are processed
+- Basic email address validator
 
 0.2 (16.03.2010)
 - You now can declare custom messages as a class-level dict
