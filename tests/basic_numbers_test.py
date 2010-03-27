@@ -19,13 +19,13 @@ class IntegerValidatorTest(ValidationTest):
         self.assert_equals(4, self.process(4))
     
     def test_fail_for_non_digit_strings(self):
-        self.assert_raises(InvalidDataError, self.process, 'invalid_number')
+        self.assert_raises(InvalidDataError, lambda: self.process('invalid_number'))
     
     def test_validator_rejects_bad_types(self):
-        self.assert_raises(InvalidDataError, self.process, [])
-        self.assert_raises(InvalidDataError, self.process, {})
-        self.assert_raises(InvalidDataError, self.process, object)
-        self.assert_raises(InvalidDataError, self.process, int)
+        self.assert_raises(InvalidDataError, lambda: self.process([]))
+        self.assert_raises(InvalidDataError, lambda: self.process({}))
+        self.assert_raises(InvalidDataError, lambda: self.process(object))
+        self.assert_raises(InvalidDataError, lambda: self.process(int))
     
     def test_validator_rejects_none_if_value_is_required(self):
         # Actually this functionality seems to be pretty basic and is 
