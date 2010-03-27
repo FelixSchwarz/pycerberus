@@ -56,6 +56,7 @@ class InvalidDataError(ValidationError):
         e = self.details()
         values = (cls_name, repr(e.msg()), repr(e.value()), repr(e.key()), repr(e.context()))
         return '%s(%s, %s, key=%s, context=%s)' % values
+    __str__ = __repr__
     
     def details(self):
         """Return information about the *first* error."""
