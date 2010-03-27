@@ -4,7 +4,7 @@
 # License: Public Domain
 # Authors: Martin Häcker, Felix Schwarz
 
-# Version 1.0.1
+# Version 1.0.2
 
 # This is how it works:
 # In the superclass of the class where you want to use this
@@ -26,7 +26,11 @@
 # - Package it all up nicely so it's super easy to use
 
 # Changelog
-# 1.0.1 
+# 1.0.2 (2010-03-27)
+#   - Simplistic heuristic detection if self.super() or 
+#     self.super(*args, **kwargs) was called so we can pass the right parameters
+#
+# 1.0.1
 #   - do not add arguments if subclass uses self.super() and super class does 
 #     not get any arguments besides self.
 #
@@ -36,6 +40,7 @@
 __all__ = ['SuperProxy']
 
 import inspect
+import re
 import sys
 import traceback
 
@@ -57,7 +62,8 @@ def find_class(instance, code):
                     return klass
 
 def find_arguments_for_called_method():
-    arg_names, varg_name, kwarg_name, arg_values = inspect.getargvalues(sys._getframe(3))
+    caller_frame = sys._getframe(3)
+    arg_names, varg_name, kwarg_name, arg_values = inspect.getargvalues(caller_frame)
     # don't need self
     arg_names = arg_names[1:]
     
@@ -84,15 +90,21 @@ def arguments_for_super_method(super_method):
     return find_arguments_for_called_method()
 
 
-def call_super_implementation(self, *vargs, **kwargs):
-    code = sys._getframe(1).f_code
-    method = getattr(super(find_class(self, code), self), code.co_name)
-    # always prefer explicit arguments
+self_super_regex = re.compile('self.super\((.*?)\)')
+non_whitespace_regex = re.compile('\S')
+
+def did_specify_arguments_explicitely(vargs, kwargs):
     if vargs or kwargs:
-        return method(*vargs, **kwargs)
-    else:
-        vargs, kwargs = arguments_for_super_method(method)
-        return method(*vargs, **kwargs)
+        return True
+    
+    caller_source_lines = inspect.getframeinfo(sys._getframe(2))[3]
+    caller_source_code = caller_source_lines[0]
+    match = self_super_regex.search(caller_source_code)
+    assert match is not None, repr(caller_source_code)
+    if non_whitespace_regex.search(match.group(1)):
+        return True
+    return False
+
 
 def find_caller_self():
     arg_names, varg_name, kwarg_name, arg_values = inspect.getargvalues(sys._getframe(2))
@@ -107,7 +119,7 @@ class SuperProxy(object):
         caller_self = find_caller_self()
         method = getattr(super(find_class(caller_self, code), caller_self), code.co_name)
         # always prefer explicit arguments
-        if vargs or kwargs:
+        if did_specify_arguments_explicitely(vargs, kwargs):
             return method(*vargs, **kwargs)
         else:
             vargs, kwargs = arguments_for_super_method(method)
@@ -260,6 +272,19 @@ class SuperTests(unittest.TestCase):
                 return self.super()
         
         Lower().foo().verify()
+    
+    def test_use_correct_default_arguments_for_super_method(self):
+        class Upper(Super):
+            def foo(self, important_key='fnord', *args, **kwargs):
+                assert important_key == 'fnord', repr(important_key)
+                return self.super.method()
+        class Lower(Upper):
+            def foo(self, some_paramter=None, *args, **kwargs):
+                # Actually self.super.foo(*args, **kwargs) would work but it's
+                # too easy to use the statement below so we have to support it.
+                return self.super(*args, **kwargs)
+        
+        Lower().foo().verify()
 
 
 
@@ -267,6 +292,6 @@ class SuperTests(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-# TODO: consider adding support for nested tupple unpacking? 
+# TODO: consider adding support for nested tuple unpacking? 
 # Not sure if this is actually used, but I found a note about this in the docs 
 # of the inspect module
