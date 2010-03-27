@@ -32,10 +32,10 @@ __all__ = ['EmptyError', 'InvalidArgumentsError', 'InvalidDataError',
 class ValidationError(Exception):
     "All exceptions thrown by this library must be derived from this base class"
     
-    super = SuperProxy()
-    
     def __init__(self, msg):
-        self.super()
+        # Exceptions are old-style classes so we need an explicit call the the
+        # super class to be compatible with Python 2.3
+        Exception.__init__(self, msg)
         self._msg = msg
     
     def msg(self):
@@ -46,7 +46,7 @@ class InvalidDataError(ValidationError):
     """All exceptions which were caused by data to be validated must be derived 
     from this base class."""
     def __init__(self, msg, value, key=None, context=None, error_dict=None):
-        self.super(msg)
+        ValidationError.__init__(self, msg)
         self._details = AttrDict(key=lambda: key, msg=lambda: msg, 
                                  value=lambda: value, context=lambda: context)
         self._error_dict = error_dict or {}

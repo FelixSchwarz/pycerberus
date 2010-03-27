@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from pycerberus.api import Validator
+from pycerberus.compat import set
 from pycerberus.errors import InvalidDataError
 from pycerberus.lib import AttrDict, PythonicTestCase
 from pycerberus.schema import SchemaValidator

@@ -30,7 +30,7 @@ Installation and Setup
 
 pycerberus is just a Python library which uses setuptools so it does not require
 a special setup. It has no dependencies besides the standard Python library. 
-Python 2.4-2.6 is supported.
+Python 2.3-2.6 is supported.
 
 
 Background
@@ -86,7 +86,7 @@ most of the design ideas are also present in pycerberus.
 Development Status
 ==================================
 
-Currently (February 2010, version 0.1) pycerberus is at a very basic stage - 
+Currently (March 2010, version 0.2) pycerberus is at a very basic stage - 
 though with very solid foundations. The API for single validators is basically
 complete, i18n support is built in and there is decent documentation covering
 all important aspects. You can check multiple values (e.g. a web form) easily
@@ -98,6 +98,12 @@ specific domains* (e.g. *correct* email address validation, validating host name
 localized numbers). Another interesting topic will be *integration into different
 frameworks* like `TurboGears <http://www.turbogears.org>`_ and 
 `trac <http://trac.edgewall.org>`_.
+
+However I have to say that I'm pretty satisfied with the current status so 
+adding more features to pycerberus won't be my #1 priority in the next months.
+The current API and functionality was well-suited even when 
+`validating input parameters of a SMTP server <www.schwarz.eu/opensource/projects/pymta>`_
+so I think most use cases should be actually covered.
 
 
 

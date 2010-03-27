@@ -34,7 +34,9 @@ class PythonicTestCase(TestCase):
         self.assertEquals(True, actual, msg=msg)
     
     def assert_trueish(self, actual, msg=None):
-        self.assertTrue(actual, msg=msg)
+        if actual:
+            return
+        self.failureException(msg)
     
     def assert_none(self, actual, msg=None):
         self.assertEquals(None, actual, msg=msg)

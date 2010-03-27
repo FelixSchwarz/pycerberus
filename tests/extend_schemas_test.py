@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from pycerberus.api import Validator
+from pycerberus.compat import set
 from pycerberus.lib import PythonicTestCase
 from pycerberus.schema import SchemaValidator
 from pycerberus.validators import StringValidator

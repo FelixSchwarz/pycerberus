@@ -24,6 +24,7 @@
 
 import inspect
 
+from pycerberus.compat import reversed, set
 from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataError, \
     ThreadSafetyError
 from pycerberus.i18n import _, GettextTranslation
@@ -45,7 +46,6 @@ class EarlyBindForMethods(type):
         cls._simulate_early_binding_for_message_methods(validator_class)
         return validator_class
     
-    @classmethod
     def _simulate_early_binding_for_message_methods(cls, validator_class):
         # Need to create a dynamic method if messages are defined in a 
         # class-level dict.
@@ -71,6 +71,7 @@ class EarlyBindForMethods(type):
             # make sphinx happy
             message_for_key.__doc__ = validator_class.message_for_key.__doc__
             validator_class.message_for_key = message_for_key
+    _simulate_early_binding_for_message_methods = classmethod(_simulate_early_binding_for_message_methods)
 
 
 class BaseValidator(object):
@@ -259,10 +260,13 @@ class Validator(BaseValidator):
         # This method can be overridden on a by-class basis to get translations 
         # to support non-gettext translation mechanisms (e.g. from a db)
         translated_message = GettextTranslation(**translation_parameters).gettext(native_message)
-        # Somehow gettext does not translate the read strings from mo files even
-        # if this was declared in the po file...
+        # Somehow gettext in Python 2.6 does not translate the read strings 
+        # from mo files even if this was declared in the po file...
         # Currently we just default to UTF-8 but this should be more flexible
         # somehow...
+        # However in Python 2.3 gettext returns unicode instances already...
+        if isinstance(translated_message, unicode):
+            return translated_message
         return translated_message.decode('UTF-8')
     
     def message(self, key, context, **values):

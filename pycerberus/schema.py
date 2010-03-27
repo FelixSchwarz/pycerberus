@@ -23,6 +23,7 @@
 # THE SOFTWARE.
 
 from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
+from pycerberus.compat import set
 from pycerberus.i18n import _
 from pycerberus.errors import InvalidDataError
 
@@ -39,15 +40,14 @@ class SchemaMeta(EarlyBindForMethods):
         schema_class._formvalidators = formvalidators
         return schema_class
     
-    @classmethod
     def is_validator(cls, value):
         if isinstance(value, BaseValidator):
             return True
         elif isinstance(value, type) and issubclass(value, BaseValidator):
             return True
         return False
+    is_validator = classmethod(is_validator)
     
-    @classmethod
     def _filter_validators(cls, items):
         validators = []
         for item in items:
@@ -58,22 +58,24 @@ class SchemaMeta(EarlyBindForMethods):
                 continue
             validators.append(item)
         return validators
+    _filter_validators = classmethod(_filter_validators)
     
-    @classmethod
     def extract_fieldvalidators(cls, class_attributes_dict, superclasses):
         fields = {}
         for superclass in superclasses:
             if not hasattr(superclass, '_fields'):
                 continue
-            fields.update(cls._filter_validators(superclass._fields.items()))
+            validators = cls._filter_validators(superclass._fields.items())
+            # In Python 2.3 you can only pass dicts to {}.update()
+            fields.update(dict(validators))
         
         new_validators = cls._filter_validators(class_attributes_dict.items())
         for key, validator in new_validators:
             fields[key] = validator
             del class_attributes_dict[key]
         return fields
+    extract_fieldvalidators = classmethod(extract_fieldvalidators)
     
-    @classmethod
     def extract_formvalidators(cls, class_attributes_dict, superclasses):
         formvalidators = []
         for superclass in superclasses:
@@ -86,8 +88,8 @@ class SchemaMeta(EarlyBindForMethods):
             if not callable(validators):
                 formvalidators.extend(cls._filter_validators(validators))
         return tuple(formvalidators)
+    extract_formvalidators = classmethod(extract_formvalidators)
     
-    @classmethod
     def restore_overwritten_methods(cls, direct_superclasses, class_attributes_dict):
         super_class = direct_superclasses[0]
         for name in dir(super_class):
@@ -98,6 +100,7 @@ class SchemaMeta(EarlyBindForMethods):
             if name != 'formvalidators' and not cls.is_validator(new_value):
                 continue
             class_attributes_dict[name] = old_value
+    restore_overwritten_methods = classmethod(restore_overwritten_methods)
 
 
 class SchemaValidator(Validator):
