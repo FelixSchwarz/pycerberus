@@ -150,7 +150,7 @@ class Validator(BaseValidator):
     you set ``required`` to True but provide a default value as well.
     """
     
-    def __init__(self, default=NoValueSet, required=NoValueSet, *args, **kwargs):
+    def __init__(self, default=NoValueSet, required=NoValueSet):
         self.super()
         self._default = default
         self._required = required

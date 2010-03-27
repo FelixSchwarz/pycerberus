@@ -5,18 +5,23 @@ from pycerberus.api import NoValueSet
 from pycerberus.test_util import ValidationTest
 
 
-class DummyValidator(Validator):
-    _empty_value = 'empty'
+class ValidatorParametersTest(ValidationTest):
     
-    def __init__(self, default=42, *args, **kwargs):
-        self._is_internal_state_frozen = False
-        self.super()
-    
-    def is_empty(self, value, context):
-        return value == self._empty_value
+    def test_bail_out_if_unknown_parameters_are_passed_to_constructor(self):
+        self.assert_raises(Exception, lambda: Validator(invalid='fnord'))
 
 
-class ValidatorTest(ValidationTest):
+class DefaultAndRequiredValuesTest(ValidationTest):
+    
+    class DummyValidator(Validator):
+        _empty_value = 'empty'
+        
+        def __init__(self, default=42, *args, **kwargs):
+            self._is_internal_state_frozen = False
+            self.super()
+        
+        def is_empty(self, value, context):
+            return value == self._empty_value
     
     validator_class = DummyValidator
     
@@ -28,7 +33,7 @@ class ValidatorTest(ValidationTest):
     def test_have_special_value_for_no_value_set(self):
         self.assert_equals(NoValueSet, NoValueSet)
         self.assert_trueish(NoValueSet)
-   
+    
     def test_can_detect_empty_values_and_return_special_value_before_validation(self):
         self.validator().convert = self.not_implemented
         self.init_validator(required=False)
