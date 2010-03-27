@@ -29,6 +29,7 @@
 # 1.0.2 (2010-03-27)
 #   - Simplistic heuristic detection if self.super() or 
 #     self.super(*args, **kwargs) was called so we can pass the right parameters
+#   - Made simple_super compatible with Python 2.3 and old-style classes
 #
 # 1.0.1
 #   - do not add arguments if subclass uses self.super() and super class does 
@@ -45,6 +46,14 @@ import sys
 import traceback
 
 # REFACT: move all the methods into SuperProxy
+
+try:
+    reversed
+except NameError:
+    def reversed(an_iterable):
+        copied_iterable = list(an_iterable)
+        copied_iterable.reverse()
+        return copied_iterable
 
 def find_class(instance, code):
     method_name = code.co_name
@@ -132,7 +141,10 @@ class SuperProxy(object):
     
 
 
-# from pdb import set_trace; set_trace()
+# ------------------------------------------------------------------------------
+# test cases
+
+import unittest
 
 class Super(object):
     super = SuperProxy()
@@ -145,10 +157,9 @@ class Super(object):
     
     def verify(self):
         assert self.did_call_super
-    
 
 
-import unittest
+
 class SuperTests(unittest.TestCase):
     
     def test_no_arguments(self):
@@ -258,7 +269,7 @@ class SuperTests(unittest.TestCase):
             def __init__(self):
                 return self.super()
         
-        self.assertTrue(Lower().did_call_super)
+        self.assertEqual(True, Lower().did_call_super)
     
     def test_do_not_pass_arguments_by_default_if_lower_doesnt_have_any(self):
         # In order to have a nice API using self.super(), we need to be smart
@@ -287,10 +298,6 @@ class SuperTests(unittest.TestCase):
         Lower().foo().verify()
 
 
-
-
-if __name__ == '__main__':
-    unittest.main()
 
 # TODO: consider adding support for nested tuple unpacking? 
 # Not sure if this is actually used, but I found a note about this in the docs 
