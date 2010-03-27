@@ -86,7 +86,7 @@ most of the design ideas are also present in pycerberus.
 Development Status
 ==================================
 
-Currently (March 2010, version 0.2) pycerberus is at a very basic stage - 
+Currently (March 2010, version 0.3) pycerberus is at a very basic stage - 
 though with very solid foundations. The API for single validators is basically
 complete, i18n support is built in and there is decent documentation covering
 all important aspects. You can check multiple values (e.g. a web form) easily

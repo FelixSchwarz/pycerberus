@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.3dev'
+version = '0.3'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
@@ -29,10 +29,12 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
-0.3
+0.3 (27.03.2010)
 ==================
+- Python 2.3 compatibility
 - Schema can raise error if unknown items are processed
-
+- Basic domain name validator
+- Basic email address validator
 
 0.2 (16.03.2010)
 ==================

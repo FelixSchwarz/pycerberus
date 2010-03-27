@@ -2,9 +2,10 @@
 Changelog for pycerberus
 ========================
 
-0.3
+0.3 (27.03.2010)
 - Python 2.3 compatibility
 - Schema can raise error if unknown items are processed
+- Basic domain name validator
 - Basic email address validator
 
 0.2 (16.03.2010)
