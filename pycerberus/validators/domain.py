@@ -35,7 +35,7 @@ class DomainNameValidator(StringValidator):
     
     def messages(self):
         return {
-            'invalid_character': _('Invalid character %(invalid_character)s in domain %(domain)s.'),
+            'invalid_domain_character': _('Invalid character %(invalid_character)s in domain %(domain)s.'),
             'leading_dot':       _('Invalid domain: %(domain)s must not start with a dot.'),
             'trailing_dot':      _('Invalid domain: %(domain)s must not end with a dot.'),
             'double_dot':        _('Invalid domain: %(domain)s must not contain consecutive dots.'),
@@ -52,7 +52,7 @@ class DomainNameValidator(StringValidator):
         
         match = re.search('([^a-zA-Z0-9\.\-])', value)
         if match is not None:
-            self.error('invalid_character', value, context, invalid_character=repr(match.group(1)), domain=repr(value))
+            self.error('invalid_domain_character', value, context, invalid_character=repr(match.group(1)), domain=repr(value))
 
 
 

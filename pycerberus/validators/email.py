@@ -55,7 +55,7 @@ class EmailAddressValidator(DomainNameValidator):
     def messages(self):
         return {
             'single_at':         _(u"An email address must contain a single '@'."),
-            'invalid_character': _(u'Invalid character %(invalid_character)s in email address %(emailaddress)s.'),
+            'invalid_email_character': _(u'Invalid character %(invalid_character)s in email address %(emailaddress)s.'),
         }
     
     def validate(self, emailaddress, context):
@@ -73,5 +73,5 @@ class EmailAddressValidator(DomainNameValidator):
         match = re.search('([^a-zA-Z0-9\.\_])', localpart)
         if match is not None:
             values = dict(invalid_character=repr(match.group(1)), emailaddress=repr(emailaddress))
-            self.error('invalid_character', localpart, context, **values)
+            self.error('invalid_email_character', localpart, context, **values)
 

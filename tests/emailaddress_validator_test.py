@@ -51,5 +51,12 @@ class EmailAddressValidatorTest(ValidationTest):
     def test_reject_localpart_with_space(self):
         e = self.get_error('foo bar@example.com')
         self.assert_equals("Invalid character ' ' in email address 'foo bar@example.com'.", e.msg())
+    
+    def test_reject_domains_with_invalid_characters(self):
+        # This is a regression test - actually the EmailAddressValidator and 
+        # the DomainNameValidator used the same key which led to strange 
+        # KeyErrors
+        e = self.get_error('foobar@ex ample.com')
+        self.assert_equals("Invalid character ' ' in domain 'ex ample.com'.", e.msg())
 
 
