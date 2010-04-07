@@ -41,5 +41,8 @@ class StringValidator(Validator):
             classname = value.__class__.__name__
             self.error('invalid_type', value, context, classname=classname)
         return value
+    
+    def is_empty(self, value, context):
+        return value in (None, '')
 
 

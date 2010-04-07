@@ -90,3 +90,29 @@ class DefaultAndRequiredValuesTest(ValidationTest):
         self.assert_raises(InvalidArgumentsError, Validator, required=True, default=12)
 
 
+class StripValueTest(ValidationTest):
+    
+    validator_class = Validator
+    
+    def test_can_strip_input(self):
+        self.init_validator(strip=True)
+        self.assert_equals('foo', self.validator().process(' foo '))
+        
+        self.init_validator(strip=False)
+        self.assert_equals(' foo ', self.validator().process(' foo '))
+    
+    def test_do_not_strip_input_by_default(self):
+        self.assert_equals(' foo ', self.validator().process(' foo '))
+    
+    def test_only_strip_if_value_has_strip_method(self):
+        self.init_validator(strip=True)
+        self.assert_error(None)
+    
+    def test_input_is_stripped_before_tested_for_emptyness(self):
+        self.init_validator(strip=True)
+        self.validator().set_internal_state_freeze(False)
+        self.validator().is_empty = lambda value, context: value == ''
+        
+        self.assert_error(' ')
+
+

@@ -45,5 +45,12 @@ class StringValidatorTest(ValidationTest):
     def test_show_class_name_in_error_message(self):
         e = self.assert_raises(InvalidDataError, self.process, [])
         self.assert_contains(u'(expected string, got "list")', e.details().msg())
-
+    
+    def test_empty_string_is_also_empty(self):
+        self.assert_error(None)
+        self.assert_error('')
+        
+        self.init_validator(default='foo', required=False)
+        self.assert_equals('foo', self.process(None))
+        self.assert_equals('foo', self.process(''))
 

@@ -147,15 +147,20 @@ class Validator(BaseValidator):
     ``ValidationError``. Exceptions caused by invalid user input should use 
     ``InvalidDataError`` or one of the subclasses.
     
+    If ``strip`` is True (default is False) and the input value has a ``strip()``
+    method, the input will be stripped before it is tested for empty values and
+    passed to the ``convert()``/``validate()`` methods.
+    
     In order to prevent programmer errors, an exception will be raised if 
     you set ``required`` to True but provide a default value as well.
     """
     
-    def __init__(self, default=NoValueSet, required=NoValueSet):
+    def __init__(self, default=NoValueSet, required=NoValueSet, strip=False):
         self.super()
         self._default = default
         self._required = required
         self._check_argument_consistency()
+        self._strip_input = strip
         self._implementations, self._implementation_by_class = self._freeze_implementations_for_class()
         if self.is_internal_state_frozen() not in (True, False):
             self._is_internal_state_frozen = True
@@ -205,6 +210,8 @@ class Validator(BaseValidator):
     def process(self, value, context=None):
         if context is None:
             context = {}
+        if self._strip_input and hasattr(value, 'strip'):
+            value = value.strip()
         value = super(Validator, self).process(value, context)
         if self.is_empty(value, context) == True:
             if self.is_required() == True:
@@ -221,7 +228,7 @@ class Validator(BaseValidator):
         """Convert the input value to a suitable Python instance which is 
         returned. If the input is invalid, raise an ``InvalidDataError``."""
         return value
-   
+    
     def validate(self, converted_value, context):
         """Perform additional checks on the value which was processed 
         successfully before (otherwise this method is not called). Raise an 
