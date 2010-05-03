@@ -266,15 +266,7 @@ class Validator(BaseValidator):
     def translate_message(self, key, native_message, translation_parameters, context):
         # This method can be overridden on a by-class basis to get translations 
         # to support non-gettext translation mechanisms (e.g. from a db)
-        translated_message = GettextTranslation(**translation_parameters).gettext(native_message)
-        # Somehow gettext in Python 2.6 does not translate the read strings 
-        # from mo files even if this was declared in the po file...
-        # Currently we just default to UTF-8 but this should be more flexible
-        # somehow...
-        # However in Python 2.3 gettext returns unicode instances already...
-        if isinstance(translated_message, unicode):
-            return translated_message
-        return translated_message.decode('UTF-8')
+        return GettextTranslation(**translation_parameters).ugettext(native_message)
     
     def message(self, key, context, **values):
         # This method can be overridden globally to use a different message 

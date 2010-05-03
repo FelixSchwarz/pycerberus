@@ -28,7 +28,7 @@ import sys
 
 from pkg_resources import resource_filename
 
-__all__ = ['_']
+__all__ = ['_', 'GettextTranslation']
 
 
 class GettextTranslation(object):
@@ -69,7 +69,7 @@ class GettextTranslation(object):
         return locals_['context'] or {}
     
     def __getattr__(self, name):
-        if name not in ('gettext', ):
+        if name not in ('gettext', 'ugettext'):
             raise AttributeError(name)
         translation = self.translation(self._context_from_stack())
         return getattr(translation, name)
