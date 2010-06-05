@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.4dev'
+version = '0.3.2'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
@@ -34,6 +34,8 @@ Changelog
 - Fix egg file generation: Include all necessary packages in eggs
 - added babel support to setup.py
 - updated pot file and completed German translation
+- fix exception if translations for preferred locale are not available (fall 
+  back to english messages)
 
 0.3.1 (07.04.2010)
 ==================

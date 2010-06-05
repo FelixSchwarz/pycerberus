@@ -38,5 +38,8 @@ class MessagesFromBuiltInValidatorsAreTranslatedTest(ValidationTest):
         expected_message = u'(String erwartet, "list" erhalten)'
         translated_message = self.get_error([], locale='de').details().msg()
         self.assert_contains(expected_message, translated_message)
+    
+    def test_fallback_to_english_translation_for_unknown_locales(self):
+        self.assert_equals('Please enter a number.', self.get_error('foo', locale='unknown').details().msg())
 
 

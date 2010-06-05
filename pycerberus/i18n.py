@@ -59,7 +59,7 @@ class GettextTranslation(object):
         return args
     
     def translation(self, context):
-        return gettext.translation(self._domain(), **self._args(context))
+        return gettext.translation(self._domain(), fallback=True, **self._args(context))
     
     def _context_from_stack(self):
         frame = sys._getframe(2)

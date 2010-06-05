@@ -6,6 +6,8 @@ Changelog for pycerberus
 - Fix egg file generation: Include all necessary packages in eggs
 - added babel support to setup.py
 - updated pot file and completed German translation
+- fix exception if translations for preferred locale are not available (fall 
+  back to english messages)
 
 0.3.1 (07.04.2010)
 - Fixed bug due to duplicated message in DomainNameValidator/EmailAddressValidator
