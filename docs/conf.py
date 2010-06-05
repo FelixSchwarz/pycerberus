@@ -123,8 +123,13 @@ def _use_classnames_instead_of_class_repr(argspec):
 
 def process_signature(app, what, name, obj, opts, sig, return_annotation):
     if what == 'class':
-        argspec = inspect.getargspec(obj.__init__)
-        tuple_argspec = _use_classnames_instead_of_class_repr(argspec)
+        if not inspect.ismethod(obj.__init__):
+            # object.__init__ is a slot wrapper, inspect will throw an exception
+            # for that so we just build the correct argspec manually
+            tuple_argspec = (['self'], None, None, None)
+        else:
+            argspec = inspect.getargspec(obj.__init__)
+            tuple_argspec = _use_classnames_instead_of_class_repr(argspec)
         signature = inspect.formatargspec(*tuple_argspec)
         return (signature, return_annotation)
     return (sig, return_annotation)
