@@ -33,6 +33,7 @@ Changelog
 ==================
 - Fix egg file generation: Include all necessary packages in eggs
 - added babel support to setup.py
+- updated pot file and completed German translation
 
 0.3.1 (07.04.2010)
 ==================
