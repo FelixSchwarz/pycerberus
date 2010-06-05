@@ -32,6 +32,7 @@ Changelog
 0.3.2 (05.06.2010)
 ==================
 - Fix egg file generation: Include all necessary packages in eggs
+- added babel support to setup.py
 
 0.3.1 (07.04.2010)
 ==================
