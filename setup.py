@@ -5,9 +5,9 @@ import os
 
 import setuptools
 
-execfile(os.path.join('pycerberus', 'release.py'))
 
 if __name__ == '__main__':
+    execfile(os.path.join('pycerberus', 'release.py'))
     setuptools.setup(
           name=name,
           version=version,
