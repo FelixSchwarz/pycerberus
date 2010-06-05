@@ -29,6 +29,10 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
+0.3.2 (05.06.2010)
+==================
+- Fix egg file generation: Include all necessary packages in eggs
+
 0.3.1 (07.04.2010)
 ==================
 - Fixed bug due to duplicated message in DomainNameValidator/EmailAddressValidator

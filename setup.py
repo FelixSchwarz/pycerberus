@@ -3,12 +3,12 @@
 
 import os
 
-from setuptools import setup
+import setuptools
 
 execfile(os.path.join('pycerberus', 'release.py'))
 
 if __name__ == '__main__':
-    setup(
+    setuptools.setup(
           name=name,
           version=version,
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
           license=license,
         
           zip_safe=True,
-          packages=('pycerberus',),
+          packages=setuptools.find_packages(),
           classifiers = (
               'Development Status :: 4 - Beta',
               'Intended Audience :: Developers',
