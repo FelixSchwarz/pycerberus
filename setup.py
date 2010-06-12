@@ -47,8 +47,10 @@ if __name__ == '__main__':
           extras_require = {
               'Babel': ['Babel>=0.9.5'],
           },
-            
-          zip_safe=True,
+          
+          # simple_super is not zip_safe, neither is the current gettext 
+          # implementation
+          zip_safe=False,
           packages=setuptools.find_packages(),
           classifiers = (
               'Development Status :: 4 - Beta',
