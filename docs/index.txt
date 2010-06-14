@@ -19,8 +19,9 @@ your application from malicious (or just garbled) input data.
 * **Tune it for your needs:** You can implement custom behavior in your validators,
   e.g. fetch translations from a database instead of using gettext or define
   custom translations for built-in validators.
-* **Use it wherever you like:** pycerberus does not depend on specific contexts
-  (e.g. web development) so you can also use it in every Python application. 
+* **Use it wherever you like:** pycerberus is used in a SMTP server, trac 
+  macros as well as web applications - there are no dependecies on a specific 
+  context like web development.
 
 .. highlight:: python
 
