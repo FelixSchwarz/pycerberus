@@ -20,7 +20,7 @@ your application from malicious (or just garbled) input data.
   e.g. fetch translations from a database instead of using gettext or define
   custom translations for built-in validators.
 * **Use it wherever you like:** pycerberus is used in a SMTP server, trac 
-  macros as well as web applications - there are no dependecies on a specific 
+  macros as well as web applications - there are no dependencies on a specific 
   context like web development.
 
 .. highlight:: python
