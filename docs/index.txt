@@ -186,11 +186,19 @@ locale is the only context information that pycerberus itself cares about.
 Available validators
 ==================================
 
+pycerberus contains some basic validators already. You can use them as they are
+or use them as a basis for more specialized validators.
+
+.. toctree::
+    :maxdepth: 2
+    
+    validators/index
+
 
 Writing your own validators
 ==================================
 
-After all, using only built-in validators won't help you much: You need  
+After all, using only built-in validators won't help you much: You'll need 
 custom validation rules which means that you need to write your own validators.
 
 pycerberus comes with two classes that can serve as a good base when you start

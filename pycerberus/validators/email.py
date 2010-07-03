@@ -42,13 +42,14 @@ class EmailAddressValidator(DomainNameValidator):
     internationalized local parts/domains.
     
     For the future I envision some extensions here:
-     - support internationalized domain names (possible also encode to/
+     - support internationalized domain names (possibly also encode to/
        decode from idna) if specified by flag
      - More flexible structure if there must be a second-level domain
     
     Something that should not happen in this validator:
-    - Open SMTP connections to check if an account exists
-    - specify default domains if missing
+     - Open SMTP connections to check if an account exists
+     - specify default domains if missing
+    
     These things can be implemented in derived validators
     """
     
