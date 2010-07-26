@@ -5,7 +5,7 @@ import os
 
 import setuptools
 
-from pycerberus.distribution_helpers import commands_for_babel_support, information_from_file
+from pycerberus.lib.distribution_helpers import commands_for_babel_support, information_from_file
 
 
 if __name__ == '__main__':
