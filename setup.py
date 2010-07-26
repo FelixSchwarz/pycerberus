@@ -10,7 +10,8 @@ from pycerberus.distribution_helpers import commands_for_babel_support, informat
 
 if __name__ == '__main__':
     extra_commands = commands_for_babel_support()
-    externally_defined_parameters= information_from_file(os.path.join('pycerberus', 'release.py'))
+    release_filename = os.path.join('pycerberus', 'release.py')
+    externally_defined_parameters= information_from_file(release_filename)
     
     setuptools.setup(
           extras_require = {
