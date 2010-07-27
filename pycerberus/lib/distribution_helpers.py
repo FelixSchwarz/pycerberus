@@ -22,8 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from distutils.command.build import build
+from setuptools.command.install_lib import install_lib
 
-__all__ = ['commands_for_babel_support']
+
+__all__ = ['commands_for_babel_support', 'i18n_aware_commands']
 
 def is_babel_available():
     try:
@@ -49,7 +52,28 @@ def information_from_file(filename):
     data = dict()
     execfile(filename, data)
     is_exportable_symbol = lambda key: not key.startswith('_')
-    externally_defined_parameters = dict([(key, value) for key, value in data.items() if is_exportable_symbol(key)])
+    
+    externally_defined_parameters = dict()
+    for key, value in data.items():
+        if is_exportable_symbol(key):
+            externally_defined_parameters[key] = value
     return externally_defined_parameters
+
+def i18n_aware_commands():
+    if not is_babel_available():
+        # setup(..., cmdclass=None) will use the built-in commands in this case
+        return None
+    
+    class i18n_build(build):
+        sub_commands = [('compile_catalog', None)] + build.sub_commands
+    
+    # before doing an 'install' (which can also be a 'bdist_egg'), compile the catalog
+    class i18n_install_lib(install_lib):
+        def run(self):
+            self.run_command('compile_catalog')
+            install_lib.run(self)
+    command_dict = dict(build=i18n_build, install_lib=i18n_install_lib)
+    command_dict.update(commands_for_babel_support())
+    return command_dict
 
 
