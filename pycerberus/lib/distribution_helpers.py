@@ -23,6 +23,8 @@
 # THE SOFTWARE.
 
 from distutils.command.build import build
+import os
+
 from setuptools.command.install_lib import install_lib
 
 
@@ -48,9 +50,30 @@ def commands_for_babel_support():
     }
     return extra_commands
 
+def module_for_filename(filename):
+    if filename.endswith('.py'):
+        filename = filename[:-len('.py')]
+    module_name = filename.replace(os.sep, '.')
+    package_name = module_name.split('.')[-1]
+    top_level_module = __import__(module_name)
+    module = getattr(top_level_module, package_name)
+    return module
+
+def information_from_module(module):
+    data = dict()
+    for symbol_name in dir(module):
+        value = getattr(module, symbol_name)
+        if not isinstance(value, basestring):
+            continue
+        data[symbol_name] = value
+    return data
+
 def information_from_file(filename):
     data = dict()
-    execfile(filename, data)
+    if os.path.exists(filename):
+        execfile(filename, data)
+    else:
+        data = information_from_module(module_for_filename(filename))
     is_exportable_symbol = lambda key: not key.startswith('_')
     
     externally_defined_parameters = dict()
