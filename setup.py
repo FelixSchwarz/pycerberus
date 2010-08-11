@@ -18,6 +18,9 @@ if __name__ == '__main__':
             'Babel': ['Babel>=0.9.5'],
         },
         
+        tests_require = ['Babel'],
+        test_suite = 'nose.collector',
+        
         # simple_super is not zip_safe, neither is the current gettext 
         # implementation
         zip_safe=False,
@@ -33,7 +36,6 @@ if __name__ == '__main__':
             'Programming Language :: Python',
             'Topic :: Software Development :: Libraries :: Python Modules',
         ),
-        test_suite = 'nose.collector',
         cmdclass=extra_commands,
         **externally_defined_parameters
     )
