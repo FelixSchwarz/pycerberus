@@ -31,7 +31,7 @@ Installation and Setup
 
 pycerberus is just a Python library which uses setuptools so it does not require
 a special setup. It has no dependencies besides the standard Python library. 
-Python 2.3-2.6 is supported.
+Python 2.3-2.7 is supported.
 
 
 Background
