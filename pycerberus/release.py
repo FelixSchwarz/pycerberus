@@ -32,7 +32,7 @@ Changelog
 
 0.3.3 (04.07.2010)
 ==================
-- Fix installation issue: pycerberus is actually not zip-saafe
+- Fix installation issue: pycerberus is actually not zip-safe
 
 0.3.2 (05.06.2010)
 ==================
