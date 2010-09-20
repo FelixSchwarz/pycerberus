@@ -72,6 +72,10 @@ class GettextTranslation(object):
         if name not in ('gettext', 'ugettext'):
             raise AttributeError(name)
         translation = self.translation(self._context_from_stack())
+        if name == 'ugettext' and not hasattr(translation, 'ugettext'):
+            # Python3 has no ugettext - everything is unicode by 
+            # default…
+            name = 'gettext'
         return getattr(translation, name)
 
 
