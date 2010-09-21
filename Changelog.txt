@@ -2,7 +2,8 @@
 Changelog for pycerberus
 ========================
 
-(development version)
+0.4 (to be released)
+- pycerberus now supports Python 3!
 - Fix installation/egg generation without babel
 
 0.3.3 (04.07.2010)

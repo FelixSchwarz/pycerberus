@@ -30,6 +30,11 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
+0.4 (to be released)
+====================
+- Python 3 support
+- Fix installation/egg generation without babel
+
 0.3.3 (04.07.2010)
 ==================
 - Fix installation issue: pycerberus is actually not zip-safe
