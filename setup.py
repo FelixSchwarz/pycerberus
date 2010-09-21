@@ -5,7 +5,7 @@ import os
 
 import setuptools
 
-from pycerberus.lib.distribution_helpers import i18n_aware_commands, information_from_file
+from distribution_helpers import i18n_aware_commands, information_from_file
 
 
 if __name__ == '__main__':
