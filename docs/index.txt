@@ -39,7 +39,7 @@ Background
 
 In every software you must check carefully that untrusted user input data 
 matches your expectations. Unvalidated user input is a common source of security
-flaws. However many checks are repetitive and validation logic tend to be 
+flaws. However many checks are repetitive and validation logic tends to be 
 scattered all around the code. Because basic checks are duplicated, developers 
 forget to check also for uncommon edge cases. Eventually there is often also 
 some code to convert the input data (usually strings) to more convenient Python 
@@ -69,14 +69,14 @@ restrictions you specified earlier (e.g. from a class which is mapped by an ORM
 to a database). However that approach completely ignores that validation 
 typically depends on context: In an API you have typically a lot more freedom in
 regard to allowed values compared to a public web interface where input needs to
-conform to a lot more checks. With a model where you declare the validation 
+conform to a lot more checks. In a system where you declare the validation 
 explicitly, this is possible. Also it is quite easy writing some code that 
 generates a bottom line of validation rules automatically based on your ORM 
 model and add additional restrictions depending on the context.
 
 As pycerberus is completely context-agnostic (not being bundled with a specific
 framework), you can use it in many different places (e.g. web applications with
-different frameworks, server applications, check parameters in a library, ...).
+different frameworks, server applications, check parameters in a library, …).
 
 
 Further reading: `FormEncode's design rationale <http://www.formencode.org/Design.html>`_ - 
@@ -242,8 +242,8 @@ an attribute. If you don't like this behavior, you can set
 Putting all together - A simple validator
 -----------------------------------------
 
-Now it's time to put all together. This validator demonstrates most of the API
-as explained so far:
+Now it's time to put it all together. This validator demonstrates most of the 
+API as explained so far:
 
 .. literalinclude:: ./unicode_validator.py
     :pyobject: UnicodeValidator
@@ -275,7 +275,7 @@ locale-dependent input data (e.g. different decimal separator characters) as
 well as validation errors in different languages. The former aspect is not yet
 covered by default but you should be able to write custom validators easily. 
 
-All messages from validators included in pycerberus are translated in 
+All messages from validators included in pycerberus can be translated in 
 different languages using the standard gettext library. The language of 
 validation error messages will be chosen depending on the locale which is given 
 in the state dictionary,
