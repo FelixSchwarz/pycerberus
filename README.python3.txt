@@ -5,7 +5,7 @@ Python 3 support for pycerberus is done by the help of the wonderful '2to3' tool
 However there are some shortcomings that you should be aware of:
 1. Full i18n support requires Babel and there is no version of Babel with Python 3 support yet. Therefore I don't use Babel on Python 3. However you can get localized error messages if you use Babel with Python 2 to compile the catalog files. After the initial generation of the mo files (done at install time), Babel is not required anymore. For the most recent status of Babel with Python 3, please read http://babel.edgewall.org/ticket/209
 
-2. nosetests also does not have a stable version with Python 3 support. There is a unofficial fork of nose which supports at least basic functionality on Python 3: https://bitbucket.org/foogod/python-nose3 (I still need to send in some private patches so the nosetests command line tool will run). You only need nosetests to run the unit tests, so most people can ignore this limitation.
+2. nosetests also does not have a stable version with Python 3 support. There is a unofficial fork of nose which supports at least basic functionality on Python 3: https://bitbucket.org/foogod/python-nose3 . Support for Python 3 in nose is done by using 2to3 so the library needs to be installed somewhere (just 'setup.py develop' won't do the trick). You only need nosetests to run the unit tests, so most people can ignore this limitation.
 
 3. The 2to3 support in distutils causes some issues which I'll fix eventually:
     - Only installed files will be converted. Therefore you neither can run the tests nor build the docs without using 2to3 explicitely.
