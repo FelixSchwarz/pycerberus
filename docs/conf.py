@@ -111,15 +111,16 @@ class NonStringRepr(object):
 
 
 def _use_classnames_instead_of_class_repr(argspec):
-        defaults = []
+    defaults = []
+    if argspec.defaults is not None:
         for default in argspec.defaults:
             if isinstance(default, type):
                 defaults.append(NonStringRepr(default.__name__))
                 continue
             defaults.append(default)
-        tuple_argspec = [i for i in argspec]
-        tuple_argspec[3] = defaults
-        return tuple_argspec
+    tuple_argspec = [i for i in argspec]
+    tuple_argspec[3] = defaults
+    return tuple_argspec
 
 def process_signature(app, what, name, obj, opts, sig, return_annotation):
     if what == 'class':

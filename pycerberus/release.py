@@ -34,6 +34,8 @@ Changelog
 ====================
 - Python 3 support
 - Fix installation/egg generation without babel
+- Added a schema which can parse positional parameters from a string into a 
+  dict before processing the data like a normal schema would do
 
 0.3.3 (04.07.2010)
 ==================

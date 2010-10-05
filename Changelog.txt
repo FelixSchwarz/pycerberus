@@ -5,6 +5,8 @@ Changelog for pycerberus
 0.4 (to be released)
 - pycerberus now supports Python 3!
 - Fix installation/egg generation without babel
+- Added a schema which can parse positional parameters from a string into a 
+  dict before processing the data like a normal schema would do
 
 0.3.3 (04.07.2010)
 - Fix installation issue: pycerberus is actually not zip-safe

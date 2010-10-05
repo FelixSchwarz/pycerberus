@@ -46,6 +46,8 @@ class ValidationTest(PythonicTestCase):
         if self._validator is not None:
             return self._validator
         return self.init_validator()
+        
+    schema = validator
     
     def process(self, *args, **kwargs):
         if len(args) == 1 and 'context' not in kwargs:
