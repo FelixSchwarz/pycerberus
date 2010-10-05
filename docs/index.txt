@@ -38,8 +38,8 @@ There are some optional packages which you can choose to install:
 * I'm using **nosetests** ("nose") to run all the automated tests.
 
 pycerberus has been tested on **Python 2.3-2.7** as well as **Python 3**. To know
-more about limitations in Python 3 support please have a look in the file 
-README.python3.txt which is part of the source distribution.
+more about Python 3 support (and its limitations), please read the section 
+:ref:`Python 3 Support<python3>`.
 
 
 Background
@@ -591,6 +591,14 @@ eliminates the duplication problem described above,
 
 What happens if SecondPage declares a different validator for 'id'? In this case
 it will just replace the ''IntegerValidator()'' declared by ''FirstPage''!
+
+
+.. _python3:
+
+Support for Python 3
+==============================
+
+.. include:: ../README.python3.txt
 
 
 
