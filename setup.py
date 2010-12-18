@@ -10,7 +10,7 @@ import setuptools
 # I want to define some information in the code so it's accessible at runtime
 # using standard Python. The downside is that these Python files need to be
 # converted to valid Python 3 code before we can load them in setup.
-# As the 2to3 parameter in setuptools.setup only works *after+ this whole file
+# As the 2to3 parameter in setuptools.setup only works *after* this whole file
 # has been parsed, the MetaDataExtractor will take care of converting some 
 # special files before importing them.
 class MetaDataExtractor(object):
