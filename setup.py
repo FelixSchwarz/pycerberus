@@ -63,6 +63,28 @@ class MetaDataExtractor(object):
         externally_defined_parameters = information_from_file(self.releasefile_name)
         
         if self.uses_python3():
+            # Converting files in-place to Python 3 which is necessary for build
+            # client support until bitten supports conditional build steps.
+            from setuptools.command.egg_info import egg_info
+            from setuptools.command.build_py import Mixin2to3
+            from distutils.filelist import findall
+            
+            class to_python3(egg_info, Mixin2to3):
+                def run(self):
+                    super(to_python3, self).run()
+                    self.run_2to3(self.sources_to_convert())
+                
+                def sources_to_convert(self):
+                    file_names = []
+                    sources = findall(dir='pycerberus')
+                    tests = findall(dir='tests')
+                    for file_name in sources + tests:
+                        if not file_name.endswith('.py'):
+                            continue
+                        file_names.append(file_name)
+                    return file_names
+            extra_commands['egg_info'] = to_python3
+        
             self.revert_files_to_python2()
             externally_defined_parameters['use_2to3'] =  True
         return extra_commands, externally_defined_parameters
