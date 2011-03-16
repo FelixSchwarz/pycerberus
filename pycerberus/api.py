@@ -85,7 +85,7 @@ class BaseValidator(object):
     
     def messages(self):
         """Return all messages which are defined by this validator as a 
-        key/message dictionary. Alternatives you can create a class-level
+        key/message dictionary. Alternatively you can create a class-level
         dictionary which contains these keys/messages.
         
         You must declare all your messages here so that all keys are known 
@@ -98,7 +98,8 @@ class BaseValidator(object):
     
     def message_for_key(self, key, context):
         """Return a message for a specific key. Implement this method if you 
-        want to avoid calls to messages() which might be costly."""
+        want to avoid calls to messages() which might be costly (otherwise 
+        implementing this method is optional)."""
         raise NotImplementedError('message_for_key() should have been replaced by a metaclass')
     
     def keys(self):
