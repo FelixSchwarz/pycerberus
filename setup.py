@@ -28,17 +28,27 @@ class MetaDataExtractor(object):
         import subprocess
         
         absolute_pathname = os.path.join(self.this_dir(), filename)
-        exit_code = subprocess.call(['2to3', '--write', absolute_pathname], 
-                                    cwd=self.this_dir(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        assert exit_code == 0, 'Conversion of %s failed: error code %s' % (absolute_pathname, exit_code)
+        command = ['2to3', '--write', absolute_pathname]
+        process = subprocess.Popen(command, cwd=self.this_dir(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.wait()
+        
+        exit_code = process.returncode
+        if exit_code != 0:
+            output = process.stdout.read().strip()
+            stderr = process.stderr.read().strip()
+            print(output)
+            print(stderr)
+            assert exit_code == 0, 'Conversion of %s failed: error code %s' % (absolute_pathname, exit_code)
     
     def revert_file_to_python2_version(self, filename):
         absolute_pathname = os.path.join(self.this_dir(), filename)
-        os.rename(absolute_pathname + '.bak', absolute_pathname)
+        if os.path.exists(absolute_pathname + '.bak'):
+            os.rename(absolute_pathname + '.bak', absolute_pathname)
     
     def convert_files_to_python3(self):
         for filename in self.preconversion_files:
-            self.convert_file_to_python3(filename)
+            if os.path.exists(filename):
+                self.convert_file_to_python3(filename)
     
     def revert_files_to_python2(self):
         for filename in self.preconversion_files:
