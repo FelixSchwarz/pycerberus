@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: felix.schwarz@oss.schwarz.eu\n"
 "POT-Creation-Date: 2009-12-15 12:56+0100\n"
-"PO-Revision-Date: 2010-06-05 19:54+0200\n"
+"PO-Revision-Date: 2011-04-14 16:39+0200\n"
 "Last-Translator: Felix Schwarz <felix.schwarz@oss.schwarz.eu>\n"
 "Language-Team: de <felix.schwarz@oss.schwarz.eu>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.5\n"
 
-#: pycerberus/api.py:204
+#: pycerberus/api.py:205
 msgid "Value must not be empty."
 msgstr "Bitte geben Sie einen Wert ein."
 
@@ -30,6 +30,11 @@ msgstr ""
 #: pycerberus/schema.py:163
 #, python-format
 msgid "Additional fields detected: %(additional_items)s."
+msgstr "Zusätzliche Felder gefunden: %(additional_items)s."
+
+#: pycerberus/schemas.py:60
+#, fuzzy, python-format
+msgid "Too many parameters: %(additional_items)s"
 msgstr "Zusätzliche Felder gefunden: %(additional_items)s."
 
 #: pycerberus/validators/basic_numbers.py:44 pycerberus/validators/string.py:36
@@ -71,14 +76,18 @@ msgstr "Ungültige Domain: %(domain)s darf nicht mit einem Punkt enden."
 #: pycerberus/validators/domain.py:41
 #, python-format
 msgid "Invalid domain: %(domain)s must not contain consecutive dots."
-msgstr "Ungültige Domain: %(domain)s darf keine aufeinanderfolgenden Punkt enthalten."
+msgstr ""
+"Ungültige Domain: %(domain)s darf keine aufeinanderfolgenden Punkt "
+"enthalten."
 
-#: pycerberus/validators/email.py:57
+#: pycerberus/validators/email.py:58
 msgid "An email address must contain a single '@'."
 msgstr "Eine E-Mail-Adresse darf nur ein einziges '@'-Zeichen enthalten."
 
-#: pycerberus/validators/email.py:58
+#: pycerberus/validators/email.py:59
 #, python-format
 msgid "Invalid character %(invalid_character)s in email address %(emailaddress)s."
-msgstr "Ungültiges Zeichen %(invalid_character)s in der E-Mail-Adresse %(emailaddress)s."
+msgstr ""
+"Ungültiges Zeichen %(invalid_character)s in der E-Mail-Adresse "
+"%(emailaddress)s."
 
