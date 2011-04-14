@@ -1,14 +1,14 @@
-# Translations template for pycerberus.
-# Copyright (C) 2010 Felix Schwarz
-# This file is distributed under the same license as the pycerberus project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+# Translations template for PROJECT.
+# Copyright (C) 2011 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: pycerberus 0.4dev\n"
-"Report-Msgid-Bugs-To: felix.schwarz@oss.schwarz.eu\n"
-"POT-Creation-Date: 2010-06-05 19:54+0200\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2011-04-14 16:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.5\n"
 
-#: pycerberus/api.py:204
+#: pycerberus/api.py:205
 msgid "Value must not be empty."
 msgstr ""
 
@@ -29,6 +29,11 @@ msgstr ""
 #: pycerberus/schema.py:163
 #, python-format
 msgid "Additional fields detected: %(additional_items)s."
+msgstr ""
+
+#: pycerberus/schemas.py:60
+#, python-format
+msgid "Too many parameters: %(additional_items)s"
 msgstr ""
 
 #: pycerberus/validators/basic_numbers.py:44 pycerberus/validators/string.py:36
@@ -70,11 +75,11 @@ msgstr ""
 msgid "Invalid domain: %(domain)s must not contain consecutive dots."
 msgstr ""
 
-#: pycerberus/validators/email.py:57
+#: pycerberus/validators/email.py:58
 msgid "An email address must contain a single '@'."
 msgstr ""
 
-#: pycerberus/validators/email.py:58
+#: pycerberus/validators/email.py:59
 #, python-format
 msgid "Invalid character %(invalid_character)s in email address %(emailaddress)s."
 msgstr ""
