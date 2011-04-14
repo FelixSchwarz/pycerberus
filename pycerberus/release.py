@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.4dev'
+version = '0.4'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
@@ -30,9 +30,9 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
-0.4 (to be released)
+0.4 (13.04.2011)
 ====================
-- Python 3 support
+- pycerberus now supports Python 3!
 - Fix installation/egg generation without babel
 - Added a schema which can parse positional parameters from a string into a 
   dict before processing the data like a normal schema would do

@@ -2,7 +2,7 @@
 Changelog for pycerberus
 ========================
 
-0.4 (to be released)
+0.4 (13.04.2011)
 - pycerberus now supports Python 3!
 - Fix installation/egg generation without babel
 - Added a schema which can parse positional parameters from a string into a 
