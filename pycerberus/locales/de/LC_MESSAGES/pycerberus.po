@@ -1,10 +1,10 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2010 Felix Schwarz
-# Felix Schwarz <felix.schwarz@oss.schwarz.eu>, 2010.
+# Copyright (C) 2010-2011 Felix Schwarz
+# Felix Schwarz <felix.schwarz@oss.schwarz.eu>, 2010-2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.4\n"
 "Report-Msgid-Bugs-To: felix.schwarz@oss.schwarz.eu\n"
 "POT-Creation-Date: 2009-12-15 12:56+0100\n"
 "PO-Revision-Date: 2011-04-14 16:39+0200\n"
@@ -21,7 +21,7 @@ msgid "Value must not be empty."
 msgstr "Bitte geben Sie einen Wert ein."
 
 #: pycerberus/schema.py:162
-#, fuzzy, python-format
+#, python-format
 msgid "Validator got unexpected input (expected \"dict\", got \"%(classname)s\")."
 msgstr ""
 "Unerwartete Eingabe für Validator (\"dict\" erwartet, \"%(classname)s\" "
@@ -33,9 +33,9 @@ msgid "Additional fields detected: %(additional_items)s."
 msgstr "Zusätzliche Felder gefunden: %(additional_items)s."
 
 #: pycerberus/schemas.py:60
-#, fuzzy, python-format
+#, python-format
 msgid "Too many parameters: %(additional_items)s"
-msgstr "Zusätzliche Felder gefunden: %(additional_items)s."
+msgstr "Zu viele Parameter: %(additional_items)s"
 
 #: pycerberus/validators/basic_numbers.py:44 pycerberus/validators/string.py:36
 #, python-format
