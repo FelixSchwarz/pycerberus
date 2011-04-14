@@ -346,15 +346,13 @@ the messages() method and mark the message strings as translatable::
         
         # your validation logic ...
 
-Afterwards you just have to start the usual gettext process:
+Afterwards you just have to start the usual gettext process. I always use `Babel <http://babel.edgewall.org>`_ because it provides the very convenient ``pybabel`` tool which simplifies the workflow a lot:
 
-* Collect the translatable strings in a po template (.pot file), e.g.
-  pygettext.py --output=mymessages.pot <py file>
-* Merge the pot file into individual po files for every locale, e.g.
-  msgmerge --update locales/de/LC_MESSAGES/mymessages.po mymessages.pot
+* Collect the translatable strings in a po template (.pot) file, e.g. ``pybabel extract . --output=mymessages.pot``
+* Create the initial po file for your new locale (only needed once): ``pybabel init --domain=pycerberus --input-file=mymessages.pot --locale=<locale ID> --output-dir=locales/``
+* After every change to a translatable string in your source code, you need to recreate the pot file (see first step) and update the po file for your locale: ``pybabel update --domain=pycerberus --input-file=mymessages.pot --output-dir=locales/``
 * Translate the messages for every locale.
-* Compile the final po file into a mo file, e.g.
-  msgfmt.py locales/en/LC_MESSAGES/pycerberus.po
+* Compile the final po file into a mo file, e.g. ``pybabel compile --domain=pycerberus --directory=locales/``
 
 
 Override existing messages and translations
