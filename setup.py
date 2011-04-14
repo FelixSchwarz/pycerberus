@@ -65,7 +65,7 @@ class MetaDataExtractor(object):
             self.convert_files_to_python3()
         
         # With Python 3 we can only import this after applying the Python 3 fixes.
-        # The file is not in the libary because the __init__.py files for the 
+        # The file is not in the library because the __init__.py files for the 
         # module pull in other modules which need to be converted just to import
         # the module containing release metadata
         from distribution_helpers import i18n_aware_commands, information_from_file
