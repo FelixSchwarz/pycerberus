@@ -2,6 +2,9 @@
 Changelog for pycerberus
 ========================
 
+0.4.1 (16.04.2011)
+- Fix source distribution (distribution_helpers.py were not included)
+
 0.4 (13.04.2011)
 - pycerberus now supports Python 3!
 - Fix installation/egg generation without babel

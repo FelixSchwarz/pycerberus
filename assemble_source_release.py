@@ -3,7 +3,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -105,7 +105,8 @@ def main():
     build_documentation(this_dir)
     
     package_files = ('docs', 'examples', 'pycerberus', 'tests', 'Changelog.txt', 
-                     'COPYING.txt', 'setup.py', ('build/html', 'docs/html'))
+                     'COPYING.txt', 'setup.py', 'distribution_helpers.py',
+                     ('build/html', 'docs/html'))
     tar_fp = create_tarball(this_dir, package_files, '%s-%s' % (name, version))
     
     gz_filename = '%s-%s.tar.gz' % (name, version)
