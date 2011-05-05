@@ -105,7 +105,8 @@ def main():
     build_documentation(this_dir)
     
     package_files = ('docs', 'examples', 'pycerberus', 'tests', 'Changelog.txt', 
-                     'COPYING.txt', 'setup.py', 'distribution_helpers.py',
+                     'COPYING.txt', 'README.python3.txt', 'setup.py', 
+                     'setup.cfg', 'distribution_helpers.py',
                      ('build/html', 'docs/html'))
     tar_fp = create_tarball(this_dir, package_files, '%s-%s' % (name, version))
     
