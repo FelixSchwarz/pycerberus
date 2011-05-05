@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.5dev'
+version = '0.4.2'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
@@ -29,6 +29,10 @@ your application from malicious (or just garbled) input data.
 
 Changelog
 ******************************
+
+0.4.2 (05.05.2011)
+====================
+- More fixes for source distribution because of missing files in tar.gz
 
 0.4.1 (16.04.2011)
 ====================

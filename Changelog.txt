@@ -2,6 +2,9 @@
 Changelog for pycerberus
 ========================
 
+0.4.2 (05.05.2011)
+- More fixes for source distribution because of missing files in tar.gz
+
 0.4.1 (16.04.2011)
 - Fix source distribution (distribution_helpers.py were not included)
 
