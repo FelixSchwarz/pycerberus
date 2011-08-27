@@ -34,8 +34,8 @@ from pycerberus.validators import IntegerValidator, StringValidator
 
 class SchemaTest(PythonicTestCase):
     
-    def _schema(self, fields=('id',), formvalidators=()):
-        schema = SchemaValidator()
+    def _schema(self, fields=('id',), formvalidators=(), **kwargs):
+        schema = SchemaValidator(**kwargs)
         assert set(fields).issubset(set(('id', 'key')))
         if 'id' in fields:
             schema.add('id', IntegerValidator())
@@ -136,9 +136,7 @@ class SchemaTest(PythonicTestCase):
         self.assert_raises(InvalidDataError, schema.process, dict(foo=42))
         
     def test_exception_contains_information_about_invalid_and_extra_fields(self):
-        schema = self._schema()
-        schema.set_internal_state_freeze(False)
-        schema.set_allow_additional_parameters(False)
+        schema = self._schema(allow_additional_parameters=False)
 
         exception = self.assert_raises(InvalidDataError, schema.process,
                                         {'id': 'invalid', 'foo':'heh'})
