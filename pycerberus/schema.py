@@ -201,14 +201,9 @@ class SchemaValidator(Validator):
             self._process_field(key, validator, fields, context, validated_fields, exceptions)
         additional_items = set(fields).difference(set(self.fieldvalidators()))
         if (not self.allow_additional_parameters) and additional_items:
-            # one exception for each extra item
-            for item_key in additional_items: # iterating through keys
-                exceptions[item_key] = InvalidDataError(
-                    self.message('additional_item', context=context, additional_item=fields[item_key]), # i don't know why we want to pass the value, not the key
-                    fields[item_key],
-                    item_key,
-                    context
-                )
+            for item_key in additional_items:
+                error = self.error('additional_item', fields[item_key], context, additional_item=item_key)
+                exceptions[item_key] = error
         if len(exceptions) > 0:
             self._raise_exception(exceptions, context)
         return validated_fields

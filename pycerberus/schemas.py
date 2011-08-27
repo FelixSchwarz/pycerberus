@@ -66,7 +66,8 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
     def split_parameters(self, value, context):
         arguments = []
         if len(value) > 0:
-            arguments = re.split(self.separator_pattern(), value.strip())
+            nr_declared_fields = len(self.fieldvalidators())
+            arguments = re.split(self.separator_pattern(), value.strip(), nr_declared_fields)
         return arguments
     
     def _parameter_names(self):
@@ -84,9 +85,9 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         
         parameter_names, arguments = self.aggregate_values(parameter_names, arguments)
         nr_missing_parameters = max(len(parameter_names) - len(arguments), 0)
-        nr_additional_parameters = max(len(arguments) - len(parameter_names), 0)
         arguments.extend([None] * nr_missing_parameters)
-        parameter_names.extend(['extra%d' % i for i in xrange(nr_additional_parameters)])
+        if len(parameter_names) < len(arguments):
+            parameter_names.append('_extra')
         return dict(zip(parameter_names, arguments))
     
     def set_parameter_order(self, parameter_names):
@@ -96,7 +97,13 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         if value is None:
             value = {}
         fields = self._map_arguments_to_named_fields(value, context or {})
-        print 'fields', fields
         return self.super(fields, context=context)
 
+    def _raise_exception(self, exceptions, context):
+        if '_extra' in exceptions:
+            error = exceptions['_extra']
+            del exceptions['_extra']
+            value = error.details().value()
+            exceptions['_extra'] = self.error('additional_item', value, context, additional_item=value)
+        self.super()
 

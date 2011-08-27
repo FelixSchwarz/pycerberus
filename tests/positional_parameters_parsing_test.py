@@ -38,8 +38,8 @@ class TestPositionalArgumentsWithoutData(ValidationTest):
         self.assert_equals({}, self.schema().process(None))
     
     def test_bails_out_if_additional_parameters_are_passed(self):
-        e = self.assert_error('fnord')
-        self.assert_equals(u"Extra parameter: 'fnord'", e.msg())
+        e = self.assert_error('foo bar')
+        self.assert_equals(u"Extra parameter: 'foo bar'", e.msg())
 
 
 class TestPositionalArgumentsWithSingleParameter(ValidationTest):
@@ -54,7 +54,8 @@ class TestPositionalArgumentsWithSingleParameter(ValidationTest):
         self.assert_error(None)
     
     def test_bails_out_if_too_many_parameters_are_passed(self):
-        self.assert_error('foo, bar')
+        e = self.assert_error('foo, bar, baz')
+        self.assert_equals(u"Extra parameter: 'bar, baz'", e.msg())
     
     def test_accepts_one_parameter(self):
         self.assert_equals({'foo': 'fnord'}, self.schema().process('fnord'))
