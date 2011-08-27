@@ -1,39 +1,39 @@
-# Translations template for PROJECT.
-# Copyright (C) 2011 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# Translations template for pycerberus.
+# Copyright (C) 2011 Felix Schwarz
+# This file is distributed under the same license as the pycerberus project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-04-14 16:38+0200\n"
+"Project-Id-Version: pycerberus 0.5dev\n"
+"Report-Msgid-Bugs-To: felix.schwarz@oss.schwarz.eu\n"
+"POT-Creation-Date: 2011-08-27 20:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 0.9.5\n"
+"Generated-By: Babel 0.9.6\n"
 
 #: pycerberus/api.py:205
 msgid "Value must not be empty."
 msgstr ""
 
-#: pycerberus/schema.py:162
+#: pycerberus/schema.py:163
 #, python-format
 msgid "Validator got unexpected input (expected \"dict\", got \"%(classname)s\")."
 msgstr ""
 
-#: pycerberus/schema.py:163
+#: pycerberus/schema.py:164
 #, python-format
-msgid "Additional fields detected: %(additional_items)s."
+msgid "Undeclared field detected: \"%(additional_item)s\"."
 msgstr ""
 
-#: pycerberus/schemas.py:60
+#: pycerberus/schemas.py:61
 #, python-format
-msgid "Too many parameters: %(additional_items)s"
+msgid "Unknown parameter \"%(additional_item)s\""
 msgstr ""
 
 #: pycerberus/validators/basic_numbers.py:44 pycerberus/validators/string.py:36

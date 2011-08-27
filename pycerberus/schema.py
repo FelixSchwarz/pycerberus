@@ -161,7 +161,7 @@ class SchemaValidator(Validator):
     def messages(self):
         return {
                 'invalid_type': _(u'Validator got unexpected input (expected "dict", got "%(classname)s").'),
-                'additional_item': _(u'Additional field detected: \'%(additional_item)s\'.'),
+                'additional_item': _(u'Undeclared field detected: "%(additional_item)s".'),
                }
     
     def convert(self, fields, context):

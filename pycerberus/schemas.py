@@ -58,7 +58,7 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         self.set_internal_state_freeze(True)
     
     def messages(self):
-        return {'additional_item': _('Extra parameter: \'%(additional_item)s\'')}
+        return {'additional_item': _('Unknown parameter "%(additional_item)s"')}
     
     def separator_pattern(self):
         return '\s*,\s*'
