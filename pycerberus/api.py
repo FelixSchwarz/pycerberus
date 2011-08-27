@@ -23,6 +23,7 @@
 # THE SOFTWARE.
 
 import inspect
+import warnings
 
 from pycerberus.compat import reversed, set
 from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataError, \
@@ -106,10 +107,14 @@ class BaseValidator(object):
         """Return all keys defined by this specific validator class."""
         raise NotImplementedError('keys() should have been replaced by a metaclass')
     
-    def error(self, key, value, context, errorclass=InvalidDataError, **values):
+    def raise_error(self, key, value, context, errorclass=InvalidDataError, **values):
         """Raise an InvalidDataError for the given key."""
         msg_template = self.message_for_key(key, context)
         raise errorclass(msg_template % values, value, key=key, context=context)
+    
+    def error(self, *args, **kwargs):
+        warnings.warn("BaseValidator.error() is deprecated. Please use 'raise_error' instead!", DeprecationWarning)
+        self.raise_error(*args, **kwargs)
     
     def process(self, value, context=None):
         """This is the method to validate your input. The validator returns a
