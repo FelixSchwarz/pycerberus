@@ -3,6 +3,7 @@
 # The MIT License
 # 
 # Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +66,10 @@ class SchemaTest(PythonicTestCase):
         schema = self._schema(('id', 'key'))
         self.assert_isinstance(schema.validator_for('id'), IntegerValidator)
         self.assert_isinstance(schema.validator_for('key'), StringValidator)
+
+    def test_can_specify_allow_additional_params_at_construction(self):
+        schema = SchemaValidator(allow_additional_parameters=False)
+        self.assert_equals(schema.allow_additional_parameters, False)
     
     # -------------------------------------------------------------------------
     # processing / validation

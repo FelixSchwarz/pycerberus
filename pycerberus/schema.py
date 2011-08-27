@@ -3,6 +3,7 @@
 # The MIT License
 # 
 # Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -107,10 +108,10 @@ class SchemaValidator(Validator):
     
     __metaclass__ = SchemaMeta
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, allow_additional_parameters=True, *args, **kwargs):
         self._fields = {}
         self._formvalidators = []
-        self.allow_additional_parameters = True
+        self.allow_additional_parameters = allow_additional_parameters
         self.super()
         self._setup_fieldvalidators()
         self._setup_formvalidators()
