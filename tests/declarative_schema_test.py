@@ -23,6 +23,7 @@
 # THE SOFTWARE.
 
 from pycerberus.api import Validator
+from pycerberus.errors import InvalidDataError
 from pycerberus.compat import set
 from pycerberus.lib import PythonicTestCase
 from pycerberus.schema import SchemaValidator
@@ -33,14 +34,16 @@ from pycerberus.validators import IntegerValidator
 class DeclarativeSchemaTest(PythonicTestCase):
     
     class DeclarativeSchema(SchemaValidator):
+        allow_additional_parameters = False
+    
         id = IntegerValidator()
         amount = IntegerValidator
         formvalidators = (Validator(), )
     
-    def schema(self, schema_class=None):
+    def schema(self, schema_class=None, **kwargs):
         if schema_class is None:
             schema_class = self.__class__.DeclarativeSchema
-        return schema_class()
+        return schema_class(**kwargs)
     
     # -------------------------------------------------------------------------
     # setup / introspection
@@ -64,5 +67,13 @@ class DeclarativeSchemaTest(PythonicTestCase):
     def test_can_have_formvalidators(self):
         self.assert_callable(self.schema().formvalidators)
         self.assert_length(1, self.schema().formvalidators())
+    
+    def test_can_bail_out_if_additional_items_are_detected(self):
+        e = self.assert_raises(InvalidDataError, lambda: self.schema().process(dict(id=42, amount=21, extra='foo')))
+        self.assert_equals('Undeclared field detected: "extra".', e.msg())
+    
+    def test_can_override_additional_items_setting_on_class_instantiation(self):
+        schema = self.schema(allow_additional_parameters=True)
+        schema.process(dict(id=42, amount=21, extra='foo'))
 
 

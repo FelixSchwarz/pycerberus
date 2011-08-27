@@ -477,6 +477,12 @@ If you need to ensure that no values with unknown keys are passed to the schema
 the schema: ``Schema(allow_additional_parameters=False)``. The schema will 
 raise an exception if it finds any unknown keys.
 
+The equivalent "declarative schema" (see next section) is::
+
+    class MySchema(SchemaValidator):
+        allow_additional_parameters=False
+        # ...
+
 
 Declarative Schemas
 -----------------------------------

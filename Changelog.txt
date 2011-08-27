@@ -3,6 +3,9 @@ Changelog for pycerberus
 ========================
 
 0.5dev
+- 'allow_additional_parameters' can now be specified in the schema constructor
+  directly as well as a parameter for a declarative schema
+
 API changes:
  - BaseValidator.error() is deprecated now as the name does not really reflect
    that the method also raised the exception. I added a new method named 
