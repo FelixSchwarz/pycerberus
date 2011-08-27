@@ -8,3 +8,7 @@ build
 .*\.egg-info$
 .*\.tar\.gz$
 .*\.sw[po]$
+dist
+sdist
+\.python3
+trac
