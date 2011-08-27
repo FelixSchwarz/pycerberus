@@ -7,3 +7,4 @@ build
 \.settings
 .*\.egg-info$
 .*\.tar\.gz$
+.*\.sw[po]$
