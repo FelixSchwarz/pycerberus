@@ -50,16 +50,16 @@ class IntegerValidator(Validator):
     def convert(self, value, context):
         if not isinstance(value, (int, basestring)):
             classname = value.__class__.__name__
-            self.error('invalid_type', value, context, classname=classname)
+            self.raise_error('invalid_type', value, context, classname=classname)
         try:
             return int(value)
         except ValueError:
-            self.error('invalid_number', value, context)
+            self.raise_error('invalid_number', value, context)
     
     def validate(self, value, context):
         if (self.min is not None) and (value < self.min):
-            self.error('too_low', value, context, min=self.min)
+            self.raise_error('too_low', value, context, min=self.min)
         if (self.max is not None) and (value > self.max):
-            self.error('too_big', value, context, max=self.max)
+            self.raise_error('too_big', value, context, max=self.max)
 
 

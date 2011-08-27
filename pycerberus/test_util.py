@@ -67,7 +67,6 @@ class ValidationTest(PythonicTestCase):
     
     def message_for_key(self, key, locale='de'):
         "Return the error message for the given key."
-        call = lambda: self.validator().error(key, None, {'locale': locale})
-        exception = self.assert_raises(InvalidDataError, call)
+        exception = self.validator().error(key, None, {'locale': locale})
         return exception.details().msg()
 

@@ -44,15 +44,15 @@ class DomainNameValidator(StringValidator):
     def validate(self, value, context):
         self.super()
         if value.startswith('.'):
-            self.error('leading_dot', value, context, domain=repr(value))
+            self.raise_error('leading_dot', value, context, domain=repr(value))
         if value.endswith('.'):
-            self.error('trailing_dot', value, context, domain=repr(value))
+            self.raise_error('trailing_dot', value, context, domain=repr(value))
         if '..' in value:
-            self.error('double_dot', value, context, domain=repr(value))
+            self.raise_error('double_dot', value, context, domain=repr(value))
         
         match = re.search('([^a-zA-Z0-9\.\-])', value)
         if match is not None:
-            self.error('invalid_domain_character', value, context, invalid_character=repr(match.group(1)), domain=repr(value))
+            self.raise_error('invalid_domain_character', value, context, invalid_character=repr(match.group(1)), domain=repr(value))
 
 
 

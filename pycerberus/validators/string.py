@@ -39,7 +39,7 @@ class StringValidator(Validator):
     def convert(self, value, context):
         if not isinstance(value, basestring):
             classname = value.__class__.__name__
-            self.error('invalid_type', value, context, classname=classname)
+            self.raise_error('invalid_type', value, context, classname=classname)
         return value
     
     def is_empty(self, value, context):

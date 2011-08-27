@@ -206,7 +206,10 @@ class Validator(BaseValidator):
     
     def error(self, key, value, context, errorclass=InvalidDataError, **values):
         translated_message = self.message(key, context, **values)
-        raise errorclass(translated_message, value, key=key, context=context)
+        return errorclass(translated_message, value, key=key, context=context)
+    
+    def raise_error(self, key, value, context, errorclass=InvalidDataError, **values):
+        raise self.error(key, value, context, errorclass=errorclass, **values)
     
     def process(self, value, context=None):
         if context is None:
@@ -216,7 +219,7 @@ class Validator(BaseValidator):
         value = super(Validator, self).process(value, context)
         if self.is_empty(value, context) == True:
             if self.is_required() == True:
-                self.error('empty', value, context, errorclass=EmptyError)
+                self.raise_error('empty', value, context, errorclass=EmptyError)
             return self.empty_value(context)
         converted_value = self.convert(value, context)
         self.validate(converted_value, context)

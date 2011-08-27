@@ -168,7 +168,7 @@ class SchemaValidator(Validator):
         if fields is None:
             return self.empty_value(context)
         if not isinstance(fields, dict):
-            self.error('invalid_type', fields, context, classname=fields.__class__)
+            self.raise_error('invalid_type', fields, context, classname=fields.__class__)
         return self._process_fields(fields, context)
     
     def is_empty(self, value, context):

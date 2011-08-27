@@ -532,7 +532,7 @@ You can add formvalidators to a form like this::
     class NumbersMatch(Validator):
         def validate(self, fields, context):
             if fields['a'] != fields['b' ]:
-                self.error('no_match', fields, context=context)
+                self.raise_error('no_match', fields, context=context)
     schema.add_formvalidator(NumbersMatch)
 
 Of course there is also a declarative way to use form validators::

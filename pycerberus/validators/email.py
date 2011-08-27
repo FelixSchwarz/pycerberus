@@ -62,7 +62,7 @@ class EmailAddressValidator(DomainNameValidator):
     def validate(self, emailaddress, context):
         parts = emailaddress.split('@')
         if len(parts) != 2:
-            self.error('single_at', emailaddress, context)
+            self.raise_error('single_at', emailaddress, context)
         localpart, domain = parts
         self.super(domain, context)
         self._validate_localpart(localpart, emailaddress, context)
@@ -74,5 +74,5 @@ class EmailAddressValidator(DomainNameValidator):
         match = re.search('([^a-zA-Z0-9\.\_])', localpart)
         if match is not None:
             values = dict(invalid_character=repr(match.group(1)), emailaddress=repr(emailaddress))
-            self.error('invalid_email_character', localpart, context, **values)
+            self.raise_error('invalid_email_character', localpart, context, **values)
 

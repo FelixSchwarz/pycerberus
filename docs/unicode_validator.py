@@ -26,12 +26,12 @@ class UnicodeValidator(Validator):
             return unicode(value, 'UTF-8')
         except Exception:
             classname = value.__class__.__name__
-            self.error('invalid_type', value, context, classname=classname)
+            self.raise_error('invalid_type', value, context, classname=classname)
     
     def validate(self, converted_value, context):
         if self._max_length is None:
             return
         if len(converted_value) > self._max_length:
-            self.error('too_long', converted_value, context, max_length=self._max_length)
+            self.raise_error('too_long', converted_value, context, max_length=self._max_length)
 
 

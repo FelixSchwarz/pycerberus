@@ -30,6 +30,16 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
+0.5dev
+====================
+
+API changes:
+------------
+ - BaseValidator.error() only instantiates the appropriate exception. I added
+   a new method named '.raise_error()' which behaves exactly like the old 
+   .error() method. This change was done so the method name reflects the actual
+   behavior and so some duplicate exception instantiation could be removed.
+
 0.4.2 (05.05.2011)
 ====================
 - More fixes for source distribution because of missing files in tar.gz

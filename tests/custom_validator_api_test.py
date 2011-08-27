@@ -29,7 +29,7 @@ from pycerberus.test_util import ValidationTest
 class ValidatorWithCustomMessageForKey(Validator):
     
     def validate(self, value, context):
-        self.error('inactive', value, context)
+        self.raise_error('inactive', value, context)
     
     def messages(self):
         return {'inactive': 'Untranslated message'}
@@ -52,7 +52,7 @@ class CanDeclareMessagesInClassDictValidator(Validator):
     messages = {'classlevel': 'Message from class-level.'}
     
     def validate(self, value, context):
-        self.error('classlevel', value, context)
+        self.raise_error('classlevel', value, context)
 
 
 class CanDeclareMessagesInClassDictTest(ValidationTest):
