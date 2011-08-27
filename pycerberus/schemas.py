@@ -73,7 +73,7 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
     def _parameter_names(self):
         return list(self._parameter_order)
     
-    def aggregate_values(self, parameter_names, arguments):
+    def aggregate_values(self, parameter_names, arguments, context):
         """This method can manipulate or aggregate parsed arguments. In this 
         class, it's just a noop but sub classes can override this method to do
         more interesting stuff."""
@@ -83,7 +83,7 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         parameter_names = self._parameter_names()
         arguments = self.split_parameters(value, context)
         
-        parameter_names, arguments = self.aggregate_values(parameter_names, arguments)
+        parameter_names, arguments = self.aggregate_values(parameter_names, arguments, context)
         nr_missing_parameters = max(len(parameter_names) - len(arguments), 0)
         arguments.extend([None] * nr_missing_parameters)
         if len(parameter_names) < len(arguments):
