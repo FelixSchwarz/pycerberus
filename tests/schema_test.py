@@ -69,7 +69,7 @@ class SchemaTest(PythonicTestCase):
 
     def test_can_specify_allow_additional_params_at_construction(self):
         schema = SchemaValidator(allow_additional_parameters=False)
-        self.assert_equals(schema.allow_additional_parameters, False)
+        self.assert_equals(False, schema.allow_additional_parameters)
     
     # -------------------------------------------------------------------------
     # processing / validation
@@ -142,7 +142,7 @@ class SchemaTest(PythonicTestCase):
 
         exception = self.assert_raises(InvalidDataError, schema.process,
                                         {'id': 'invalid', 'foo':'heh'})
-        self.assert_equals(len(exception.error_dict().items()), 2)
+        self.assert_equals(2, len(exception.error_dict().items()))
     
     # -------------------------------------------------------------------------
     # form validators
