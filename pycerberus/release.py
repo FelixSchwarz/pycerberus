@@ -35,10 +35,11 @@ Changelog
 
 API changes:
 ------------
- - BaseValidator.error() only instantiates the appropriate exception. I added
-   a new method named '.raise_error()' which behaves exactly like the old 
-   .error() method. This change was done so the method name reflects the actual
-   behavior and so some duplicate exception instantiation could be removed.
+ - BaseValidator.error() is deprecated now as the name does not really reflect
+   that the method also raised the exception. I added a new method named 
+   '.raise_error()' which behaves exactly like the old .error() method. In 
+   addition there is a new method '.exception()' which only creates an exception
+   instance.
 
 0.4.2 (05.05.2011)
 ====================

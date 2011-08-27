@@ -104,6 +104,6 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
             error = exceptions['_extra']
             del exceptions['_extra']
             value = error.details().value()
-            exceptions['_extra'] = self.error('additional_item', value, context, additional_item=value)
+            exceptions['_extra'] = self.exception('additional_item', value, context, additional_item=value)
         self.super()
 

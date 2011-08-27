@@ -202,7 +202,7 @@ class SchemaValidator(Validator):
         additional_items = set(fields).difference(set(self.fieldvalidators()))
         if (not self.allow_additional_parameters) and additional_items:
             for item_key in additional_items:
-                error = self.error('additional_item', fields[item_key], context, additional_item=item_key)
+                error = self.exception('additional_item', fields[item_key], context, additional_item=item_key)
                 exceptions[item_key] = error
         if len(exceptions) > 0:
             self._raise_exception(exceptions, context)
