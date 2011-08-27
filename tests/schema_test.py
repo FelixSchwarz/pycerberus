@@ -135,6 +135,14 @@ class SchemaTest(PythonicTestCase):
         schema.set_allow_additional_parameters(False)
         self.assert_raises(InvalidDataError, schema.process, dict(foo=42))
         
+    def test_exception_contains_information_about_invalid_and_extra_fields(self):
+        schema = self._schema()
+        schema.set_internal_state_freeze(False)
+        schema.set_allow_additional_parameters(False)
+
+        exception = self.assert_raises(InvalidDataError, schema.process,
+                                        {'id': 'invalid', 'foo':'heh'})
+        self.assert_equals(len(exception.error_dict().items()), 2)
     
     # -------------------------------------------------------------------------
     # form validators

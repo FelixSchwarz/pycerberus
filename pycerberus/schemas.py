@@ -3,6 +3,7 @@
 # The MIT License
 # 
 # Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +58,7 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         self.set_internal_state_freeze(True)
     
     def messages(self):
-        return {'additional_items': _('Too many parameters: %(additional_items)s')}
+        return {'additional_item': _('Extra parameter: \'%(additional_item)s\'')}
     
     def separator_pattern(self):
         return '\s*,\s*'

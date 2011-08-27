@@ -3,6 +3,7 @@
 # The MIT License
 # 
 # Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +39,7 @@ class TestPositionalArgumentsWithoutData(ValidationTest):
     
     def test_bails_out_if_additional_parameters_are_passed(self):
         e = self.assert_error('fnord')
-        self.assert_equals(u"Too many parameters: 'fnord'", e.msg())
+        self.assert_equals(u"Extra parameter: 'fnord'", e.msg())
 
 
 class TestPositionalArgumentsWithSingleParameter(ValidationTest):
