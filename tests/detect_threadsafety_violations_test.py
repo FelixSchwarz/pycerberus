@@ -24,6 +24,7 @@
 
 from pycerberus.api import Validator
 from pycerberus.errors import ThreadSafetyError
+from pycerberus.lib.pythonic_testcase import *
 from pycerberus.test_util import ValidationTest
 
 
@@ -35,7 +36,7 @@ class DetectThreadSafetyViolationInValidatorTest(ValidationTest):
     validator_class = NonThreadSafeValidator
     
     def test_can_detect_threadsafety_violations(self):
-        self.assert_raises(ThreadSafetyError, self.process, 42)
+        assert_raises(ThreadSafetyError, lambda: self.process(42))
     
     def test_can_disable_threadsafety_detection(self):
         class ValidatorWrittenByExpert(self.validator_class):

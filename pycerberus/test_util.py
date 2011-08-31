@@ -23,10 +23,13 @@
 # THE SOFTWARE.
 
 from pycerberus import InvalidDataError
-from pycerberus.lib import PythonicTestCase
+from pycerberus.lib.simple_super import SuperProxy
+from pycerberus.lib.pythonic_testcase import *
 
 
 class ValidationTest(PythonicTestCase):
+    
+    super = SuperProxy()
     
     def setUp(self):
         self.super()
@@ -56,7 +59,7 @@ class ValidationTest(PythonicTestCase):
     
     def assert_error(self, value, *args, **kwargs):
         call = lambda: self.process(value, *args, **kwargs)
-        return self.assert_raises(InvalidDataError, call)
+        return assert_raises(InvalidDataError, call)
     
     def assert_error_with_locale(self, value, locale='en', *args, **kwargs):
         """Process the given value and assert that this raises a validation

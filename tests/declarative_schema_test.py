@@ -26,6 +26,7 @@ from pycerberus.api import Validator
 from pycerberus.errors import InvalidDataError
 from pycerberus.compat import set
 from pycerberus.lib import PythonicTestCase
+from pycerberus.lib.pythonic_testcase import *
 from pycerberus.schema import SchemaValidator
 from pycerberus.validators import IntegerValidator
 
@@ -65,8 +66,8 @@ class DeclarativeSchemaTest(PythonicTestCase):
             self.assert_false(hasattr(self.schema(), fieldname))
     
     def test_can_have_formvalidators(self):
-        self.assert_callable(self.schema().formvalidators)
-        self.assert_length(1, self.schema().formvalidators())
+        assert_callable(self.schema().formvalidators)
+        assert_length(1, self.schema().formvalidators())
     
     def test_can_bail_out_if_additional_items_are_detected(self):
         e = self.assert_raises(InvalidDataError, lambda: self.schema().process(dict(id=42, amount=21, extra='foo')))

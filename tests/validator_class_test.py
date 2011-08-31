@@ -24,13 +24,14 @@
 
 from pycerberus import EmptyError, InvalidArgumentsError, Validator
 from pycerberus.api import NoValueSet
+from pycerberus.lib.pythonic_testcase import *
 from pycerberus.test_util import ValidationTest
 
 
 class ValidatorParametersTest(ValidationTest):
     
     def test_bail_out_if_unknown_parameters_are_passed_to_constructor(self):
-        self.assert_raises(Exception, lambda: Validator(invalid='fnord'))
+        assert_raises(Exception, lambda: Validator(invalid='fnord'))
 
 
 class DefaultAndRequiredValuesTest(ValidationTest):
@@ -83,11 +84,11 @@ class DefaultAndRequiredValuesTest(ValidationTest):
     def test_raise_exception_if_required_value_is_missing(self):
         self.assert_equals(42,  Validator(required=True).process(42))
         self.assert_none(Validator(required=False).process(None))
-        self.assert_raises(EmptyError, Validator(required=True).process, None)
-        self.assert_raises(EmptyError, Validator().process, None)
+        assert_raises(EmptyError, lambda: Validator(required=True).process(None))
+        assert_raises(EmptyError, lambda: Validator().process(None))
     
     def test_raise_exception_if_value_is_required_but_default_is_set_to_prevent_errors(self):
-        self.assert_raises(InvalidArgumentsError, Validator, required=True, default=12)
+        assert_raises(InvalidArgumentsError, lambda: Validator(required=True, default=12))
 
 
 class StripValueTest(ValidationTest):
