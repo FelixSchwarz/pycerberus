@@ -72,8 +72,14 @@ class DeclarativeSchemaTest(PythonicTestCase):
         e = self.assert_raises(InvalidDataError, lambda: self.schema().process(dict(id=42, amount=21, extra='foo')))
         self.assert_equals('Undeclared field detected: "extra".', e.msg())
     
-    def test_can_override_additional_items_setting_on_class_instantiation(self):
+    def test_can_override_additional_items_parameter_on_class_instantiation(self):
         schema = self.schema(allow_additional_parameters=True)
         schema.process(dict(id=42, amount=21, extra='foo'))
+    
+    def test_additional_items_parameter_is_inherited_for_schema_subclasses(self):
+        class DerivedSchema(self.DeclarativeSchema):
+            pass
+        schema = DerivedSchema()
+        self.assert_raises(InvalidDataError, lambda: schema.process(dict(id=42, amount=21, extra='foo')))
 
 

@@ -39,7 +39,8 @@ class SchemaMeta(EarlyBindForMethods):
         schema_class = EarlyBindForMethods.__new__(cls, classname, direct_superclasses, class_attributes_dict)
         schema_class._fields = fields
         schema_class._formvalidators = formvalidators
-        schema_class.allow_additional_parameters = class_attributes_dict.get('allow_additional_parameters', None)
+        inherited_allow_additional_parameters = getattr(schema_class, 'allow_additional_parameters', None)
+        schema_class.allow_additional_parameters = class_attributes_dict.get('allow_additional_parameters', inherited_allow_additional_parameters)
         return schema_class
     
     def is_validator(cls, value):
