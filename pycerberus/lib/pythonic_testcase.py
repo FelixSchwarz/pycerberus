@@ -36,8 +36,8 @@
 
 from unittest import TestCase
 
-__all__ = ['assert_callable', 'assert_contains', 'assert_equals', 
-           'assert_false', 'assert_falseish',
+__all__ = ['assert_almost_equals', 'assert_callable', 'assert_contains', 
+           'assert_equals', 'assert_false', 'assert_falseish',
            'assert_isinstance', 'assert_length', 'assert_none', 
            'assert_not_none', 'assert_not_equals', 
            'assert_raises', 'assert_true', 'assert_trueish', 'PythonicTestCase', ]
@@ -93,6 +93,20 @@ def assert_not_equals(expected, actual, message=None):
     if expected != actual:
         return
     default_message = '%s == %s' % (repr(expected), repr(actual))
+    if message is None:
+        raise AssertionError(default_message)
+    raise AssertionError(default_message + ': ' + message)
+
+def assert_almost_equals(expected, actual, max_delta=None, message=None):
+    if expected == actual:
+        return
+    if (max_delta is not None) and (abs(expected - actual) <= max_delta):
+        return
+    
+    if max_delta is None:
+        default_message = '%s != %s' % (repr(expected), repr(actual))
+    else:
+        default_message = '%s != %s +/- %s' % (repr(expected), repr(actual), repr(max_delta))
     if message is None:
         raise AssertionError(default_message)
     raise AssertionError(default_message + ': ' + message)
@@ -162,8 +176,6 @@ class PythonicTestCase(TestCase):
             return globals()[name]
         return getattr(super(PythonicTestCase, self), name)
 
-# almost_equals
-# isinstance
 # smaller_than
 # greater_than
 # is_callable
