@@ -83,7 +83,7 @@ class ForEach(Validator):
         return validator    
     
     def _raise_exception(self, exceptions, context):
-        first_error = filter(None, exceptions)[0].details()
+        first_error = list(filter(None, exceptions))[0].details()
         # can't use self.exception() as all values are already filled
         raise InvalidDataError(first_error.msg(), first_error.value(), first_error.key(), 
                                context, error_list=exceptions)
