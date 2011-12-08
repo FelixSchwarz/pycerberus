@@ -1,6 +1,5 @@
 \.pyc$
 \.mo$
-pyinputvalidation\.egg-info
 build
 \.project
 \.pydevproject
@@ -10,5 +9,5 @@ build
 .*\.sw[po]$
 dist
 sdist
-\.python3
-trac
+local
+TODO.txt
