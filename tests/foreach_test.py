@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from pycerberus.api import NoValueSet
 from pycerberus.errors import InvalidArgumentsError
 from pycerberus.lib.pythonic_testcase import *
 from pycerberus.test_util import ValidationTest
@@ -102,5 +103,11 @@ class ForEachTest(ValidationTest):
         assert_raises(InvalidArgumentsError, 
             lambda: ForEach(IntegerValidator, min_length=2, max_length=1))
     
-    # TODO: Check if we can avoid the conversion to list
+    def test_returns_empty_tuple_if_not_required_and_no_value_given(self):
+        validator = ForEach(IntegerValidator, required=False)
+        assert_equals((), validator.empty_value({}))
+    
+    def test_can_set_validator_arguments_for_constructor(self):
+        self.init_validator(ForEach(IntegerValidator, default=[], required=False))
+        assert_equals([], self.process(None))
 

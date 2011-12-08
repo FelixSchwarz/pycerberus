@@ -32,7 +32,7 @@ __all__ = ['ForEach']
 
 class ForEach(Validator):
     
-    def __init__(self, validator, min_length=0, max_length=NoValueSet):
+    def __init__(self, validator, min_length=0, max_length=NoValueSet, **kwargs):
         self._validator = self._init_validator(validator)
         self._min_length = min_length
         self._max_length = max_length
@@ -41,7 +41,8 @@ class ForEach(Validator):
                 values = tuple(map(repr, [self._min_length, self._max_length]))
                 message = 'min_length must be smaller or equal to max_length (%s > %s)' % values
                 raise InvalidArgumentsError(message)
-        self.super(default=NoValueSet)
+        kwargs.setdefault('default', ())
+        self.super(**kwargs)
     
     def messages(self):
         return {
@@ -68,9 +69,6 @@ class ForEach(Validator):
                 exceptions.append(None)
         if filter(None, exceptions):
             self._raise_exception(exceptions, context)
-    
-    def empty(self):
-        return ()
     
     def _is_iterable(self, value):
         try:
