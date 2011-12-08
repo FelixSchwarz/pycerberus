@@ -59,7 +59,7 @@ framework also has built-in support for less common (but important) use cases
 like internationalization.
 
 The framework itself is heavily inspired by `FormEncode <http://www.formencode.org>`_
-by Ian Bicking. Therefore most of `FormEncode's design rationale <http://www.formencode.org/Design.html>`_
+by Ian Bicking. Therefore most of `FormEncode's design rationale <http://www.formencode.org/en/latest/Design.html>`_
 is directly applicable to pycerberus. However several things about FormEncode 
 annoyed me so much that I decided to write my own library when I needed one for 
 my SMTP server project `pymta <http://www.schwarz.eu/opensource/projects/pymta>`_.
