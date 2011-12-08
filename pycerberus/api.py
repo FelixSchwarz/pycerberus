@@ -249,6 +249,7 @@ class Validator(BaseValidator):
         This method must not modify the ``converted_value``."""
         pass
     
+    # REFACT: rename to default_value()
     def empty_value(self, context):
         """Return the 'empty' value for this validator (usually None)."""
         if self._default is NoValueSet:

@@ -95,17 +95,15 @@ most of the design ideas are also present in pycerberus.
 Development Status
 ==================================
 
-Currently (March 2010, version 0.3) pycerberus is at a very basic stage - 
+Currently (December 2011, version 0.5) pycerberus is at a very basic stage - 
 though with very solid foundations. The API for single validators is basically
 complete, i18n support is built in and there is decent documentation covering
 all important aspects. You can check multiple values (e.g. a web form) easily
 using a validation Schema ("compound validator").
 
-The future development will focus on *repeating fields* (list of values). After 
-that, I'll try to increase the number of *built-in validators for
-specific domains* (e.g. *correct* email address validation, validating host names,
-localized numbers). Another interesting topic will be *integration into different
-frameworks* like `TurboGears <http://www.turbogears.org>`_ and 
+In the future 'll try to increase the number of *built-in validators for
+specific domains* (e.g. localized numbers). Another interesting topic will be 
+*integration into different frameworks* like `TurboGears <http://www.turbogears.org>`_ and 
 `trac <http://trac.edgewall.org>`_.
 
 However I have to say that I'm pretty satisfied with the current status so 

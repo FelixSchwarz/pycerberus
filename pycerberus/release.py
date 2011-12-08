@@ -34,6 +34,8 @@ Changelog
 ====================
 - 'allow_additional_parameters' can now be specified in the schema constructor
   directly as well as a parameter for a declarative schema
+- new ForEach validator to validate a list of items with the same validator
+- InvalidDataErrors can return a list of errors using '.errors()'
 
 API changes:
 ------------

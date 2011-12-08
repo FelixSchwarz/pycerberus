@@ -35,10 +35,13 @@ class ValidationTest(PythonicTestCase):
         self.super()
         self._validator = None
         if hasattr(self, 'validator_class'):
-            self.init_validator()
+            # this will set up the validator with the correct arguments 
+            # specified in the testcase
+            self.validator()
     
     def init_validator(self, validator=None, *args, **kwargs):
         if (validator is None) and hasattr(self, 'validator_class'):
+            # FIXME: This won't work as args filled means that validator != None
             validator = self.validator_class(*args, **kwargs)
         self._validator = validator
         return self._validator
@@ -48,7 +51,9 @@ class ValidationTest(PythonicTestCase):
         created yet)."""
         if self._validator is not None:
             return self._validator
-        return self.init_validator()
+        
+        args = [None] + list(getattr(self, 'validator_args', ()))
+        return self.init_validator(*args)
         
     schema = validator
     
