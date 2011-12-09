@@ -2,7 +2,7 @@
 pycerberus documentation
 ************************
 
-pycerberus is a framework to check user data thoroughly so that you can protect
+pycerberus is a library to check user data thoroughly so that you can protect
 your application from malicious (or just garbled) input data.
 
 * **Remove stupid code which converts input values:** After values are validated, you 
@@ -53,12 +53,12 @@ forget to check also for uncommon edge cases. Eventually there is often also
 some code to convert the input data (usually strings) to more convenient Python 
 data types like int or bool.
 
-pycerberus is a framework that tackles these common problems and allows
+pycerberus is a library that tackles these common problems and allows
 you to write tailored validators to perform additional checks. Furthermore the 
-framework also has built-in support for less common (but important) use cases
+library also has built-in support for less common (but important) use cases
 like internationalization.
 
-The framework itself is heavily inspired by `FormEncode <http://www.formencode.org>`_
+The library itself is heavily inspired by `FormEncode <http://www.formencode.org>`_
 by Ian Bicking. Therefore most of `FormEncode's design rationale <http://www.formencode.org/en/latest/Design.html>`_
 is directly applicable to pycerberus. However several things about FormEncode 
 annoyed me so much that I decided to write my own library when I needed one for 
@@ -378,7 +378,7 @@ define custom translations for this key in your own .po files.
 Modify gettext options (locale dir, domain)
 ------------------------------------------------------------
 
-The gettext framework is configurable, e.g. in which directory your .mo files
+The gettext library is configurable, e.g. in which directory your .mo files
 are located and which domain (.mo filename) should be used. In pycerberus this
 is configurable by validator::
 
