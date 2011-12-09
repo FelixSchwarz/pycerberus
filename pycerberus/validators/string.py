@@ -22,7 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pycerberus.api import Validator
+from pycerberus.api import NoValueSet, Validator
+from pycerberus.errors import InvalidArgumentsError
 from pycerberus.i18n import _
 
 
@@ -31,16 +32,35 @@ __all__ = ['StringValidator']
 
 class StringValidator(Validator):
     
+    def __init__(self, min_length=0, max_length=NoValueSet, **kwargs):
+        self._min_length = min_length
+        self._max_length = max_length
+        if (self._min_length is not None) and (self._max_length != NoValueSet):
+            if self._min_length > self._max_length:
+                values = tuple(map(repr, [self._min_length, self._max_length]))
+                message = 'min_length must be smaller or equal to max_length (%s > %s)' % values
+                raise InvalidArgumentsError(message)
+        kwargs.setdefault('default', u'')
+        self.super(**kwargs)
+        
     def messages(self):
         return {
-                'invalid_type': _(u'Validator got unexpected input (expected string, got "%(classname)s").'),
-               }
+            'invalid_type': _(u'Validator got unexpected input (expected string, got "%(classname)s").'),
+            'too_long': _(u'Must be less than %(max)d characters long.'),
+            'too_short': _(u'Must be at least %(min)d characters long.'),
+        }
     
     def convert(self, value, context):
         if not isinstance(value, basestring):
             classname = value.__class__.__name__
             self.raise_error('invalid_type', value, context, classname=classname)
         return value
+    
+    def validate(self, value, context):
+        if len(value) < self._min_length:
+            self.raise_error('too_short', value, context, min=self._min_length)
+        if self._max_length != NoValueSet and len(value) > self._max_length:
+            self.raise_error('too_long', value, context, max=self._max_length)
     
     def is_empty(self, value, context):
         return value in (None, '')

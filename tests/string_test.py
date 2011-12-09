@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pycerberus import InvalidDataError
+from pycerberus import InvalidArgumentsError, InvalidDataError
 from pycerberus.lib.pythonic_testcase import *
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import StringValidator
@@ -54,4 +54,26 @@ class StringValidatorTest(ValidationTest):
         self.init_validator(default='foo', required=False)
         self.assert_equals('foo', self.process(None))
         self.assert_equals('foo', self.process(''))
+    
+    def test_can_specify_min_length(self):
+        self.init_validator(StringValidator(min_length=3))
+        self.process('foo')
+        self.assert_error('fo')
+    
+    def test_can_specify_max_length(self):
+        self.init_validator(StringValidator(max_length=3))
+        self.process('foo')
+        self.assert_error('foobar')
+    
+    def test_can_specify_min_and_max_length_together(self):
+        self.init_validator(StringValidator(min_length=2, max_length=3))
+        self.assert_error('f')
+        self.process('fo')
+        self.process('foo')
+        self.assert_error('foobar')
+    
+    def test_min_length_must_be_smaller_or_equal_max_length(self):
+        assert_raises(InvalidArgumentsError, 
+            lambda: StringValidator(min_length=2, max_length=1))
+    
 
