@@ -87,7 +87,7 @@ framework), you can use it in many different places (e.g. web applications with
 different frameworks, server applications, check parameters in a library, …).
 
 
-Further reading: `FormEncode's design rationale <http://www.formencode.org/Design.html>`_ - 
+Further reading: `FormEncode's design rationale <http://www.formencode.org/en/latest/Design.html>`_ - 
 most of the design ideas are also present in pycerberus.
 
 
