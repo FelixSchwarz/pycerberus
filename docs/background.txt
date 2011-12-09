@@ -1,0 +1,49 @@
+Background
+==================================
+
+In every software you must check carefully that untrusted user input data 
+matches your expectations. Unvalidated user input is a common source of security
+flaws. However many checks are repetitive and validation logic tends to be 
+scattered all around the code. Because basic checks are duplicated, developers 
+forget to check also for uncommon edge cases. Eventually there is often also 
+some code to convert the input data (usually strings) to more convenient Python 
+data types like int or bool.
+
+pycerberus is a library that tackles these common problems and allows
+you to write tailored validators to perform additional checks. Furthermore the 
+library also has built-in support for less common (but important) use cases
+like internationalization.
+
+The library itself is heavily inspired by `FormEncode <http://www.formencode.org>`_
+by Ian Bicking. Therefore most of `FormEncode's design rationale <http://www.formencode.org/en/latest/Design.html>`_
+is directly applicable to pycerberus. However several things about FormEncode 
+annoyed me so much that I decided to write my own library when I needed one for 
+my SMTP server project `pymta <http://www.schwarz.eu/opensource/projects/pymta>`_.
+
+
+Philosophy and Design
+==================================
+
+Rules are declared explicitly: Separating policy from mechanism
+---------------------------------------------------------------
+
+pycerberus separates validation rules ("Validators") from the objects they 
+validate against. It might be tempting to derive the validation rules from 
+restrictions you specified earlier (e.g. from a class which is mapped by an ORM
+to a database). However that approach completely ignores that validation 
+typically depends on context: In an API you have typically a lot more freedom in
+regard to allowed values compared to a public web interface where input needs to
+conform to a lot more checks. In a system where you declare the validation 
+explicitly, this is possible. Also it is quite easy writing some code that 
+generates a bottom line of validation rules automatically based on your ORM 
+model and add additional restrictions depending on the context.
+
+As pycerberus is completely context-agnostic (not being bundled with a specific
+framework), you can use it in many different places (e.g. web applications with
+different frameworks, server applications, check parameters in a library, …).
+
+
+Further reading: `FormEncode's design rationale <http://www.formencode.org/en/latest/Design.html>`_ - 
+most of the design ideas are also present in pycerberus.
+
+

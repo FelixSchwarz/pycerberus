@@ -1,0 +1,15 @@
+Installation and Setup
+==================================
+
+pycerberus is just a Python library which uses setuptools so it does not require
+a special setup. It has no dependencies besides the standard Python library. 
+There are some optional packages which you can choose to install:
+
+* **Babel** is the most convenient option to generate the gettext catalog files 
+  so you can see localized error messages.
+* I'm using **nosetests** ("nose") to run all the automated tests.
+
+pycerberus has been tested on **Python 2.3-2.7** as well as **Python 3**. To know
+more about Python 3 support (and its limitations), please read the section 
+:ref:`Python 3 Support<python3>`.
+

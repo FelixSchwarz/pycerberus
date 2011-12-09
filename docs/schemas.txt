@@ -1,0 +1,123 @@
+Using Validation Schemas
+==================================
+
+Especially in web development you often get multiple values from a form and you
+want to validate all these values easily. This is where "compound validators" 
+aka "schemas" come into play. A schema contains multiple validators, one validator 
+for every field. There's nothing special about these validators - they are just
+validators like the ones I explained in the previous section. Every field 
+validator only cares about a single value and does not see the rest of the 
+values. Also a schema is technically just a special validator.
+
+You can define a schema like this::
+
+    from pycerberus.schema import SchemaValidator
+    from pycerberus.validators import IntegerValidator, StringValidator
+    
+    schema = SchemaValidator()
+    schema.add('id', IntegerValidator())
+    schema.add('name', StringValidator())
+
+Afterwards the schema behaves most like all basic validators - instead of a
+single input value they just get a dictionary::
+
+    validated_values = schema.process({'id': '42', 'name': 'Foo Bar'})
+
+If you declared a validator for a key which is not present in the input dict, 
+the validator will get its 'empty' value instead::
+
+    id_required = SchemaValidator()
+    id_required.add('id', IntegerValidator(required=False))
+    id_required.process({}) # -> {'id': None}
+    
+    id_optional = SchemaValidator()
+    id_optional.add('id', IntegerValidator(required=True))
+    id_optional.process({}) # raises an Exception because id None is not acceptable
+
+Do not mix up the 'default' value with the 'empty' value::
+
+    IntegerValidator(default=42)
+
+The 'default' value in this case is 42 but the 'empty' value is still None.
+
+
+Please note that Schemas are 'secure by default' which means that the returned
+dictionary contains only values that were validated. If you did not add a 
+validator for a specific key, this key won't be included in the result.
+
+If you need to ensure that no values with unknown keys are passed to the schema
+(even if those would be just dropped), you can specify this when instantiating
+the schema: ``Schema(allow_additional_parameters=False)``. The schema will 
+raise an exception if it finds any unknown keys.
+
+The equivalent "declarative schema" (see next section) is::
+
+    class MySchema(SchemaValidator):
+        allow_additional_parameters=False
+        # ...
+
+
+Declarative Schemas
+-----------------------------------
+
+Schemas can be an important part in your application security. Also they define
+some kind of interface (which parameters does your application expect). Besides
+the algorithmic way to build a schema there is a 'declarative' way so that you
+can review and audit your schemas easily::
+
+    class MySchema(SchemaValidator):
+        id   = IntegerValidator()
+        name = StringValidator()
+    
+    # using it...
+    schema = MySchema()
+
+It's absolutely the same schema but the definition is way easier to read.
+
+
+Schema Error Handling
+-----------------------------------
+
+All schema validators are executed even if one of the previous validators failed.
+Because of that you can display the user all errors at once::
+
+    schema = SchemaValidator()
+    schema.add('id', IntegerValidator())
+    schema.add('name', StringValidator())
+    try:
+        schema.process({'id': 'invalid', 'name': None})
+    except InvalidDataError, e:
+        e.error_dict()    # {'id': <id validation error>, 'name': <id validation error>}
+        e.error_for('id') # id validation error
+
+
+Validating multiple fields in a Schema
+--------------------------------------
+
+Sometimes you need to validate multiple fields in a schema - e.g. you need to
+check in a 'change password' action that the password is entered the same twice.
+Or you need to check that a certain value is higher than another value in the 
+form. That's where *formvalidators* come into play.
+
+formvalidators are validators like all other field validators but they get the
+complete field dict as input, not a single item. Also formvalidators are run
+*after* all field validators successfully validated the input - therefore you
+have access to reasonably sane values, already converted to a handy Python data
+type. Opposite to simple field validators, the validation process fails 
+immediately if one formvalidator fails.
+
+You can add formvalidators to a form like this::
+
+    class NumbersMatch(Validator):
+        def validate(self, fields, context):
+            if fields['a'] != fields['b' ]:
+                self.raise_error('no_match', fields, context=context)
+    schema.add_formvalidator(NumbersMatch)
+
+Of course there is also a declarative way to use form validators::
+
+    class MySchema(SchemaValidator):
+        # ...
+        formvalidators = (NumbersMatch, )
+
+

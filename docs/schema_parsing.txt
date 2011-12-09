@@ -1,0 +1,22 @@
+Parse Input with Schemas
+------------------------
+
+In the common "web form" use case you already get parameters mapped to keys. 
+That's usually the job of your web framework. However sometimes it's not that 
+easy: Before you can do input validation, you need to parse the user input from
+a string and convert that into a dict.
+
+This is where ''PositionalArgumentsParsingSchema()'' might help you: This schema
+takes a string and extracts several parameters from it. So you can use it to
+transform ``"foo, 42"`` into ``dict(name="foo", value=42)``.
+
+.. autoclass:: pycerberus.schemas.PositionalArgumentsParsingSchema
+   :members:
+
+This schema is used for example in `pymta <http://www.schwarz.eu/opensource/projects/pymta>`_.
+to parse the SMTP command strings. Also I used it in my 
+`OhlohWidgetsMacro <http://www.schwarz.eu/opensource/projects/ohloh_widgets_macro>`_:
+Trac macros can get parameters but these are passed as a single string so the 
+schema takes care of separating these arguments.
+
+

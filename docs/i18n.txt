@@ -1,0 +1,151 @@
+Internationalization
+==================================
+
+Modern applications must be able to handle different languages. 
+Internationalization (i18n) in pycerberus refers to validating 
+locale-dependent input data (e.g. different decimal separator characters) as 
+well as validation errors in different languages. The former aspect is not yet
+covered by default but you should be able to write custom validators easily. 
+
+All messages from validators included in pycerberus can be translated in 
+different languages using the standard gettext library. The language of 
+validation error messages will be chosen depending on the locale which is given 
+in the state dictionary,
+
+i18n support in pycerberus is a bit broader than just translating 
+existing error messages. i18n becomes interesting when you write your own 
+validators (based on the ones that come with pycerberus) and your translations
+need to play along with the built-in ones:
+
+* Translate only the messages you defined, keep the existing pycerberus translations.
+* If you don't like the existing pycerberus translations, you can define your 
+  own without even changing a single line or file in pycerberus.
+* Specify additional translation options per validator class (e.g. a different
+  gettext domain or a different directory where your translations are stored).
+* Even though pycerberus uses the well-known gettext mechanism to retrieve
+  translations, you can use any other source as well (e.g. a database or a XML 
+  file).
+
+All i18n support in pycerberus aims to provide custom validators with a
+nice, simple-to-use API while maintaining the flexibility that serious 
+applications need.
+
+
+Get translated error messages
+------------------------------
+
+If you want to get translated error messages from a validator, you set the 
+correct ''context''. formencode looks for a key named 'locale' in the context
+dictionary::
+
+    validator = IntegerValidator()
+    validator.process('foo', context={'locale': 'en'}) # u'Please enter a number.'
+    validator.process('foo', context={'locale': 'de'}) # u'Bitte geben Sie eine Zahl ein.'
+
+
+Internal gettext details
+------------------------------
+
+Usually you don't have to know much about how pycerberus uses gettext internally.
+Just for completeness: The default domain is 'pycerberus'. By default 
+translations (.mo files) are loaded from ``pycerberus.locales``, with a fall back
+to the system-wide locale dir ''/usr/share/locale''.
+
+
+Translate your custom messages
+------------------------------
+
+To translate messages from a custom validator, you need to declare them in
+the messages() method and mark the message strings as translatable::
+
+    from pycerberus.api import Validator
+    from pycerberus.i18n import _
+    
+    class MyValidator(Validator):
+        def messages(self):
+            return {
+                    'foo': _('A message.'),
+                    'bar': _('Another message.'),
+                   }
+        
+        # your validation logic ...
+
+Afterwards you just have to start the usual gettext process. I always use `Babel <http://babel.edgewall.org>`_ because it provides the very convenient ``pybabel`` tool which simplifies the workflow a lot:
+
+* Collect the translatable strings in a po template (.pot) file, e.g. ``pybabel extract . --output=mymessages.pot``
+* Create the initial po file for your new locale (only needed once): ``pybabel init --domain=pycerberus --input-file=mymessages.pot --locale=<locale ID> --output-dir=locales/``
+* After every change to a translatable string in your source code, you need to recreate the pot file (see first step) and update the po file for your locale: ``pybabel update --domain=pycerberus --input-file=mymessages.pot --output-dir=locales/``
+* Translate the messages for every locale.
+* Compile the final po file into a mo file, e.g. ``pybabel compile --domain=pycerberus --directory=locales/``
+
+
+Override existing messages and translations
+------------------------------------------------------------
+
+Assume your custom validator is a subclass of a built-in validator but you 
+don't like the built-in translation. Of course you can replace pycerberus' mo
+files directly. However there is also another way where you don't have to change
+pycerberus itself::
+
+    class CustomValidatorThatOverridesTranslations(Validator):
+        
+        def messages(self):
+            return {'empty': _('My custom message if the value is empty'),
+                    'custom': _('A custom message')}
+        
+        # ...
+
+This validator will use a different message for the 'empty' error and you can
+define custom translations for this key in your own .po files.
+
+
+
+Modify gettext options (locale dir, domain)
+------------------------------------------------------------
+
+The gettext library is configurable, e.g. in which directory your .mo files
+are located and which domain (.mo filename) should be used. In pycerberus this
+is configurable by validator::
+
+    class ValidatorWithCustomGettextOptions(Validator):
+        
+        def messages(self):
+            return {'custom': _('A custom message')}
+        
+        def translation_parameters(self, context):
+            return {'domain': 'myapp', 'localedir': '/home/foo/locale'}
+        
+        # ...
+
+These translation parameters are passed directly to the ''gettext'' call so you
+can read about the available options in the `gettext documentation <http://docs.python.org/library/gettext.html>`_.
+Your parameter will be applied for all messages which were declared in your 
+validator class (but not in others). So you can modify the parameters for your
+own validator but keep all the existing parameters (and translations) for 
+built-in validators.
+
+
+Retrieve translations from a different source (e.g. database)
+-------------------------------------------------------------
+
+Sometimes you don't want to use gettext. For instance you could store translations
+in a relational database so that your users can update the messages themselves
+without fiddling with gettext tools::
+
+    class ValidatorWithNonGettextTranslation(FrameworkValidator):
+        
+        def messages(self):
+            return {'custom': _('A custom message')}
+        
+        def translate_message(self, key, native_message, translation_parameters, context):
+            # fetch the translation for 'native_message' from somewhere
+            translated_message = get_translation_from_db(native_message)
+            return translated_message
+
+You can use this mechanism to plug in arbitrary translation systems into 
+gettext. Your translation mechanism is (again) only applied to keys which were
+defined by your specific validator class. If you want to use your translation
+system also for keys which were defined by built-in validators, you need to
+re-define these keys in your class as shown in the previous section.
+
+

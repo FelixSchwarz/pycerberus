@@ -1,0 +1,74 @@
+Using Validators
+==================================
+
+In pycerberus "Validators" are used to specify validation rules which ensure
+that the input matches your expectations. Every basic validator validates a 
+just single value (e.g. one specific input field in a web application). When 
+the validation was successful, the validated and converted value is returned. 
+If something is wrong with the data, an exception is raised::
+
+    from pycerberus.validators import IntegerValidator
+    IntegerValidator().process('42') # returns 42 as int
+
+pycerberus puts conversion and validation together in one call because of two
+main reasons:
+
+* As a user you need to convert input data (usually strings) anyway into a more
+  sensible format (e.g. int). These lines of code are redundant because you 
+  declared in the validator already what the value should be.
+* During the validation process, it is very easy to do also the conversion. In
+  fact many validations are done just by trying to do a conversion and catch
+  all exceptions that were raised during that process.
+
+
+
+Validation Errors
+----------------------------------
+
+Every validation error will trigger an exception, usually an ``InvalidDataError``.
+This exception will contain a translated error message which can be presented to
+the user, a key so you can identify the exact error programmatically and the 
+original, unmodified value::
+
+    from pycerberus.errors import InvalidDataError
+    from pycerberus.validators import IntegerValidator
+    try:
+        IntegerValidator().process('foo')
+    except InvalidDataError, e:
+        details = e.details()
+        details.msg()         # u'Please enter a number.'
+        details.key()         # 'invalid_number'
+        details.value()       # 'foo'
+        details.context()     # {}
+
+
+Configuring Validators
+----------------------------------
+
+You can configure the behavior of the validator when instantiating it. For 
+example, if you pass ``required=False`` to the constructor, most validators will
+also accept ``None`` as a valid value::
+
+        IntegerValidator(required=True).process(None)  # -> validation error
+        IntegerValidator(required=False).process(None) # None
+
+Validators support different configuration options which are explained along the
+validator description.
+
+
+Context
+----------------------------------
+
+All validators support an optional ``context`` argument (which defaults to an
+emtpy dict). It is used to plug validators into your application and make
+them aware of the overall system state: For example a validator must know which
+locale it should use to translate an error message to the correct language 
+without relying on some global variables::
+
+    context = {'locale': 'de'}
+    validator = IntegerValidator()
+    validator.process('foo', context=context) # u'Bitte geben Sie eine Zahl ein.'
+
+The context variable is especially useful when writing custom validators - 
+locale is the only context information that pycerberus itself cares about.
+

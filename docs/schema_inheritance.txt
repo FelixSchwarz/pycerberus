@@ -1,0 +1,50 @@
+Schema inheritance - build multi-page forms without duplication
+---------------------------------------------------------------
+
+Validation schemas are an important piece of information: On the one hand they
+can serve as a kind of API specification (which parameters are accepted by your 
+application) and on the other hand they are important for security audits (which
+constraints are put on your input values). Obviously this is something that you
+want to get right - duplicating this information only increases the likelyhood 
+of bugs.
+
+The issue becomes especially annoying when you have a web application with a
+complex form (e.g. a new user registration process) that you want to split in
+multiple steps on different pages so that your users won't drop out immediately
+when they see the huge form. It is good HTTP/ReST design practice to keep state 
+on the client side. Therefore you pass fields from previous pages in hidden 
+input fields to the next and for the final page it looks like there was one big 
+form. This also has the advantage that you can shuffle the fields on the 
+different pages without changing real logic.
+
+With that approach your pretty much settled - however you need a separate 
+validation schema for every single page which is a huge duplication. With 
+pycerberus you can avoid that by using ''schema inheritance''::
+
+    class FirstPage(SchemaValidator):
+        id = IntegerValidator()
+        
+        formvalidators = (SomeValidator(), )
+    
+    class SecondPage(FirstPage):
+        # this schema contains also 'id' validator
+        name = StringValidator()
+        
+        # formvalidators are implicitely appended so actually this schema has
+        # these formvalidators: (SomeValidator(), AnotherValidator(), )
+        formvalidators = (AnotherValidator(), )
+    
+    class FinalPage(SecondPage):
+        # this schema contains also 'id' and 'name' validators
+        age = IntegerValidator()
+        
+        # This page contains again both formvalidators
+
+As you can see, every page adds some validators while keeping the old ones. This
+eliminates the duplication problem described above,
+
+What happens if SecondPage declares a different validator for 'id'? In this case
+it will just replace the ''IntegerValidator()'' declared by ''FirstPage''!
+
+
+
