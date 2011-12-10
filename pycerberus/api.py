@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
 # THE SOFTWARE.
 
 import inspect
+import sys
+import types        
 import warnings
 
 from pycerberus.compat import reversed, set
@@ -79,10 +81,36 @@ class BaseValidator(object):
     """The BaseValidator implements only the minimally required methods. 
     Therefore it does not put many constraints on you. Most users probably want 
     to use the ``Validator`` class which already implements some commonly used 
-    features."""
+    features.
+    
+    You can pass ``messages`` a dict of messages during instantiation to 
+    overwrite messages specified in the validator without the need to create 
+    a subclass."""
     
     __metaclass__ = EarlyBindForMethods
     super = SuperProxy()
+    
+    def __init__(self, messages=None):
+        if not messages:
+            return
+        
+        old_messages = self.messages
+        old_message_for_key = self.message_for_key
+        def messages_(self):
+            all_messages = old_messages()
+            all_messages.update(messages)
+            return all_messages
+        def message_for_key(self, key, context):
+            if key in messages:
+                return messages[key]
+            return old_message_for_key(key, context)
+        self.messages = self._new_instancemethod(messages_)
+        self.message_for_key = self._new_instancemethod(message_for_key)
+    
+    def _new_instancemethod(self, method):
+        if sys.version_info < (3,):
+            return types.MethodType(method, self, self.__class__)
+        return types.MethodType(method, self)
     
     def messages(self):
         """Return all messages which are defined by this validator as a 
@@ -161,8 +189,8 @@ class Validator(BaseValidator):
     you set ``required`` to True but provide a default value as well.
     """
     
-    def __init__(self, default=NoValueSet, required=NoValueSet, strip=False):
-        self.super()
+    def __init__(self, default=NoValueSet, required=NoValueSet, strip=False, messages=None):
+        self.super(messages=messages)
         self._default = default
         self._required = required
         self._check_argument_consistency()
@@ -187,11 +215,16 @@ class Validator(BaseValidator):
         implementations_for_class = {}
         known_functions = set()
         for cls in reversed(inspect.getmro(self.__class__)):
-            if self._class_defines_custom_keys(cls, known_functions):
-                known_functions.add(cls.keys)
-                for key in cls.keys(self):
-                    class_for_key[key] = self._implementations_by_key(cls)
-                    implementations_for_class[cls] = class_for_key[key]
+            if not self._class_defines_custom_keys(cls, known_functions):
+                continue
+            defined_keys = cls.keys(self)
+            if cls == self.__class__:
+                cls = self
+                defined_keys = self.keys()
+            known_functions.add(cls.keys)
+            for key in defined_keys:
+                class_for_key[key] = self._implementations_by_key(cls)
+                implementations_for_class[cls] = class_for_key[key]
         return class_for_key, implementations_for_class
     
     def _implementations_by_key(self, cls):
@@ -294,8 +327,15 @@ class Validator(BaseValidator):
         def context_key_wrapper(*args):
             method = self._implementations[key][methodname]
             args = list(args) + [context]
-            return method(self, *args)
+            if self._is_unbound(method):
+                return method(self, *args)
+            return method(*args)
         return context_key_wrapper
+    
+    def _is_unbound(self, method):
+        if sys.version_info < (3,):
+            return (method.__self__ is None)
+        return (getattr(method, '__self__',  None) is None)
     
     def is_internal_state_frozen(self):
         is_frozen = getattr(self, '_is_internal_state_frozen', NoValueSet)

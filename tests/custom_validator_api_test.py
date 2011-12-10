@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -39,12 +39,44 @@ class ValidatorWithCustomMessageForKey(Validator):
         return 'message from custom lookup'
 
 
+class AdditionalMessagesValidator(Validator):
+    def messages(self):
+        # need to have multiple messages, therefore 'ValidatorWithCustomMessageForKey'
+        # is not suitable
+        return {
+            'disabled': 'account disabled',
+            'deleted': 'account deleted',
+        }
+    
+    def validate(self, value, context):
+        if value in ('disabled', 'deleted'):
+            self.raise_error(value, value, context)
+        raise AssertionError('unknown value in validate')
+
+
 class CustomValidatorAPITest(ValidationTest):
     
-    validator_class = ValidatorWithCustomMessageForKey
-    
-    def test_validators_can_custom_lookup_mechanism_for_messages(self):
+    def test_validators_can_use_custom_lookup_mechanism_for_messages(self):
+        self.init_validator(ValidatorWithCustomMessageForKey())
         self.assert_equals('message from custom lookup', self.message_for_key('inactive'))
+    
+    def test_can_specify_additional_messages_during_instantiation(self):
+        validator = AdditionalMessagesValidator(messages={
+            'deleted': 'Your account was deleted.'
+        })
+        self.init_validator(validator)
+        
+        self.assert_equals({
+            'disabled': 'account disabled',
+            'deleted': 'Your account was deleted.',
+        }, validator.messages())
+        self.assert_equals('account disabled', validator.message_for_key('disabled', {}))
+        self.assert_equals('Your account was deleted.', validator.message_for_key('deleted', {}))
+        self.assert_equals(['disabled', 'deleted'], list(validator.keys()))
+        
+        self.assert_equals('account disabled', self.message_for_key('disabled'))
+        self.assert_equals('Your account was deleted.', self.message_for_key('deleted'))
+        self.assert_equals('Value must not be empty.', self.message_for_key('empty', locale='en'))
 
 
 

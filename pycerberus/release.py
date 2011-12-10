@@ -38,6 +38,8 @@ Changelog
 - added 'min_length', 'max_length' parameters when instantiating a 
   StringValidator
 - InvalidDataErrors can return a list of errors using '.errors()'
+- All validator messages can be overridden during instantiation by specifying
+  ``messages`` attribute,
 
 API changes:
 ------------
