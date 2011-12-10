@@ -36,7 +36,7 @@ Documentation
     background
     status
     using
-    validators/index
+    Available validators <available_validators>
     writing_your_own
     i18n
     schemas
