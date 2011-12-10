@@ -31,6 +31,8 @@ __all__ = ['ForEach']
 
 
 class ForEach(Validator):
+    """Apply a validator to every item of an iterable (like map). Also you
+    can specify the allowed min/max number of items in that iterable."""
     
     def __init__(self, validator, min_length=0, max_length=NoValueSet, **kwargs):
         self._validator = self._init_validator(validator)

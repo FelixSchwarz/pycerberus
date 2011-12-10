@@ -21,6 +21,11 @@ or use them as a basis for more specialized validators.
     :members:
     :show-inheritance:
 
+.. automodule:: pycerberus.validators.foreach
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: pycerberus.validators.string
     :members:
     :undoc-members:
