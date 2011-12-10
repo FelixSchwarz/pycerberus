@@ -42,7 +42,7 @@ Documentation
     schemas
     schema_inheritance
     schema_parsing
-    Support for Python 3 <../README.python3>
+    Support for Python 3 <python3>
 
 
 
