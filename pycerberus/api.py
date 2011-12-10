@@ -334,7 +334,7 @@ class Validator(BaseValidator):
     
     def _is_unbound(self, method):
         if sys.version_info < (3,):
-            return (method.__self__ is None)
+            return (method.im_self is None)
         return (getattr(method, '__self__',  None) is None)
     
     def is_internal_state_frozen(self):
