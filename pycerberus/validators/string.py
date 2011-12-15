@@ -32,10 +32,10 @@ __all__ = ['StringValidator']
 
 class StringValidator(Validator):
     
-    def __init__(self, min_length=0, max_length=NoValueSet, **kwargs):
+    def __init__(self, min_length=NoValueSet, max_length=NoValueSet, **kwargs):
         self._min_length = min_length
         self._max_length = max_length
-        if (self._min_length is not None) and (self._max_length != NoValueSet):
+        if (self._min_length != NoValueSet) and (self._max_length != NoValueSet):
             if self._min_length > self._max_length:
                 values = tuple(map(repr, [self._min_length, self._max_length]))
                 message = 'min_length must be smaller or equal to max_length (%s > %s)' % values
@@ -57,7 +57,7 @@ class StringValidator(Validator):
         return value
     
     def validate(self, value, context):
-        if len(value) < self._min_length:
+        if self._min_length != NoValueSet and len(value) < self._min_length:
             self.raise_error('too_short', value, context, min=self._min_length)
         if self._max_length != NoValueSet and len(value) > self._max_length:
             self.raise_error('too_long', value, context, max=self._max_length)

@@ -75,5 +75,18 @@ class StringValidatorTest(ValidationTest):
     def test_min_length_must_be_smaller_or_equal_max_length(self):
         assert_raises(InvalidArgumentsError, 
             lambda: StringValidator(min_length=2, max_length=1))
+
+
+class ValidatorsDerivedFromStringTest(ValidationTest):
+    class ValidatorWithCustomMessageForKey(StringValidator):
+        def convert(self, value, context):
+            return True
     
+    validator_class = ValidatorWithCustomMessageForKey
+    
+    def test_only_test_for_length_if_explicitely_set(self):
+        self.process('5')
+        
+        self.init_validator(self.validator_class(min_length=0))
+        assert_raises(TypeError, lambda: self.process('5'))
 
