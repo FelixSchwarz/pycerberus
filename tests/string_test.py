@@ -78,11 +78,11 @@ class StringValidatorTest(ValidationTest):
 
 
 class ValidatorsDerivedFromStringTest(ValidationTest):
-    class ValidatorWithCustomMessageForKey(StringValidator):
+    class TrueValidator(StringValidator):
         def convert(self, value, context):
             return True
     
-    validator_class = ValidatorWithCustomMessageForKey
+    validator_class = TrueValidator
     
     def test_only_test_for_length_if_explicitely_set(self):
         self.process('5')
