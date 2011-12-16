@@ -35,14 +35,16 @@ class StringValidator(Validator):
     def __init__(self, min_length=NoValueSet, max_length=NoValueSet, **kwargs):
         self._min_length = min_length
         self._max_length = max_length
+        self._check_min_max_length_consistency()
+        self.super(**kwargs)
+    
+    def _check_min_max_length_consistency(self):
         if (self._min_length != NoValueSet) and (self._max_length != NoValueSet):
             if self._min_length > self._max_length:
                 values = tuple(map(repr, [self._min_length, self._max_length]))
                 message = 'min_length must be smaller or equal to max_length (%s > %s)' % values
                 raise InvalidArgumentsError(message)
-        kwargs.setdefault('default', u'')
-        self.super(**kwargs)
-        
+    
     def messages(self):
         return {
             'invalid_type': _(u'Validator got unexpected input (expected string, got "%(classname)s").'),
