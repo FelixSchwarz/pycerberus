@@ -242,12 +242,16 @@ class Validator(BaseValidator):
     def messages(self):
         return {'empty': _('Value must not be empty.')}
     
-    def exception(self, key, value, context, errorclass=InvalidDataError, **values):
+    def exception(self, key, value, context, errorclass=InvalidDataError, 
+            error_dict=None, error_list=(), **values):
         translated_message = self.message(key, context, **values)
-        return errorclass(translated_message, value, key=key, context=context)
+        return errorclass(translated_message, value, key=key, context=context, 
+            error_dict=error_dict, error_list=error_list)
     
-    def raise_error(self, key, value, context, errorclass=InvalidDataError, **values):
-        raise self.exception(key, value, context, errorclass=errorclass, **values)
+    def raise_error(self, key, value, context, errorclass=InvalidDataError, 
+            error_dict=None, error_list=(), **values):
+        raise self.exception(key, value, context, errorclass=errorclass, 
+            error_dict=error_dict, error_list=error_list, **values)
     
     def process(self, value, context=None):
         if context is None:
