@@ -11,6 +11,8 @@ Changelog for pycerberus
   StringValidator
 - All validator messages can be overridden during instantiation by specifying
   ``messages`` attribute,
+- new OneOf validator to validate that a value is in a given list of allowed
+  values
 
 API changes:
  - BaseValidator.error() is deprecated now as the name does not really reflect

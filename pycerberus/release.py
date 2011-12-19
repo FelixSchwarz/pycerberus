@@ -40,6 +40,8 @@ Changelog
 - InvalidDataErrors can return a list of errors using '.errors()'
 - All validator messages can be overridden during instantiation by specifying
   ``messages`` attribute,
+- new OneOf validator to validate that a value is in a given list of allowed
+  values
 
 API changes:
 ------------
