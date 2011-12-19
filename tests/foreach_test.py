@@ -44,6 +44,9 @@ class ForEachTest(ValidationTest):
     def test_passes_if_every_single_item_passes(self):
         self.process((21, 42,))
     
+    def test_applied_validator_can_convert_items(self):
+        assert_equals((21, 42), self.process(('21', '42')))
+    
     def test_applies_validator_to_first_item(self):
         errors = self.assert_error(['bar']).errors()
         

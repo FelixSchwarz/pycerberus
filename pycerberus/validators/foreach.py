@@ -53,7 +53,7 @@ class ForEach(Validator):
             'too_long': _(u'Less than%(max)d items required.'),
         }
 
-    def validate(self, values, context):
+    def convert(self, values, context):
         exceptions = []
         if not self._is_iterable(values):
             self.raise_error('invalid_type', values, context, classname=values.__class__.__name__)
@@ -62,15 +62,17 @@ class ForEach(Validator):
         if self._max_length != NoValueSet and len(values) > self._max_length:
             self.raise_error('too_long', values, context, max=self._max_length)
         
+        validated = []
         for value in values:
             try:
-                self._validator.process(value, context)
+                validated.append(self._validator.process(value, context))
             except InvalidDataError, e:
                 exceptions.append(e)
             else:
                 exceptions.append(None)
         if filter(None, exceptions):
             self._raise_exception(exceptions, context)
+        return tuple(validated)
     
     def _is_iterable(self, value):
         try:
