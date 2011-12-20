@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +26,7 @@
 from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
 from pycerberus.compat import set
 from pycerberus.i18n import _
-from pycerberus.errors import InvalidDataError
+from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 
 __all__ = ['SchemaValidator']
 
@@ -41,6 +41,8 @@ class SchemaMeta(EarlyBindForMethods):
         schema_class._formvalidators = formvalidators
         inherited_allow_additional_parameters = getattr(schema_class, 'allow_additional_parameters', None)
         schema_class.allow_additional_parameters = class_attributes_dict.get('allow_additional_parameters', inherited_allow_additional_parameters)
+        inherited_filter_unvalidated_parameters = getattr(schema_class, 'filter_unvalidated_parameters', True)
+        schema_class.filter_unvalidated_parameters = class_attributes_dict.get('filter_unvalidated_parameters', inherited_filter_unvalidated_parameters)
         return schema_class
     
     def is_validator(cls, value):
@@ -110,7 +112,8 @@ class SchemaValidator(Validator):
     
     __metaclass__ = SchemaMeta
     
-    def __init__(self, allow_additional_parameters=None, *args, **kwargs):
+    def __init__(self, allow_additional_parameters=None, 
+            filter_unvalidated_parameters=None, *args, **kwargs):
         self._fields = {}
         self._formvalidators = []
         
@@ -118,9 +121,18 @@ class SchemaValidator(Validator):
             self.allow_additional_parameters = allow_additional_parameters
         if getattr(self, 'allow_additional_parameters', None) is None:
             self.allow_additional_parameters = True
-        self.super()
+        if filter_unvalidated_parameters is not None:
+            self.filter_unvalidated_parameters = filter_unvalidated_parameters
+        self._check_consistency_additional_and_filtered_parameters()
+        
+        self.super(*args, **kwargs)
         self._setup_fieldvalidators()
         self._setup_formvalidators()
+    
+    def _check_consistency_additional_and_filtered_parameters(self):
+        if (not self.allow_additional_parameters) and (not self.filter_unvalidated_parameters):
+            message = _(u'if "allow_additional_parameters" is False, "filter_unvalidated_parameters=False" is meaningless')
+            raise InvalidArgumentsError(message)
     
     def _init_validator(self, validator):
         if isinstance(validator, type):
@@ -210,6 +222,9 @@ class SchemaValidator(Validator):
             for item_key in additional_items:
                 error = self.exception('additional_item', fields[item_key], context, additional_item=item_key)
                 exceptions[item_key] = error
+        if not self.filter_unvalidated_parameters:
+            for key in additional_items:
+                validated_fields[key] = fields[key]
         if len(exceptions) > 0:
             self._raise_exception(exceptions, context)
         return validated_fields

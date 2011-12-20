@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010-2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,15 +25,16 @@
 
 from pycerberus.api import Validator
 from pycerberus.compat import set
-from pycerberus.errors import InvalidDataError
+from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 from pycerberus.lib import AttrDict
 from pycerberus.lib.pythonic_testcase import *
+from pycerberus.test_util import ValidationTest
 from pycerberus.schema import SchemaValidator
 from pycerberus.validators import IntegerValidator, StringValidator
 
 
 
-class SchemaTest(PythonicTestCase):
+class SchemaTest(ValidationTest):
     
     def _schema(self, fields=('id',), formvalidators=(), **kwargs):
         schema = SchemaValidator(**kwargs)
@@ -129,6 +130,9 @@ class SchemaTest(PythonicTestCase):
         self.assert_equals({}, key_error.value())
         self.assert_equals('invalid_type', key_error.key())
     
+    # -------------------------------------------------------------------------
+    # warn about additional parameters
+    
     def test_schema_can_bail_out_if_additional_items_are_detected(self):
         schema = self._schema(fields=())
         self.assert_equals({}, schema.process(dict(foo=42)))
@@ -142,6 +146,25 @@ class SchemaTest(PythonicTestCase):
         exception = assert_raises(InvalidDataError, 
             lambda: schema.process({'id': 'invalid', 'foo':'heh'}))
         self.assert_equals(2, len(exception.error_dict().items()))
+    
+    # -------------------------------------------------------------------------
+    # pass unvalidated parameters
+    
+    def test_filters_unvalidated_parameters_by_default(self):
+        schema = self._schema(filter_unvalidated_parameters=True)
+        self.init_validator(schema)
+        
+        assert_equals({'id': 42}, self.process({'id': '42', 'foo': 'bar'}))
+    
+    def test_passes_unvalidated_parameters_if_specified(self):
+        schema = self._schema(filter_unvalidated_parameters=False)
+        self.init_validator(schema)
+
+        assert_equals({'id': 42, 'foo': 'bar'}, self.process({'id': '42', 'foo': 'bar'}))
+    
+    def test_prevents_schema_instantiation_with_exception_for_additional_items_and_passing_unvalidated(self):
+        assert_raises(InvalidArgumentsError,
+            lambda: self._schema(allow_additional_parameters=False, filter_unvalidated_parameters=False))
     
     # -------------------------------------------------------------------------
     # form validators

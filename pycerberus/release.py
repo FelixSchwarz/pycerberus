@@ -42,6 +42,8 @@ Changelog
   ``messages`` attribute,
 - new OneOf validator to validate that a value is in a given list of allowed
   values
+- added constructor parameter 'filter_unvalidated_parameters' (default True) 
+  for SchemaValidators to pass unvalidated parameters instead of removing them
 
 API changes:
 ------------

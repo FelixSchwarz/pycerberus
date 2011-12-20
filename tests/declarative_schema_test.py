@@ -28,18 +28,20 @@ from pycerberus.compat import set
 from pycerberus.lib import PythonicTestCase
 from pycerberus.lib.pythonic_testcase import *
 from pycerberus.schema import SchemaValidator
+from pycerberus.test_util import ValidationTest
 from pycerberus.validators import IntegerValidator
 
 
 
-class DeclarativeSchemaTest(PythonicTestCase):
+class DeclarativeSchemaTest(ValidationTest):
     
     class DeclarativeSchema(SchemaValidator):
         allow_additional_parameters = False
-    
+        
         id = IntegerValidator()
         amount = IntegerValidator
         formvalidators = (Validator(), )
+    validator_class = DeclarativeSchema
     
     def schema(self, schema_class=None, **kwargs):
         if schema_class is None:
@@ -69,6 +71,9 @@ class DeclarativeSchemaTest(PythonicTestCase):
         assert_callable(self.schema().formvalidators)
         assert_length(1, self.schema().formvalidators())
     
+    # -------------------------------------------------------------------------
+    # warn about additional parameters
+    
     def test_can_bail_out_if_additional_items_are_detected(self):
         e = self.assert_raises(InvalidDataError, lambda: self.schema().process(dict(id=42, amount=21, extra='foo')))
         self.assert_equals('Undeclared field detected: "extra".', e.msg())
@@ -82,5 +87,27 @@ class DeclarativeSchemaTest(PythonicTestCase):
             pass
         schema = DerivedSchema()
         self.assert_raises(InvalidDataError, lambda: schema.process(dict(id=42, amount=21, extra='foo')))
+    
+    # -------------------------------------------------------------------------
+    # pass unvalidated parameters
+    
+    class PassValuesSchema(SchemaValidator):
+        filter_unvalidated_parameters=False
+        id = IntegerValidator()
+    
+    def test_passes_unvalidated_parameters_if_specified(self):
+        self.init_validator(self.PassValuesSchema())
+        assert_equals({'id': 42, 'foo': 'bar'}, self.process({'id': '42', 'foo': 'bar'}))
+    
+    def test_filter_unvalidated_parameter_is_inherited_for_schema_subclasses(self):        
+        class DerivedSchema(self.PassValuesSchema):
+            pass
+        
+        self.init_validator(DerivedSchema())
+        assert_equals({'id': 42, 'foo': 'bar'}, self.process({'id': '42', 'foo': 'bar'}))
+    
+    def test_can_override_filter_unvalidated_parameter_on_class_instantiation(self):
+        self.init_validator(self.PassValuesSchema(filter_unvalidated_parameters=True))
+        assert_equals({'id': 42}, self.process({'id': '42', 'foo': 'bar'}))
 
 
