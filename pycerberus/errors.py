@@ -80,6 +80,16 @@ class InvalidDataError(ValidationError):
         elif self._error_dict:
             return self._error_dict.values()
         return [self]
+    
+    def unpack_errors(self):
+        if self._error_dict:
+            error_dict = {}
+            for key, error in self._error_dict.items():
+                error_dict[key] = error.unpack_errors()
+            return error_dict
+        elif self._error_list:
+            raise NotImplementedError
+        return self
 
 
 class EmptyError(InvalidDataError):

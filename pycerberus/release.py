@@ -44,6 +44,9 @@ Changelog
   values
 - added constructor parameter 'filter_unvalidated_parameters' (default True) 
   for SchemaValidators to pass unvalidated parameters instead of removing them
+- InvalidDataErrors can "unpack" their errors so that an ordinary dict is used
+  as container for sub-errors (instead of another InvalidDataError with an 
+  error_dict)
 
 API changes:
 ------------

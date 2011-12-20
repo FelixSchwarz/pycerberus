@@ -47,4 +47,15 @@ class InvalidDataErrorTest(PythonicTestCase):
     def test_errors_can_generate_list_of_errors_from_single_error(self):
         e = InvalidDataError('a message', 42)
         assert_equals([e], e.errors())
+    
+    def _error(self, message='a message', value=42, error_dict=None):
+        return InvalidDataError(message, value, error_dict=error_dict)
+    
+    def test_can_unpack_errors_from_error_dict(self):
+        foo_error = self._error('foo', 21)
+        bar_error = self._error('bar', 21)
+        subschema_error = self._error(message='subschema_error', error_dict={'foo': foo_error, 'bar': bar_error})
+        wrapping_error = self._error(error_dict={'foobar': subschema_error})
+        
+        assert_equals({'foobar': {'foo': foo_error, 'bar': bar_error}}, wrapping_error.unpack_errors())
 
