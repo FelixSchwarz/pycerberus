@@ -235,5 +235,24 @@ class SchemaTest(ValidationTest):
         
         error = assert_raises(InvalidDataError, lambda: schema.process({'id': '42'}))
         self.assert_equals('expected', error.details().key())
-
+    
+    # -------------------------------------------------------------------------
+    # sub-schemas
+    
+    def _user_schema(self):
+        user_schema = self._schema(fields=())
+        user_schema.add('first_name', StringValidator)
+        user_schema.add('last_name', StringValidator)
+        return user_schema
+    
+    def _schema_with_user_subschema(self):
+        schema = self._schema(fields=())    
+        schema.add('user', self._user_schema())
+        return schema
+    
+    def test_can_declare_schema_with_subschema(self):
+        self.init_validator(self._schema_with_user_subschema())
+        
+        user_input = {'user': {'first_name': 'Foo', 'last_name': 'Bar'}}
+        assert_equals(user_input, self.process(user_input))
 

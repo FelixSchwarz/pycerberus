@@ -29,7 +29,7 @@ from pycerberus.lib import PythonicTestCase
 from pycerberus.lib.pythonic_testcase import *
 from pycerberus.schema import SchemaValidator
 from pycerberus.test_util import ValidationTest
-from pycerberus.validators import IntegerValidator
+from pycerberus.validators import IntegerValidator, StringValidator
 
 
 
@@ -109,5 +109,21 @@ class DeclarativeSchemaTest(ValidationTest):
     def test_can_override_filter_unvalidated_parameter_on_class_instantiation(self):
         self.init_validator(self.PassValuesSchema(filter_unvalidated_parameters=True))
         assert_equals({'id': 42}, self.process({'id': '42', 'foo': 'bar'}))
+    
+    # -------------------------------------------------------------------------
+    # sub-schemas
+    
+    def test_can_declare_schema_with_subschema(self):
+        class PersonSchema(SchemaValidator):
+            first_name = StringValidator
+            last_name = StringValidator
+        
+        class UserSchema(SchemaValidator):
+            user = PersonSchema
+        self.init_validator(UserSchema())
+        
+        user_input = {'user': {'first_name': 'Foo', 'last_name': 'Bar'}}
+        assert_equals(user_input, self.process(user_input))
+    
 
 
