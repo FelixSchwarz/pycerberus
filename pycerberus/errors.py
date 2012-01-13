@@ -88,7 +88,13 @@ class InvalidDataError(ValidationError):
                 error_dict[key] = error.unpack_errors()
             return error_dict
         elif self._error_list:
-            raise NotImplementedError
+            error_list = []
+            for error in self._error_list:
+                unpacked = None
+                if error is not None:
+                    unpacked = error.unpack_errors()
+                error_list.append(unpacked)
+            return error_list
         return self
 
 

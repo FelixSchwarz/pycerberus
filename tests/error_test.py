@@ -48,8 +48,8 @@ class InvalidDataErrorTest(PythonicTestCase):
         e = InvalidDataError('a message', 42)
         assert_equals([e], e.errors())
     
-    def _error(self, message='a message', value=42, error_dict=None):
-        return InvalidDataError(message, value, error_dict=error_dict)
+    def _error(self, message='a message', value=42, error_dict=None, error_list=None):
+        return InvalidDataError(message, value, error_dict=error_dict, error_list=error_list)
     
     def test_can_unpack_errors_from_error_dict(self):
         foo_error = self._error('foo', 21)
@@ -58,4 +58,11 @@ class InvalidDataErrorTest(PythonicTestCase):
         wrapping_error = self._error(error_dict={'foobar': subschema_error})
         
         assert_equals({'foobar': {'foo': foo_error, 'bar': bar_error}}, wrapping_error.unpack_errors())
+    
+    def test_can_unpack_errors_from_error_list(self):
+        foo_error = self._error('foo', 21)
+        subschema_error = self._error(message='subschema_error', error_list=[foo_error, None])
+        wrapping_error = self._error(error_dict={'foobar': subschema_error})
+        
+        assert_equals({'foobar': [foo_error, None]}, wrapping_error.unpack_errors())
 
