@@ -47,6 +47,9 @@ class IntegerValidator(Validator):
                 'too_big': _(u'Number must be %(max)d or smaller.'),
                }
     
+    def is_empty(self, value, context):
+        return (value in (None, ''))
+    
     def convert(self, value, context):
         if not isinstance(value, (int, basestring)):
             classname = value.__class__.__name__

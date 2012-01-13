@@ -25,6 +25,7 @@ API changes:
    '.raise_error()' which behaves exactly like the old .error() method. In 
    addition there is a new method '.exception()' which only creates an exception
    instance.
+ - IntegerValidator now treats '' and None as empty
 
 0.4.2 (05.05.2011)
 - More fixes for source distribution because of missing files in tar.gz

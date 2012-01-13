@@ -79,5 +79,8 @@ class IntegerValidatorTest(ValidationTest):
     def test_minium_value_must_be_smaller_or_equal_to_maximum(self):
         e = assert_raises(InvalidArgumentsError, lambda: self.init_validator(min=13, max=12))
         self.assert_equals('min must be smaller or equal to max (13 > 12)', e.msg())
-
+    
+    def test_treats_empty_string_as_empty_value(self):
+        self.init_validator(required=False)
+        assert_equals(None, self.process(''))
 
