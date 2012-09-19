@@ -18,6 +18,7 @@ Changelog for pycerberus
 - InvalidDataErrors can "unpack" their errors so that an ordinary dict is used
   as container for sub-errors (instead of another InvalidDataError with an 
   error_dict)
+- new BooleanCheckbox validator to validate typical HTML checkboxes
 
 API changes:
  - BaseValidator.error() is deprecated now as the name does not really reflect
