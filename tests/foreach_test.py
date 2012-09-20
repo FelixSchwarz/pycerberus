@@ -22,7 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pycerberus.api import NoValueSet
 from pycerberus.errors import InvalidArgumentsError
 from pycerberus.lib.pythonic_testcase import *
 from pycerberus.test_util import ValidationTest
