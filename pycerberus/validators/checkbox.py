@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from pycerberus.errors import InvalidDataError
 from pycerberus.i18n import _
 from pycerberus.validators.string import StringValidator
 
@@ -57,4 +58,11 @@ class BooleanCheckbox(StringValidator):
     
     def empty_value(self, context):
         return False
+    
+    def stringify(self, value, context=None):
+        "Returns True for all trueish values, otherwise False."
+        try:
+            return self.convert(value, context or dict())
+        except InvalidDataError:
+            return False
 

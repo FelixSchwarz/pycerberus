@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2010, 2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,16 @@ from pycerberus.lib.pythonic_testcase import *
 from pycerberus.test_util import ValidationTest
 
 
-class ValidatorParametersTest(ValidationTest):
+class ValidatorTest(ValidationTest):
     
     def test_bail_out_if_unknown_parameters_are_passed_to_constructor(self):
         assert_raises(Exception, lambda: Validator(invalid='fnord'))
+    
+    def test_stringify(self):
+        self.init_validator(Validator())
+        assert_equals(u'ö', self.stringify(u'ö'))
+        assert_equals('1', self.stringify(1))
+        assert_equals(None, self.stringify(None))
 
 
 class DefaultAndRequiredValuesTest(ValidationTest):

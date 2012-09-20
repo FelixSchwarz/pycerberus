@@ -27,6 +27,8 @@ API changes:
    addition there is a new method '.exception()' which only creates an exception
    instance.
  - IntegerValidator now treats '' and None as empty
+ - BaseValidator.to_string() changed to BaseValidator.stringify() so Validators
+   are not required to return a string anymore.
 
 0.4.2 (05.05.2011)
 - More fixes for source distribution because of missing files in tar.gz

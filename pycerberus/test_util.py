@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2010, 2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,11 @@ class ValidationTest(PythonicTestCase):
         if len(args) == 1 and 'context' not in kwargs:
             kwargs['context'] = {}
         return self._validator.process(*args, **kwargs)
+    
+    def stringify(self, *args, **kwargs):
+        if len(args) == 1 and 'context' not in kwargs:
+            kwargs['context'] = {}
+        return self._validator.stringify(*args, **kwargs)
     
     def assert_error(self, value, *args, **kwargs):
         call = lambda: self.process(value, *args, **kwargs)

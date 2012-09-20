@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 import inspect
 import sys
-import types        
+import types
 import warnings
 
 from pycerberus.compat import reversed, set
@@ -151,11 +151,16 @@ class BaseValidator(object):
         In case of errors a ``InvalidDataError`` is thrown."""
         return value
     
-    def as_string(self, value, context=None):
-        """Return the (Python) value as string which could be converted back to
-        the given value using this validator. This is useful for widget 
-        libraries like ToscaWidgets."""
-        return str(value)
+    def stringify(self, value, context=None):
+        """Undo the conversion of ``process()`` and return a "string-like" 
+        representation. This method is especially useful for widget libraries
+        like ToscaWigets so they can render Python data types in a human 
+        readable way.
+        The returned value does not have to be an actual Python string as long
+        as it has a meaningful unicode() result."""
+        if value is None:
+            return None
+        return unicode(value)
 
 
 class Validator(BaseValidator):
