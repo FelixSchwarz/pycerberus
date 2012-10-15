@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import copy
 import inspect
 import sys
 import types
@@ -124,6 +125,43 @@ class BaseValidator(object):
         returning them is expensive. You can reduce the overhead in some 
         situations by implementing ``message_for_key()``"""
         return {}
+    
+    def copy(self):
+        """Return a copy of this instance."""
+        clone = copy.copy(self)
+        was_frozen = False
+        if hasattr(clone, 'is_internal_state_frozen'):
+            was_frozen = clone.is_internal_state_frozen()
+            clone.set_internal_state_freeze(False)
+        # deepcopy only copies instance-level attribute but we need to copy also
+        # class-level attributes to support the declarative syntax properly.
+        # I did not want to add more metaclass magic (that's already complicated
+        # enough).
+        klass = self.__class__
+        for name in dir(clone):
+            if name in ('__dict__', '__doc__', '__module__', '__slotnames__',
+                        '__weakref__', 'super'):
+                continue
+            elif not hasattr(klass, name):
+                # this is an instance-specific attribute/method, already copied
+                continue
+            clone_value = getattr(clone, name)
+            klass_value = getattr(klass, name)
+            if id(clone_value) != id(klass_value):
+                continue
+            if name.startswith('__') and callable(clone_value):
+                continue
+            elif inspect.isroutine(clone_value):
+                continue
+            
+            if hasattr(clone_value, 'copy'):
+                copied_value = clone_value.copy()
+            else:
+                copied_value = copy.copy(clone_value)
+            setattr(clone, name, copied_value)
+        if was_frozen:
+            clone.set_internal_state_freeze(True)
+        return clone
     
     def message_for_key(self, key, context):
         """Return a message for a specific key. Implement this method if you 

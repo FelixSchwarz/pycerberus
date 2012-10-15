@@ -38,6 +38,20 @@ class ValidatorTest(ValidationTest):
         assert_equals(u'ö', self.stringify(u'ö'))
         assert_equals('1', self.stringify(1))
         assert_equals(None, self.stringify(None))
+    
+    def test_can_copy_itself(self):
+        # This is the same test as in BaseValidator - however Validator has
+        # thread-safety built-in so we need extra code
+        class MutableValidator(Validator):
+            acceptable_values = [1, 2, 3]
+        validator = MutableValidator()
+        
+        a = validator.copy()
+        b = validator.copy()
+        a.acceptable_values.append(4)
+        
+        assert_contains(4, a.acceptable_values)
+        assert_not_contains(4, b.acceptable_values)
 
 
 class DefaultAndRequiredValuesTest(ValidationTest):
