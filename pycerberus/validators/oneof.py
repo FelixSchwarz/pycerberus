@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2011-2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pycerberus.api import NoValueSet, Validator
-from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.api import Validator
 from pycerberus.i18n import _
 
 

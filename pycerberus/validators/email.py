@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ class EmailAddressValidator(DomainNameValidator):
     
     def messages(self):
         return {
-            'single_at':         _(u"An email address must contain a single '@'."),
+            'single_at': _(u"An email address must contain a single '@'."),
             'invalid_email_character': _(u'Invalid character %(invalid_character)s in email address %(emailaddress)s.'),
         }
     
