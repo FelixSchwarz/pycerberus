@@ -30,10 +30,14 @@ from pycerberus.lib.pythonic_testcase import *
 class ValidationTest(PythonicTestCase):
     
     super = SuperProxy()
+    # don't initialize '_validator' attribute in 'setUp()' so that subclasses
+    # can initialize the validator themself before calling this 'setUp()'.
+    # This is important if the validator to be tested requires mandatory 
+    # arguments for initialization.
+    _validator = None
     
     def setUp(self):
         self.super()
-        self._validator = None
         if hasattr(self, 'validator_class'):
             # this will set up the validator with the correct arguments 
             # specified in the testcase
