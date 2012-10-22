@@ -23,6 +23,7 @@
 # THE SOFTWARE.
 
 from pycerberus.api import Validator
+from pycerberus.i18n import _
 
 
 __all__ = ['MatchingFields']
@@ -35,7 +36,7 @@ class MatchingFields(Validator):
         self.super.__init__(*args, **kwargs)
     
     def messages(self):
-        return dict(mismatch=u'Fields do not match')
+        return dict(mismatch=_(u'Fields do not match'))
     
     def validate(self, values, context):
         first = values[self.first_field]
