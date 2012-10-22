@@ -20,6 +20,8 @@ Changelog for pycerberus
   error_dict)
 - new BooleanCheckbox validator to validate typical HTML checkboxes
 - new API method for all validators: '.copy()' returns a clone of the validator
+- new MatchingFields form validator (typically used to verify a password 
+  confirmation field)
 
 API changes:
  - BaseValidator.error() is deprecated now as the name does not really reflect
