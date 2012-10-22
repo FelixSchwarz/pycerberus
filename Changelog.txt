@@ -22,6 +22,8 @@ Changelog for pycerberus
 - new API method for all validators: '.copy()' returns a clone of the validator
 - new MatchingFields form validator (typically used to verify a password 
   confirmation field)
+- new AgreeToConditionsCheckbox validator which works like a BooleanCheckbox 
+  but enforces a trueish value
 
 API changes:
  - BaseValidator.error() is deprecated now as the name does not really reflect

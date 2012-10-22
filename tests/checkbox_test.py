@@ -37,6 +37,7 @@ class BooleanCheckboxTest(ValidationTest):
         assert_false(self.process('false'))
         assert_false(self.process(False))
         assert_false(self.process(None))
+        assert_false(self.process(''))
     
     def test_true_values(self):
         assert_true(self.process('on'))
