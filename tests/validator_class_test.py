@@ -33,11 +33,11 @@ class ValidatorTest(ValidationTest):
     def test_bail_out_if_unknown_parameters_are_passed_to_constructor(self):
         assert_raises(Exception, lambda: Validator(invalid='fnord'))
     
-    def test_stringify(self):
+    def test_revert_conversion(self):
         self.init_validator(Validator())
-        assert_equals(u'ö', self.stringify(u'ö'))
-        assert_equals('1', self.stringify(1))
-        assert_equals(None, self.stringify(None))
+        assert_equals(u'ö', self.revert_conversion(u'ö'))
+        assert_equals('1', self.revert_conversion(1))
+        assert_equals(None, self.revert_conversion(None))
     
     def test_can_copy_itself(self):
         # This is the same test as in BaseValidator - however Validator has

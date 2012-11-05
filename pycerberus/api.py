@@ -189,16 +189,21 @@ class BaseValidator(object):
         In case of errors a ``InvalidDataError`` is thrown."""
         return value
     
-    def stringify(self, value, context=None):
+    def revert_conversion(self, value, context=None):
         """Undo the conversion of ``process()`` and return a "string-like" 
         representation. This method is especially useful for widget libraries
         like ToscaWigets so they can render Python data types in a human 
         readable way.
         The returned value does not have to be an actual Python string as long
-        as it has a meaningful unicode() result."""
+        as it has a meaningful unicode() result. Generally the validator 
+        should accept the return value in its '.process()' method."""
         if value is None:
             return None
         return unicode(value)
+    
+    def to_string(self, *args, **kwargs):
+        warnings.warn("BaseValidator.to_string() is deprecated. Please use 'revert_conversion' instead!", DeprecationWarning)
+        self.revert_conversion(*args, **kwargs)
 
 
 class Validator(BaseValidator):

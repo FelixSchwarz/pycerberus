@@ -65,19 +65,19 @@ class BooleanCheckboxTest(ValidationTest):
         assert_equals({'decision': False}, CheckboxSchema().process({}))
         assert_equals({'decision': False}, CheckboxSchema().process({'foo': 'bar'}))
     
-    def test_can_stringify_falsish_values(self):
-        assert_false(self.stringify(False))
-        assert_false(self.stringify('false'))
-        assert_false(self.stringify('FALSE'))
-        assert_false(self.stringify('off'))
-        assert_false(self.stringify(None))
-        assert_false(self.stringify([]))
-        assert_false(self.stringify('invalid'))
+    def test_can_revert_conversion_for_falsish_values(self):
+        assert_false(self.revert_conversion(False))
+        assert_false(self.revert_conversion('false'))
+        assert_false(self.revert_conversion('FALSE'))
+        assert_false(self.revert_conversion('off'))
+        assert_false(self.revert_conversion(None))
+        assert_false(self.revert_conversion([]))
+        assert_false(self.revert_conversion('invalid'))
     
-    def test_can_stringify_trueish_values(self):
-        assert_true(self.stringify(True))
-        assert_true(self.stringify('true'))
-        assert_true(self.stringify('TRUE'))
-        assert_true(self.stringify('on'))
-        assert_true(self.stringify('t'))
+    def test_can_revert_conversion_for_trueish_values(self):
+        assert_true(self.revert_conversion(True))
+        assert_true(self.revert_conversion('true'))
+        assert_true(self.revert_conversion('TRUE'))
+        assert_true(self.revert_conversion('on'))
+        assert_true(self.revert_conversion('t'))
 

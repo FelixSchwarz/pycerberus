@@ -66,10 +66,10 @@ class ValidationTest(PythonicTestCase):
             kwargs['context'] = {}
         return self._validator.process(*args, **kwargs)
     
-    def stringify(self, *args, **kwargs):
+    def revert_conversion(self, *args, **kwargs):
         if len(args) == 1 and 'context' not in kwargs:
             kwargs['context'] = {}
-        return self._validator.stringify(*args, **kwargs)
+        return self._validator.revert_conversion(*args, **kwargs)
     
     def assert_error(self, value, *args, **kwargs):
         call = lambda: self.process(value, *args, **kwargs)

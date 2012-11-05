@@ -59,7 +59,7 @@ class BooleanCheckbox(StringValidator):
     def empty_value(self, context):
         return False
     
-    def stringify(self, value, context=None):
+    def revert_conversion(self, value, context=None):
         "Returns True for all trueish values, otherwise False."
         try:
             return self.convert(value, context or dict())
