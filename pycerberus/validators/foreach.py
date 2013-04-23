@@ -50,7 +50,7 @@ class ForEach(Validator):
         return {
             'invalid_type': _(u'Validator got unexpected input (expected string, got "%(classname)s").'),
             'too_short': _(u'More than %(min)d items required.'),
-            'too_long': _(u'Less than%(max)d items required.'),
+            'too_long': _(u'Less than %(max)d items required.'),
         }
 
     def convert(self, values, context):
