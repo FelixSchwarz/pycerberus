@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2013 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,11 +30,14 @@ class EmailAddressValidatorTest(ValidationTest):
     
     validator_class = EmailAddressValidator
     
+    def _assert_valid_email(self, address_string):
+        self.assert_equals(address_string, self.process(address_string))
+    
     def test_accepts_simple_email_address(self):
-        self.assert_equals('foo@example.com', self.process('foo@example.com'))
-        self.assert_equals('foo.bar@example.com', self.process('foo.bar@example.com'))
-        self.assert_equals('foo_bar@example.com', self.process('foo_bar@example.com'))
-        self.assert_equals('foo@bar-baz.example', self.process('foo@bar-baz.example'))
+        self._assert_valid_email('foo@example.com')
+        self._assert_valid_email('foo.bar@example.com')
+        self._assert_valid_email('foo_bar@example.com')
+        self._assert_valid_email('foo@bar-baz.example')
     
     def test_reject_email_address_without_at(self):
         e = self.get_error('example.com')
