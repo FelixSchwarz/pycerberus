@@ -47,6 +47,12 @@ Changelog
 - InvalidDataErrors can "unpack" their errors so that an ordinary dict is used
   as container for sub-errors (instead of another InvalidDataError with an 
   error_dict)
+- new BooleanCheckbox validator to validate typical HTML checkboxes
+- new API method for all validators: '.copy()' returns a clone of the validator
+- new MatchingFields form validator (typically used to verify a password 
+  confirmation field)
+- new AgreeToConditionsCheckbox validator which works like a BooleanCheckbox 
+  but enforces a trueish value
 - EmailAddressValidator accepts also '-' and '+' characters in local part
 
 API changes:
