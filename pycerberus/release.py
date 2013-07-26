@@ -47,6 +47,7 @@ Changelog
 - InvalidDataErrors can "unpack" their errors so that an ordinary dict is used
   as container for sub-errors (instead of another InvalidDataError with an 
   error_dict)
+- EmailAddressValidator accepts also '-' and '+' characters in local part
 
 API changes:
 ------------

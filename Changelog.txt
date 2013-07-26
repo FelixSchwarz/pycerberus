@@ -24,6 +24,7 @@ Changelog for pycerberus
   confirmation field)
 - new AgreeToConditionsCheckbox validator which works like a BooleanCheckbox 
   but enforces a trueish value
+- EmailAddressValidator accepts also '-' and '+' characters in local part
 
 API changes:
  - BaseValidator.error() is deprecated now as the name does not really reflect

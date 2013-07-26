@@ -38,6 +38,8 @@ class EmailAddressValidatorTest(ValidationTest):
         self._assert_valid_email('foo.bar@example.com')
         self._assert_valid_email('foo_bar@example.com')
         self._assert_valid_email('foo@bar-baz.example')
+        self._assert_valid_email('foo+bar@example.com')
+        self._assert_valid_email('foo-bar@example.com')
     
     def test_reject_email_address_without_at(self):
         e = self.get_error('example.com')
@@ -46,10 +48,6 @@ class EmailAddressValidatorTest(ValidationTest):
     def test_reject_email_address_with_multiple_at_characters(self):
         e = self.get_error('foo@bar@example.com')
         self.assert_equals("An email address must contain a single '@'.", e.msg())
-    
-    def test_reject_localpart_with_minus(self):
-        e = self.get_error('foo-bar@example.com')
-        self.assert_equals("Invalid character '-' in email address 'foo-bar@example.com'.", e.msg())
     
     def test_reject_localpart_with_space(self):
         e = self.get_error('foo bar@example.com')

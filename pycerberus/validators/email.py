@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010, 2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2012, 2013 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ class EmailAddressValidator(DomainNameValidator):
     # private helpers
     
     def _validate_localpart(self, localpart, emailaddress, context):
-        match = re.search('([^a-zA-Z0-9\.\_])', localpart)
+        match = re.search('([^a-zA-Z0-9\.\_\-\+])', localpart)
         if match is not None:
             values = dict(invalid_character=repr(match.group(1)), emailaddress=repr(emailaddress))
             self.raise_error('invalid_email_character', localpart, context, **values)
