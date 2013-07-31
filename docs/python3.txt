@@ -1,5 +1,7 @@
 Support for Python 3
 ==================================
 
+.. _python3:
+
 .. include:: ../README.python3.txt
 
