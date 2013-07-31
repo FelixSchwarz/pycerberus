@@ -23,13 +23,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from io import BytesIO
 import gzip
 import os
-from StringIO import StringIO
 import subprocess
 import tarfile
 import tempfile
 
+
+def create_default_sdist(project_dir):
+    dist_files = set()
+    dist_dir = os.path.join(project_dir, 'dist')
+    if os.path.exists(dist_dir):
+        dist_files = set(os.listdir(dist_dir))
+    
+    subprocess.check_call(['python', 'setup.py', 'sdist'], cwd=project_dir,
+        stdout=subprocess.PIPE)
+    new_dist_files = set(os.listdir(dist_dir)) - dist_files
+    assert len(new_dist_files) == 1, 'did you remember to delete any preexisting .tar.gz in dist?'
+    sdist_filename = new_dist_files.pop()
+    return sdist_filename
 
 def build_documentation(project_dir):
     doc_dir = os.path.join(project_dir, 'docs')
@@ -77,10 +90,23 @@ def add_files_below_directory(tar, dirname, arcname, project_dir, path_prefix):
             tarname = make_tarname(project_dir, tar_fname, path_prefix)
             tar.add(fname, tarname)
 
-def create_tarball(project_dir, package_files, path_prefix):
-    tar_fp = StringIO()
-    tar = tarfile.open(fileobj=tar_fp, mode='w')
+def clone_tar(gzip_fp):
+    target_fp = BytesIO()
     
+    source_fp = BytesIO()
+    source_fp.write(gzip_fp.read())
+    source_fp.seek(0)
+    source_tar = tarfile.open(fileobj=source_fp, mode='r')
+    tar = tarfile.open(fileobj=target_fp, mode='w|gz')
+    for tarinfo in source_tar.getmembers():
+        member_fp = source_tar.extractfile(tarinfo)
+        tar.addfile(tarinfo, fileobj=member_fp)
+    source_tar.close()
+    
+    return (target_fp, tar)
+
+def add_package_files_to_tarball(source_tar_fp, project_dir, package_files, path_prefix):
+    target_fp, tar = clone_tar(source_tar_fp)
     for filename in package_files:
         arcname = None
         if not isinstance(filename, basestring):
@@ -91,8 +117,8 @@ def create_tarball(project_dir, package_files, path_prefix):
         else:
             add_files_below_directory(tar, filename, arcname, project_dir, path_prefix)
     tar.close()
-    tar_fp.seek(0,0)
-    return tar_fp
+    target_fp.seek(0,0)
+    return target_fp
 
 def get_name_and_version():
     release_info = {}
@@ -102,16 +128,19 @@ def get_name_and_version():
 def main():
     name, version = get_name_and_version()
     this_dir = os.path.abspath(os.path.dirname(__file__))
+    
+    sdist_filename = create_default_sdist(this_dir)
     build_documentation(this_dir)
+    package_files = [('build/html', 'docs/html')]
     
-    package_files = ('docs', 'examples', 'pycerberus', 'tests', 'Changelog.txt', 
-                     'LICENSE.txt', 'README.python3.txt', 'setup.py', 
-                     'setup.cfg', 'distribution_helpers.py',
-                     ('build/html', 'docs/html'))
-    tar_fp = create_tarball(this_dir, package_files, '%s-%s' % (name, version))
+    sdist_path = os.path.join(this_dir, 'dist', sdist_filename)
+    tar_fp = gzip.open(sdist_path)
+    # LATER: should compute the prefix automatically
+    path_prefix = '%s-%s' % (name, version)
+    targz_fp = add_package_files_to_tarball(tar_fp, this_dir, package_files, path_prefix)
     
-    gz_filename = '%s-%s.tar.gz' % (name, version)
-    gzip.open(gz_filename, 'wb').write(tar_fp.read())
+    gz_filename = os.path.basename(sdist_filename)
+    file(gz_filename, 'wb').write(targz_fp.read())
 
 if __name__ == '__main__':
     main()
