@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.5dev'
+version = '0.5'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
@@ -30,7 +30,7 @@ your application from malicious (or just garbled) input data.
 Changelog
 ******************************
 
-0.5dev
+0.5 (05.08.2013)
 ====================
 - 'allow_additional_parameters' can now be specified in the schema constructor
   directly as well as a parameter for a declarative schema
