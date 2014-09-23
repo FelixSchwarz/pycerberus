@@ -4,7 +4,7 @@
 # License: Public Domain
 # Authors: Martin Häcker, Felix Schwarz
 
-# Version 1.0.6
+# Version 1.0.7
 
 # This is how it works:
 # In the superclass of the class where you want to use this
@@ -26,6 +26,10 @@
 # - Package it all up nicely so it's super easy to use
 
 # Changelog
+# 1.0.7 (2014-09-23)
+#   - single source for Python 2 and Python 3
+#   - fix in SuperProxy.__getattribute__ to fix nosetests test discovery in Python 3
+#
 # 1.0.6 (2011-02-21)
 #   - fix usage of "self.super(...)" inside "__init__()"
 #
@@ -163,7 +167,10 @@ class SuperFinder(object):
         # However this is not neccessary, as I only want to find methods defined
         # in python (the caller) so I  can just skip all <slot_wrappers>
         if hasattr(func, 'im_func'):
-            other_code = func.im_func.func_code
+            if sys.version_info < (3, ):
+                other_code = func.im_func.func_code
+            else:
+                other_code = func.__func__.__code__
             if id(code) == id(other_code):
                 return True
         return False
@@ -199,8 +206,8 @@ class SuperProxy(object):
         # 
         # The flag '__initialized' ensures that the actual constructor of 
         # SuperProxy can be called (once) :-)
-        if name == '__call__':
-            return object.__getattribute__(self, '__call__')
+        if name in ('__class__', '__call__'):
+            return object.__getattribute__(self, name)
         if name == '__init__':
             try:
                 object.__getattribute__(self, '_initialized__')
