@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 
 # -- Import project information ------------------------------------------------
+project_name = 'pycerberus'
 
+from email.parser import Parser as EmailParser
 import os
 
 def get_release_info():
-    release_info = {}
-    execfile(os.path.join('..', 'pycerberus', 'release.py'), release_info)
+    this_dir = os.path.dirname(__file__)
+    egg_path = os.path.abspath(os.path.join(this_dir, '..', '%s.egg-info' % project_name))
+    pkg_info_filename = os.path.join(egg_path, 'PKG-INFO')
+
+    pkg_info_fp = open(pkg_info_filename)
+    release_info = dict(EmailParser().parse(pkg_info_fp))
     return release_info
 release_info = get_release_info()
 
@@ -29,15 +35,15 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = release_info['name']
-copyright = release_info['_copyright']
+project = project_name
+copyright = '%(author)s (%(license)s license)' % dict(author=release_info['Author'], license=release_info['License'])
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = release_info['version']
+version = release_info['Version']
 # The full version, including alpha/beta/rc tags.
 release = version + ''
 

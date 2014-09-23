@@ -15,8 +15,7 @@ import setuptools
 # special files before importing them.
 class MetaDataExtractor(object):
     
-    releasefile_name = os.path.join('pycerberus', 'release.py')
-    preconversion_files = ('distribution_helpers.py', releasefile_name)
+    preconversion_files = ('distribution_helpers.py',)
     
     # --- Python 3 conversion --------------------------------------------------
     
@@ -68,9 +67,9 @@ class MetaDataExtractor(object):
         # The file is not in the library because the __init__.py files for the 
         # module pull in other modules which need to be converted just to import
         # the module containing release metadata
-        from distribution_helpers import i18n_aware_commands, information_from_file
+        from distribution_helpers import i18n_aware_commands
         extra_commands = i18n_aware_commands()
-        externally_defined_parameters = information_from_file(self.releasefile_name)
+        externally_defined_parameters = {}
         
         if self.uses_python3():
             # Converting files in-place to Python 3 which is necessary for build
@@ -94,17 +93,29 @@ class MetaDataExtractor(object):
                         file_names.append(file_name)
                     return file_names
             extra_commands['egg_info'] = to_python3
-        
             self.revert_files_to_python2()
             externally_defined_parameters['use_2to3'] =  True
         return extra_commands, externally_defined_parameters
 
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 
 if __name__ == '__main__':
     extra_commands, externally_defined_parameters = MetaDataExtractor().setup_parameters()
     
+    version = '0.6dev'
     setuptools.setup(
+        name = 'pycerberus',
+        version = version,
+        description = 'Highly flexible, no magic input validation library',
+        long_description=(read('description.txt') + read('Changelog.txt')),
+        license = 'MIT',
+        author = 'Felix Schwarz',
+        author_email = 'felix.schwarz@oss.schwarz.eu',
+        url = 'http://www.schwarz.eu/opensource/projects/pycerberus',
+        download_url = 'http://www.schwarz.eu/opensource/projects/pycerberus/download/%(version)s/pycerberus-%(version)s.tar.gz' % dict(version=version),
+
         extras_require = {
             'Babel': ['Babel>=0.9.5'],
         },
