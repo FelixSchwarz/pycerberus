@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 
 from pycerberus.api import Validator
 from pycerberus.errors import InvalidDataError
-from pycerberus.compat import set
 from pycerberus.lib import PythonicTestCase
 from pycerberus.lib.pythonic_testcase import *
 from pycerberus.schema import SchemaValidator

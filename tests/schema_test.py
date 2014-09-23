@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010-2011 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010-2011, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,6 @@
 # THE SOFTWARE.
 
 from pycerberus.api import Validator
-from pycerberus.compat import set
 from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 from pycerberus.lib import AttrDict
 from pycerberus.lib.pythonic_testcase import *

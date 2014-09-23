@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2012, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ import sys
 import types
 import warnings
 
-from pycerberus.compat import reversed, set
 from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataError, \
     ThreadSafetyError
 from pycerberus.i18n import _, GettextTranslation
