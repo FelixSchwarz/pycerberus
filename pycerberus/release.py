@@ -2,7 +2,7 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.5'
+version = '0.6dev'
 description = 'Highly flexible, no magic input validation library'
 long_description = '''
 pycerberus is a framework to check user data thoroughly so that you can protect
@@ -29,6 +29,9 @@ your application from malicious (or just garbled) input data.
 
 Changelog
 ******************************
+
+0.6 (...)
+====================
 
 0.5 (05.08.2013)
 ====================
@@ -121,6 +124,6 @@ author_email = 'felix.schwarz@oss.schwarz.eu'
 url = 'http://www.schwarz.eu/opensource/projects/pycerberus'
 download_url = 'http://www.schwarz.eu/opensource/projects/%(name)s/download/%(version)s/%(name)s-%(version)s.tar.gz' % dict(name=name, version=version)
 # prefix it with '_' so the symbol is not passed to setuptools.setup()
-_copyright = u'2009-2011 Felix Schwarz'
+_copyright = u'2009-2014 Felix Schwarz'
 license='MIT'
 
