@@ -73,8 +73,12 @@ if __name__ == '__main__':
         # implementation
         zip_safe=False,
         packages=setuptools.find_packages(exclude=['tests']),
+        # setuptools bug when using Python 2 + unicode literals
+        # It only accepts plain strings (not unicode) for package_data so we
+        # need to convert these explicitely.
+        # http://stackoverflow.com/a/23175194/138526
         package_data = {
-            'pycerberus': ['locales/*/LC_MESSAGES/pycerberus.mo'],
+            str('pycerberus'): [str('locales/*/LC_MESSAGES/pycerberus.mo')],
         },
         classifiers = (
             'Development Status :: 4 - Beta',
