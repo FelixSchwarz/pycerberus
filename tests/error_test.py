@@ -30,7 +30,7 @@ class InvalidDataErrorTest(PythonicTestCase):
     
     def test_can_return_list_of_errors(self):
         e = InvalidDataError('a message', 42, error_list=['foo'])
-        assert_equals(['foo'], e.errors())
+        assert_equals(('foo', ), e.errors())
     
     def test_can_not_set_error_dict_and_error_list(self):
         InvalidDataError('a message', 42, error_dict={}, error_list=['foo'])
@@ -45,7 +45,7 @@ class InvalidDataErrorTest(PythonicTestCase):
     
     def test_errors_can_generate_list_of_errors_from_single_error(self):
         e = InvalidDataError('a message', 42)
-        assert_equals([e], e.errors())
+        assert_equals((e, ), e.errors())
     
     def _error(self, message='a message', value=42, error_dict=None, error_list=None):
         return InvalidDataError(message, value, error_dict=error_dict, error_list=error_list)

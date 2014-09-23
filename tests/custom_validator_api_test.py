@@ -72,7 +72,7 @@ class CustomValidatorAPITest(ValidationTest):
         }, validator.messages())
         self.assert_equals('account disabled', validator.message_for_key('disabled', {}))
         self.assert_equals('Your account was deleted.', validator.message_for_key('deleted', {}))
-        self.assert_equals(['disabled', 'deleted'], list(validator.keys()))
+        self.assert_equals(set(['disabled', 'deleted']), set(validator.keys()))
         
         self.assert_equals('account disabled', self.message_for_key('disabled'))
         self.assert_equals('Your account was deleted.', self.message_for_key('deleted'))

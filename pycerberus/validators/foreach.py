@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2011-2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2011-2012, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -66,11 +66,11 @@ class ForEach(Validator):
         for value in values:
             try:
                 validated.append(self._validator.process(value, context))
-            except InvalidDataError, e:
+            except InvalidDataError as e:
                 exceptions.append(e)
             else:
                 exceptions.append(None)
-        if filter(None, exceptions):
+        if list(filter(None, exceptions)):
             self._raise_exception(exceptions, context)
         return tuple(validated)
     

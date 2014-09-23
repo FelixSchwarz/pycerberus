@@ -1,6 +1,12 @@
 Changelog
 ******************************
 
+0.6 (...)
+====================
+- stop using 2to3 for Python 3 compatibility and use exactly the same source
+  for all Python versions.
+- drop support for Python 2.4 and 2.5
+
 0.5 (05.08.2013)
 ====================
 - 'allow_additional_parameters' can now be specified in the schema constructor

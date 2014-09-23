@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2012, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 
 from pycerberus.api import NoValueSet, Validator
 from pycerberus.errors import InvalidArgumentsError
+from pycerberus.lib import six
 from pycerberus.i18n import _
 
 
@@ -53,7 +54,7 @@ class StringValidator(Validator):
         }
     
     def convert(self, value, context):
-        if not isinstance(value, basestring):
+        if not isinstance(value, six.string_types):
             classname = value.__class__.__name__
             self.raise_error('invalid_type', value, context, classname=classname)
         return value

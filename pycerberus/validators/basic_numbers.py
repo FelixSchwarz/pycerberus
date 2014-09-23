@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2010, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 
 from pycerberus.api import Validator
 from pycerberus.errors import InvalidArgumentsError
+from pycerberus.lib import six
 from pycerberus.i18n import _
 
 __all__ = ['IntegerValidator']
@@ -51,7 +52,7 @@ class IntegerValidator(Validator):
         return (value in (None, ''))
     
     def convert(self, value, context):
-        if not isinstance(value, (int, basestring)):
+        if not isinstance(value, (int, six.string_types)):
             classname = value.__class__.__name__
             self.raise_error('invalid_type', value, context, classname=classname)
         try:

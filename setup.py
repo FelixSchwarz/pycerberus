@@ -1,110 +1,56 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+from __future__ import absolute_import, unicode_literals
 
+from distutils.command.build import build
 import os
-import sys
 
 import setuptools
+from setuptools.command.install_lib import install_lib
 
-
-# I want to define some information in the code so it's accessible at runtime
-# using standard Python. The downside is that these Python files need to be
-# converted to valid Python 3 code before we can load them in setup.
-# As the 2to3 parameter in setuptools.setup only works *after* this whole file
-# has been parsed, the MetaDataExtractor will take care of converting some 
-# special files before importing them.
-class MetaDataExtractor(object):
-    
-    preconversion_files = ('distribution_helpers.py',)
-    
-    # --- Python 3 conversion --------------------------------------------------
-    
-    def this_dir(self):
-        return os.path.dirname(os.path.abspath(__file__))
-    
-    def convert_file_to_python3(self, filename):
-        # Python 2.3 does not have subprocess, so just importing it here…
-        import subprocess
-        
-        absolute_pathname = os.path.join(self.this_dir(), filename)
-        command = ['2to3', '--write', absolute_pathname]
-        process = subprocess.Popen(command, cwd=self.this_dir(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        process.wait()
-        
-        exit_code = process.returncode
-        if exit_code != 0:
-            output = process.stdout.read().strip()
-            stderr = process.stderr.read().strip()
-            print(output)
-            print(stderr)
-            assert exit_code == 0, 'Conversion of %s failed: error code %s' % (absolute_pathname, exit_code)
-    
-    def revert_file_to_python2_version(self, filename):
-        absolute_pathname = os.path.join(self.this_dir(), filename)
-        if os.path.exists(absolute_pathname + '.bak'):
-            os.rename(absolute_pathname + '.bak', absolute_pathname)
-    
-    def convert_files_to_python3(self):
-        for filename in self.preconversion_files:
-            if os.path.exists(filename):
-                self.convert_file_to_python3(filename)
-    
-    def revert_files_to_python2(self):
-        for filename in self.preconversion_files:
-            self.revert_file_to_python2_version(filename)
-    
-    # --------------------------------------------------------------------------
-    
-    def uses_python3(self):
-        major = sys.version_info[0]
-        return major == 3
-    
-    def setup_parameters(self):
-        if self.uses_python3():
-            self.convert_files_to_python3()
-        
-        # With Python 3 we can only import this after applying the Python 3 fixes.
-        # The file is not in the library because the __init__.py files for the 
-        # module pull in other modules which need to be converted just to import
-        # the module containing release metadata
-        from distribution_helpers import i18n_aware_commands
-        extra_commands = i18n_aware_commands()
-        externally_defined_parameters = {}
-        
-        if self.uses_python3():
-            # Converting files in-place to Python 3 which is necessary for build
-            # client support until bitten supports conditional build steps.
-            from setuptools.command.egg_info import egg_info
-            from setuptools.command.build_py import Mixin2to3
-            from distutils.filelist import findall
-            
-            class to_python3(egg_info, Mixin2to3):
-                def run(self):
-                    super(to_python3, self).run()
-                    self.run_2to3(self.sources_to_convert())
-                
-                def sources_to_convert(self):
-                    file_names = []
-                    sources = findall(dir='pycerberus')
-                    tests = findall(dir='tests')
-                    for file_name in sources + tests:
-                        if not file_name.endswith('.py'):
-                            continue
-                        file_names.append(file_name)
-                    return file_names
-            extra_commands['egg_info'] = to_python3
-            self.revert_files_to_python2()
-            externally_defined_parameters['use_2to3'] =  True
-        return extra_commands, externally_defined_parameters
 
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
+def i18n_aware_commands():
+    def is_babel_available():
+        try:
+            import babel
+        except ImportError:
+            return False
+        return True
+
+    def commands_for_babel_support():
+        if not is_babel_available():
+            return {}
+        from babel.messages import frontend as babel
+        return {
+            'extract_messages': babel.extract_messages,
+            'init_catalog':     babel.init_catalog,
+            'update_catalog':   babel.update_catalog,
+            'compile_catalog':  babel.compile_catalog,
+        }
+
+    if not is_babel_available():
+        # setup(..., cmdclass={}) will use just the built-in commands
+        return dict()
+
+    class i18n_build(build):
+        sub_commands = [('compile_catalog', None)] + build.sub_commands
+
+    # before doing an 'install' (which can also be a 'bdist_egg'), compile the catalog
+    class i18n_install_lib(install_lib):
+        def run(self):
+            self.run_command('compile_catalog')
+            install_lib.run(self)
+    command_dict = dict(build=i18n_build, install_lib=i18n_install_lib)
+    command_dict.update(commands_for_babel_support())
+    return command_dict
+
 
 if __name__ == '__main__':
-    extra_commands, externally_defined_parameters = MetaDataExtractor().setup_parameters()
-    
     version = '0.6dev'
+    extra_commands = i18n_aware_commands()
     setuptools.setup(
         name = 'pycerberus',
         version = version,
@@ -115,11 +61,11 @@ if __name__ == '__main__':
         author_email = 'felix.schwarz@oss.schwarz.eu',
         url = 'http://www.schwarz.eu/opensource/projects/pycerberus',
         download_url = 'http://www.schwarz.eu/opensource/projects/pycerberus/download/%(version)s/pycerberus-%(version)s.tar.gz' % dict(version=version),
-
+        
         extras_require = {
             'Babel': ['Babel>=0.9.5'],
         },
-        
+                     
         tests_require = ['Babel'],
         test_suite = 'nose.collector',
         
@@ -140,7 +86,6 @@ if __name__ == '__main__':
             'Topic :: Software Development :: Libraries :: Python Modules',
         ),
         cmdclass=extra_commands,
-        **externally_defined_parameters
     )
 
 

@@ -24,7 +24,6 @@
 
 import copy
 import inspect
-import sys
 import types
 import warnings
 
@@ -32,6 +31,8 @@ from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataErro
     ThreadSafetyError
 from pycerberus.i18n import _, GettextTranslation
 from pycerberus.lib import SuperProxy
+from pycerberus.lib import six
+
 
 __all__ = ['BaseValidator', 'Validator']
 
@@ -77,6 +78,7 @@ class EarlyBindForMethods(type):
     _simulate_early_binding_for_message_methods = classmethod(_simulate_early_binding_for_message_methods)
 
 
+@six.add_metaclass(EarlyBindForMethods)
 class BaseValidator(object):
     """The BaseValidator implements only the minimally required methods. 
     Therefore it does not put many constraints on you. Most users probably want 
@@ -87,7 +89,6 @@ class BaseValidator(object):
     overwrite messages specified in the validator without the need to create 
     a subclass."""
     
-    __metaclass__ = EarlyBindForMethods
     super = SuperProxy()
     
     def __init__(self, messages=None):
@@ -108,7 +109,7 @@ class BaseValidator(object):
         self.message_for_key = self._new_instancemethod(message_for_key)
     
     def _new_instancemethod(self, method):
-        if sys.version_info < (3,):
+        if six.PY2:
             return types.MethodType(method, self, self.__class__)
         return types.MethodType(method, self)
     
@@ -198,7 +199,7 @@ class BaseValidator(object):
         should accept the return value in its '.process()' method."""
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
     
     def to_string(self, *args, **kwargs):
         warnings.warn("BaseValidator.to_string() is deprecated. Please use 'revert_conversion' instead!", DeprecationWarning)
@@ -384,7 +385,7 @@ class Validator(BaseValidator):
         return context_key_wrapper
     
     def _is_unbound(self, method):
-        if sys.version_info < (3,):
+        if six.PY2:
             return (method.im_self is None)
         return (getattr(method, '__self__',  None) is None)
     

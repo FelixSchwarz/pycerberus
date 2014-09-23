@@ -24,8 +24,9 @@
 # THE SOFTWARE.
 
 from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
-from pycerberus.i18n import _
 from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.i18n import _
+from pycerberus.lib import six
 
 __all__ = ['SchemaValidator']
 
@@ -107,9 +108,8 @@ class SchemaMeta(EarlyBindForMethods):
     restore_overwritten_methods = classmethod(restore_overwritten_methods)
 
 
+@six.add_metaclass(SchemaMeta)
 class SchemaValidator(Validator):
-    
-    __metaclass__ = SchemaMeta
     
     def __init__(self, allow_additional_parameters=None, 
             filter_unvalidated_parameters=None, *args, **kwargs):
@@ -208,7 +208,7 @@ class SchemaValidator(Validator):
             original_value = self._value_for_field(key, validator, fields, context)
             converted_value = validator.process(original_value, context)
             validated_fields[key] = converted_value
-        except InvalidDataError, e:
+        except InvalidDataError as e:
             exceptions[key] = e
     
     def _process_field_validators(self, fields, context):
@@ -238,7 +238,7 @@ class SchemaValidator(Validator):
         return self._process_form_validators(validated_fields, context)
     
     def _raise_exception(self, exceptions, context):
-        first_field_with_error = exceptions.keys()[0]
+        first_field_with_error = tuple(exceptions.keys())[0]
         first_error = exceptions[first_field_with_error].details()
         raise InvalidDataError(first_error.msg(), first_error.value(), first_error.key(), 
                                context, error_dict=exceptions)

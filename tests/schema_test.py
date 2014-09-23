@@ -120,7 +120,7 @@ class SchemaTest(ValidationTest):
         schema = self._schema(('id', 'key'))
         exception = assert_raises(InvalidDataError, 
             lambda: schema.process({'id': 'invalid', 'key': {}}))
-        self.assert_equals(['id', 'key'], exception.error_dict().keys())
+        self.assert_equals(set(['id', 'key']), set(exception.error_dict().keys()))
         id_error = exception.error_for('id').details()
         self.assert_equals('invalid', id_error.value())
         self.assert_equals('invalid_number', id_error.key())
@@ -197,7 +197,7 @@ class SchemaTest(ValidationTest):
     def test_formvalidators_are_not_executed_if_field_validator_failed(self):
         schema = self._schema(formvalidators=(self._failing_validator(), ))
         error = assert_raises(InvalidDataError, lambda: schema.process({'id': 'invalid'}))
-        self.assert_equals(['id'], error.error_dict().keys())
+        self.assert_equals(('id',), tuple(error.error_dict().keys()))
     
     def test_formvalidators_are_executed_after_field_validators(self):
         def mock_process(fields, context=None):

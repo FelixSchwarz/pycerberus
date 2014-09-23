@@ -50,7 +50,7 @@ class InvalidDataError(ValidationError):
         self._details = AttrDict(key=lambda: key, msg=lambda: msg, 
                                  value=lambda: value, context=lambda: context)
         self._error_dict = error_dict or {}
-        self._error_list = error_list
+        self._error_list = tuple(error_list) if (error_list is not None) else None
         if self._error_dict and self._error_list:
             values = tuple(map(repr, (self._error_dict, self._error_list)))
             raise InvalidArgumentsError('You can only set one of error_dict (%s) and error_list (%s)' % values)
@@ -76,10 +76,10 @@ class InvalidDataError(ValidationError):
     def errors(self):
         "Return a list of all errors."
         if self._error_list:
-            return self._error_list
+            return tuple(self._error_list)
         elif self._error_dict:
-            return self._error_dict.values()
-        return [self]
+            return tuple(self._error_dict.values())
+        return tuple([self])
     
     def unpack_errors(self):
         if self._error_dict:
