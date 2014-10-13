@@ -77,7 +77,20 @@ class CustomValidatorAPITest(ValidationTest):
         self.assert_equals('account disabled', self.message_for_key('disabled'))
         self.assert_equals('Your account was deleted.', self.message_for_key('deleted'))
         self.assert_equals('Value must not be empty.', self.message_for_key('empty', locale='en'))
-
+    
+    def test_can_replace_builtin_messages_during_instantion(self):
+        validator_messages = AdditionalMessagesValidator().messages()
+        self.assert_not_contains('empty', validator_messages,
+            message='the bug only occurred when the validator class did not override the key itself.')
+        new_msg = 'Please select any value.'
+        validator = AdditionalMessagesValidator(messages={
+            'empty': new_msg,
+        })
+        self.init_validator(validator)
+        
+        self.assert_equals(new_msg, self.message_for_key('empty'))
+        self.assert_equals('account deleted', self.message_for_key('deleted'),
+            message='class-level message definitions should still work')
 
 
 class CanDeclareMessagesInClassDictValidator(Validator):

@@ -101,11 +101,14 @@ class BaseValidator(object):
             all_messages = old_messages()
             all_messages.update(messages)
             return all_messages
+        def keys_(self):
+            return tuple(messages_(self).keys())
         def message_for_key(self, key, context):
             if key in messages:
                 return messages[key]
             return old_message_for_key(key, context)
         self.messages = self._new_instancemethod(messages_)
+        self.keys = self._new_instancemethod(keys_)
         self.message_for_key = self._new_instancemethod(message_for_key)
     
     def _new_instancemethod(self, method):
