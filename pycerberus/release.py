@@ -2,5 +2,5 @@
 "Release information about pycerberus."
 
 name = 'pycerberus'
-version = '0.6dev'
+version = '0.6'
 
