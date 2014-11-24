@@ -6,6 +6,9 @@ Changelog
 - stop using 2to3 for Python 3 compatibility and use exactly the same source
   for all Python versions.
 - drop support for Python 2.4 and 2.5
+- bug fix: detect validator message keys correctly also when messages are
+  specified during validator initialization
+
 
 0.5 (05.08.2013)
 ====================
