@@ -1,6 +1,10 @@
 Changelog
 ******************************
 
+0.6.1dev (...)
+====================
+- no changes so far
+
 0.6 (24.11.2014)
 ====================
 - stop using 2to3 for Python 3 compatibility and use exactly the same source
