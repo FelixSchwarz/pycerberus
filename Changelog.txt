@@ -1,7 +1,7 @@
 Changelog
 ******************************
 
-0.5.1dev (...)
+0.5.1 (2016-04-15)
 ====================
 - bug fix: detect validator message keys correctly also when messages are
   specified during validator initialization
