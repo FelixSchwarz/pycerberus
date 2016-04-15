@@ -34,6 +34,8 @@ Changelog
 ====================
 - bug fix: detect validator message keys correctly also when messages are
   specified during validator initialization
+- bug fix: email address validator now complains if the domain part is missing
+  completely
 
 0.5 (05.08.2013)
 ====================
