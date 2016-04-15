@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010, 2012, 2013 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2012, 2013, 2016 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -57,6 +57,7 @@ class EmailAddressValidator(DomainNameValidator):
         return {
             'single_at': _(u"An email address must contain a single '@'."),
             'invalid_email_character': _(u'Invalid character %(invalid_character)s in email address %(emailaddress)s.'),
+            'missing_domain': _(u"Missing domain in email address '%(emailaddress)s'."),
         }
     
     def validate(self, emailaddress, context):
@@ -66,7 +67,8 @@ class EmailAddressValidator(DomainNameValidator):
         localpart, domain = parts
         self.super(domain, context)
         self._validate_localpart(localpart, emailaddress, context)
-    
+        self._validate_domain(domain, emailaddress, context)
+
     # --------------------------------------------------------------------------
     # private helpers
     
@@ -75,4 +77,8 @@ class EmailAddressValidator(DomainNameValidator):
         if match is not None:
             values = dict(invalid_character=repr(match.group(1)), emailaddress=repr(emailaddress))
             self.raise_error('invalid_email_character', localpart, context, **values)
+
+    def _validate_domain(self, domain, emailaddress, context):
+        if len(domain) == 0:
+            self.raise_error('missing_domain', emailaddress, context, emailaddress=emailaddress)
 

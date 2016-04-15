@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010, 2013 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2013, 2016 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -60,4 +60,7 @@ class EmailAddressValidatorTest(ValidationTest):
         e = self.get_error('foobar@ex ample.com')
         self.assert_equals("Invalid character ' ' in domain 'ex ample.com'.", e.msg())
 
+    def test_reject_missing_domain(self):
+        e = self.get_error('foobar@')
+        self.assert_equals("Missing domain in email address 'foobar@'.", e.msg())
 
