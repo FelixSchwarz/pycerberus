@@ -66,4 +66,14 @@ class IntegerValidator(Validator):
         if (self.max is not None) and (value > self.max):
             self.raise_error('too_big', value, context, max=self.max)
 
+    def revert_conversion(self, value, context=None):
+        if not isinstance(value, (int, six.string_types)):
+            # int() can only work on the types above, so just return the input
+            # value for other types
+            return value
+        try:
+            return int(value)
+        except ValueError:
+            return value
+
 

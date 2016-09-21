@@ -1,10 +1,12 @@
 Changelog
 ******************************
 
-0.6.1dev (...)
+0.6.1 (...)
 ====================
 - bug fix: email address validator now complains if the domain part is missing
   completely
+- IntegerValidator now implements "revert_conversion()" properly
+
 
 0.6 (24.11.2014)
 ====================

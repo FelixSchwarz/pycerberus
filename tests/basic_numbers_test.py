@@ -84,3 +84,11 @@ class IntegerValidatorTest(ValidationTest):
         self.init_validator(required=False)
         assert_equals(None, self.process(''))
 
+    def test_revert_conversion(self):
+        assert_equals(1, self.revert_conversion(1))
+        assert_equals(1, self.revert_conversion('1'))
+        assert_equals('1.9', self.revert_conversion('1.9'))
+        assert_equals(u'ö', self.revert_conversion(u'ö'))
+        assert_equals(None, self.revert_conversion(None))
+        assert_equals([], self.revert_conversion([]))
+
