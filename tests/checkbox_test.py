@@ -43,7 +43,14 @@ class BooleanCheckboxTest(ValidationTest):
         assert_true(self.process('on'))
         assert_true(self.process('true'))
         assert_true(self.process(True))
-    
+
+    def test_can_set_trueish_and_falsish_values(self):
+        self.init_validator(trueish=('a',), falsish=('b',))
+        assert_true(self.process('a'))
+        assert_false(self.process('b'))
+        self.assert_error('0')
+        self.assert_error('1')
+
     def test_strips_by_default(self):
         assert_true(self.process('  true  '))
     

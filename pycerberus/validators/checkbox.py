@@ -38,6 +38,8 @@ class BooleanCheckbox(StringValidator):
     def __init__(self, **kwargs):
         kwargs.setdefault('required', False)
         kwargs.setdefault('strip', True)
+        self.trueish = kwargs.pop('trueish', self.__class__.trueish)
+        self.falsish = kwargs.pop('falsish', self.__class__.falsish)
         self.super.__init__(**kwargs)
     
     def messages(self):
