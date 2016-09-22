@@ -48,16 +48,27 @@ class BooleanCheckbox(StringValidator):
         }
     
     def convert(self, value, context):
+        # support arbitrary data types which might be configured explicitely
+        if self._contains(value, self.trueish):
+            return True
+        elif self._contains(value, self.falsish):
+            return False
+
         if isinstance(value, bool):
             return value
-        
         string_value = self.super().lower()
         if string_value in self.trueish:
             return True
         elif string_value in self.falsish:
             return False
         self.raise_error('unknown_bool', value, context)
-    
+
+    def _contains(self, value, values):
+        for v in values:
+            if value is v:
+                return True
+        return False
+
     def empty_value(self, context):
         return False
     

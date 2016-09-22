@@ -51,6 +51,24 @@ class BooleanCheckboxTest(ValidationTest):
         self.assert_error('0')
         self.assert_error('1')
 
+    def test_accepts_all_trueish_values(self):
+        trueish = (42, 'fnord', 'on', 'true')
+        self.init_validator(trueish=trueish)
+        for value in trueish:
+            assert_true(self.process(value),
+                message='should treat %r as True' % (value,))
+
+    def test_can_handle_trueish_zero_and_falsish_one(self):
+        # 0/1 (integers) in Python are a bit special:
+        # "1 == True" but "1 is not True"
+        # "0 == False" but "0 is not False"
+        # still we go the extra mile to allow using 0 as trueish/1 as falsish
+        # (while at the same time True should still be trueish/False should be
+        # falsish)
+        self.init_validator(trueish=(0,), falsish=(1,))
+        assert_true(self.process(0))
+        assert_false(self.process(1))
+
     def test_strips_by_default(self):
         assert_true(self.process('  true  '))
     
