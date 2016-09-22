@@ -67,7 +67,13 @@ class IntegerValidator(Validator):
             self.raise_error('too_big', value, context, max=self.max)
 
     def revert_conversion(self, value, context=None):
-        if not isinstance(value, (int, six.string_types)):
+        if isinstance(value, bool):
+            # True/False should not be mapped to 1/0 here because that
+            # peculiarity of Python ("0 == False" but "0 is not False") might
+            # cause nasty surprises later on.
+            # need to check this first because "isinstance(False, int) -> True"
+            return value
+        elif not isinstance(value, (int, six.string_types)):
             # int() can only work on the types above, so just return the input
             # value for other types
             return value

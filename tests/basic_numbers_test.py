@@ -92,3 +92,9 @@ class IntegerValidatorTest(ValidationTest):
         assert_equals(None, self.revert_conversion(None))
         assert_equals([], self.revert_conversion([]))
 
+    def test_no_reversion_to_int_for_boolean_values(self):
+        true_result = self.revert_conversion(True)
+        assert true_result is True
+        false_result = self.revert_conversion(False)
+        assert false_result is False
+
