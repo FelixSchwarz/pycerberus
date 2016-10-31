@@ -56,15 +56,22 @@ class StringValidator(Validator):
     def convert(self, value, context):
         if not isinstance(value, six.string_types):
             classname = value.__class__.__name__
-            self.raise_error('invalid_type', value, context, classname=classname)
+            self.new_error('invalid_type',
+                value, context, dict(classname=classname),
+            )
+            return None
         return value
     
     def validate(self, value, context):
         if self._min_length != NoValueSet and len(value) < self._min_length:
-            self.raise_error('too_short', value, context, min=self._min_length)
+            self.new_error('too_short',
+                value, context, dict(min=self._min_length),
+            )
         if self._max_length != NoValueSet and len(value) > self._max_length:
-            self.raise_error('too_long', value, context, max=self._max_length)
-    
+            self.new_error('too_long',
+                value, context, dict(max=self._max_length),
+            )
+
     def is_empty(self, value, context):
         return value in (None, '')
 

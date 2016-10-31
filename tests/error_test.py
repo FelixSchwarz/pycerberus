@@ -24,7 +24,7 @@
 
 from pythonic_testcase import *
 
-from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
 
 
 class InvalidDataErrorTest(PythonicTestCase):
@@ -66,3 +66,14 @@ class InvalidDataErrorTest(PythonicTestCase):
         
         assert_equals({'foobar': [foo_error, None]}, wrapping_error.unpack_errors())
 
+
+class ErrorTest(PythonicTestCase):
+    def test_can_store_attributes(self):
+        context = {'quox': 21}
+        error = Error(key='foo', msg='bar', value='baz', context=context.copy())
+        assert_equals('foo', error.key)
+        assert_equals('bar', error.msg)
+        assert_equals('bar', error.message,
+            message='the alias is sometimes helpful as well')
+        assert_equals('baz', error.value)
+        assert_equals(context, error.context)

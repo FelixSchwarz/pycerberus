@@ -24,7 +24,7 @@
 
 from pycerberus.lib import AttrDict, SuperProxy
 
-__all__ = ['EmptyError', 'InvalidArgumentsError', 'InvalidDataError', 
+__all__ = ['EmptyError', 'Error', 'InvalidArgumentsError', 'InvalidDataError',
            'ThreadSafetyError', 'ValidationError']
 
 
@@ -108,4 +108,20 @@ class InvalidArgumentsError(ValidationError):
 
 class ThreadSafetyError(ValidationError):
     pass
+
+
+class Error(object):
+    def __init__(self, key, msg, value, context):
+        self.key = key
+        self.msg = msg
+        self.value = value
+        self.context = context
+
+    @property
+    def message(self):
+        return self.msg
+
+    def __repr__(self):
+        tmpl = 'Error(key=%r, msg=%r, value=%r, context=%r)'
+        return tmpl % (self.key, self.msg, self.value, self.context)
 

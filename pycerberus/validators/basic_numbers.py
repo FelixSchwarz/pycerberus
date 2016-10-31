@@ -54,7 +54,8 @@ class IntegerValidator(Validator):
     def convert(self, value, context):
         if not isinstance(value, (int, six.string_types)):
             classname = value.__class__.__name__
-            self.raise_error('invalid_type', value, context, classname=classname)
+            self.new_error('invalid_type', value, context, dict(classname=classname))
+            return
         try:
             return int(value)
         except ValueError:
@@ -62,9 +63,10 @@ class IntegerValidator(Validator):
     
     def validate(self, value, context):
         if (self.min is not None) and (value < self.min):
-            self.raise_error('too_low', value, context, min=self.min)
+            self.new_error('too_low', value, context, dict(min=self.min))
+
         if (self.max is not None) and (value > self.max):
-            self.raise_error('too_big', value, context, max=self.max)
+            self.new_error('too_big', value, context, dict(max=self.max))
 
     def revert_conversion(self, value, context=None):
         if isinstance(value, bool):

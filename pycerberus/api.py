@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2012, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2012, 2014, 2016 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,11 @@ import inspect
 import types
 import warnings
 
-from pycerberus.errors import EmptyError, InvalidArgumentsError, InvalidDataError, \
-    ThreadSafetyError
+from pycerberus.errors import *
 from pycerberus.i18n import _, GettextTranslation
 from pycerberus.lib import SuperProxy
 from pycerberus.lib import six
+from pycerberus.lib.form_data import FieldData
 
 
 __all__ = ['BaseValidator', 'Validator']
@@ -200,6 +200,8 @@ class BaseValidator(object):
         The returned value does not have to be an actual Python string as long
         as it has a meaningful unicode() result. Generally the validator 
         should accept the return value in its '.process()' method."""
+        if hasattr(value, 'initial_value'):
+            return value.initial_value
         if value is None:
             return None
         return six.text_type(value)
@@ -240,11 +242,15 @@ class Validator(BaseValidator):
     you set ``required`` to True but provide a default value as well.
     """
     
-    def __init__(self, default=NoValueSet, required=NoValueSet, strip=False, messages=None):
+    def __init__(self, default=NoValueSet, required=NoValueSet, exception_if_invalid=NoValueSet, strip=False, messages=None):
         self.super(messages=messages)
         self._default = default
         self._required = required
-        self._check_argument_consistency()
+        self._exception_if_invalid = getattr(self, 'exception_if_invalid', NoValueSet)
+        self._check_argument_consistency(exception_if_invalid)
+        if self._exception_if_invalid is NoValueSet:
+            value = True if (exception_if_invalid is NoValueSet) else exception_if_invalid
+            self._exception_if_invalid = value
         self._strip_input = strip
         self._implementations, self._implementation_by_class = self._freeze_implementations_for_class()
         if self.is_internal_state_frozen() not in (True, False):
@@ -252,12 +258,18 @@ class Validator(BaseValidator):
     
     # --------------------------------------------------------------------------
     # initialization
-    
-    def _check_argument_consistency(self):
+
+    def _check_argument_consistency(self, exception_if_invalid):
         if self.is_required(set_explicitely=True) and self._has_default_value_set():
             msg = 'Set default value (%s) has no effect because a value is required.' % repr(self._default)
             raise InvalidArgumentsError(msg)
-    
+
+        class_has_static_value = (self._exception_if_invalid is not NoValueSet)
+        user_specified_value = (exception_if_invalid is not NoValueSet)
+        if class_has_static_value and user_specified_value:
+            msg = 'This validator does not accept "exception_if_invalid" as it is set on a class level'
+            raise InvalidArgumentsError(msg)
+
     def _has_default_value_set(self):
         return (self._default is not NoValueSet)
     
@@ -301,22 +313,48 @@ class Validator(BaseValidator):
     
     def raise_error(self, key, value, context, errorclass=InvalidDataError, 
             error_dict=None, error_list=(), **values):
+        if not self._exception_if_invalid:
+            warnings.warn('raise_error() called in validator which should not use exceptions (exception_if_invalid=False)')
         raise self.exception(key, value, context, errorclass=errorclass, 
             error_dict=error_dict, error_list=error_list, **values)
     
     def process(self, value, context=None):
         if context is None:
             context = {}
+        result = FieldData(initial_value=value)
         if self._strip_input and hasattr(value, 'strip'):
             value = value.strip()
         value = super(Validator, self).process(value, context)
+
         if self.is_empty(value, context) == True:
-            if self.is_required() == True:
-                self.raise_error('empty', value, context, errorclass=EmptyError)
-            return self.empty_value(context)
+            result.set(initial_value=value)
+            if self.is_required() == False:
+                empty_value = self.empty_value(context)
+                if self._exception_if_invalid:
+                    return empty_value
+                result.set(value=empty_value)
+            else:
+                if self._exception_if_invalid:
+                    self.raise_error('empty', value, context, errorclass=EmptyError)
+                empty_error = self.new_error('empty', value, context)
+                result.set(errors=(empty_error,))
+            return result
+
         converted_value = self.convert(value, context)
-        self.validate(converted_value, context)
-        return converted_value
+        convert_errors = context.get('errors')
+        if not convert_errors:
+            self.validate(converted_value, context)
+        errors = context.pop('errors', ())
+        if not errors:
+            if self._exception_if_invalid:
+                return converted_value
+            result.set(value=converted_value)
+        elif self._exception_if_invalid:
+            error = errors[0]
+            raise InvalidDataError(error.msg, error.value, error.key, context)
+        else:
+            result.set(errors=errors)
+        return result
     
     # --------------------------------------------------------------------------
     # Defining a convenience API
@@ -336,7 +374,15 @@ class Validator(BaseValidator):
         
         This method must not modify the ``converted_value``."""
         pass
-    
+
+    def new_error(self, key, value, context, msg_values=None):
+        if self._exception_if_invalid:
+            self.raise_error(key, value, context, **(msg_values or {}))
+        error = self._error(key, value, context, msg_values=msg_values)
+        errors = context.setdefault('errors', [])
+        errors.append(error)
+        return error
+
     # REFACT: rename to default_value()
     def empty_value(self, context):
         """Return the 'empty' value for this validator (usually None)."""
@@ -406,7 +452,11 @@ class Validator(BaseValidator):
         if self.is_internal_state_frozen():
             raise ThreadSafetyError('Do not store state in a validator instance as this violates thread safety.')
         self.__dict__[name] = value
-    
+
+    def _error(self, key, value, context, msg_values=None):
+        msg = self.message(key, context, **(msg_values or {}))
+        return Error(key, msg, value, context)
+
     # -------------------------------------------------------------------------
 
 
