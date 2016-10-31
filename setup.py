@@ -3,6 +3,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from distutils.command.build import build
+import re
 import os
 
 import setuptools
@@ -11,6 +12,15 @@ from setuptools.command.install_lib import install_lib
 
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
+def requires_from_file(filename):
+    requirements = []
+    with open(filename, 'r') as requirements_fp:
+        for line in requirements_fp.readlines():
+            match = re.search('^\s*([a-zA-Z][^#]+?)(\s*#.+)?\n$', line)
+            if match:
+                requirements.append(match.group(1))
+    return requirements
 
 def i18n_aware_commands():
     def is_babel_available():
@@ -61,12 +71,9 @@ if __name__ == '__main__':
         author_email = 'felix.schwarz@oss.schwarz.eu',
         url = 'http://www.schwarz.eu/opensource/projects/pycerberus',
         download_url = 'http://www.schwarz.eu/opensource/projects/pycerberus/download/%(version)s/pycerberus-%(version)s.tar.gz' % dict(version=version),
-        
-        extras_require = {
-            'Babel': ['Babel>=0.9.5'],
-        },
-                     
-        tests_require = ['Babel'],
+
+        tests_require=requires_from_file('dev_requirements.txt'),
+        install_requires=requires_from_file('requirements.txt'),
         test_suite = 'nose.collector',
         
         # simple_super is not zip_safe, neither is the current gettext 
