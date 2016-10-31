@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2016 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # Modified 2011 Andrew Fleenor at Fastsoft <andrew@fastsoft.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pycerberus.schema import SchemaValidator
 from pycerberus.schemas import PositionalArgumentsParsingSchema
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import IntegerValidator, StringValidator
