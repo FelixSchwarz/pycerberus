@@ -41,8 +41,8 @@ class IntegerValidator(Validator):
         try:
             return int(value)
         except ValueError:
-            self.raise_error('invalid_number', value, context)
-    
+            self.new_error('invalid_number', value, context)
+
     def validate(self, value, context):
         if (self.min is not None) and (value < self.min):
             self.new_error('too_low', value, context, dict(min=self.min))
@@ -51,6 +51,8 @@ class IntegerValidator(Validator):
             self.new_error('too_big', value, context, dict(max=self.max))
 
     def revert_conversion(self, value, context=None):
+        if hasattr(value, 'initial_value'):
+            return value.initial_value
         if isinstance(value, bool):
             # True/False should not be mapped to 1/0 here because that
             # peculiarity of Python ("0 == False" but "0 is not False") might

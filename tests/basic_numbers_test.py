@@ -7,6 +7,7 @@ from pythonic_testcase import *
 
 from pycerberus import InvalidDataError
 from pycerberus.errors import InvalidArgumentsError
+from pycerberus.lib.form_data import FieldData
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import IntegerValidator
 
@@ -74,6 +75,7 @@ class IntegerValidatorTest(ValidationTest):
         self.init_validator(required=False)
         assert_none(self.process(''))
 
+    # --- revert_conversion() -------------------------------------------------
     def test_revert_conversion(self):
         assert_equals(1, self.revert_conversion(1))
         assert_equals(1, self.revert_conversion('1'))
@@ -88,3 +90,37 @@ class IntegerValidatorTest(ValidationTest):
         false_result = self.revert_conversion(False)
         assert false_result is False
 
+    def test_can_use_field_data_to_revert_conversion(self):
+        data = FieldData('foo', initial_value='bar')
+        assert_equals('bar', self.revert_conversion(data))
+
+    # --- results instead of exceptions ---------------------------------------
+    def test_can_return_result_for_valid_input(self):
+        self.init_validator(IntegerValidator(exception_if_invalid=False))
+        result = self.process('6')
+        assert_false(result.contains_errors())
+        assert_equals('6', result.initial_value)
+        assert_equals(6, result.value)
+
+    def test_can_return_result_for_invalid_input(self):
+        self.init_validator(IntegerValidator(exception_if_invalid=False))
+        result = self.process('invalid')
+        assert_true(result.contains_errors())
+        assert_equals('invalid', result.initial_value)
+        assert_none(result.value)
+
+    def test_can_return_result_from_validate(self):
+        self.init_validator(IntegerValidator(min=10, max=20, exception_if_invalid=False))
+        result = self.process('5')
+        assert_true(result.contains_errors())
+
+        result = self.process('40')
+        assert_true(result.contains_errors())
+
+    def test_can_skip_validate_if_convert_found_errors(self):
+        self.init_validator(IntegerValidator(min=10, exception_if_invalid=False))
+        result = self.process('invalid')
+        assert_true(result.contains_errors())
+        assert_equals('invalid', result.initial_value)
+        assert_none(result.value)
+        assert_length(1, result.errors)
