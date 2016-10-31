@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2016 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,8 @@
 
 import os
 
-from pycerberus.test_util import PythonicTestCase
+from pythonic_testcase import PythonicTestCase
+
 from pycerberus.i18n import GettextTranslation
 
 

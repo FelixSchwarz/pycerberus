@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2010, 2014 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2010, 2014, 2016 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from pythonic_testcase import PythonicTestCase
+
 from pycerberus.api import Validator
-from pycerberus.lib import PythonicTestCase
 from pycerberus.schema import SchemaValidator
 from pycerberus.validators import StringValidator
 

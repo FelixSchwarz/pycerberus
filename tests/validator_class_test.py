@@ -2,7 +2,7 @@
 #
 # The MIT License
 # 
-# Copyright (c) 2009-2010, 2012 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+# Copyright (c) 2009-2010, 2012, 2016 Felix Schwarz <felix.schwarz@oss.schwarz.eu>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from pythonic_testcase import *
+
 from pycerberus import EmptyError, InvalidArgumentsError, Validator
 from pycerberus.api import NoValueSet
-from pycerberus.lib.pythonic_testcase import *
 from pycerberus.test_util import ValidationTest
 
 
