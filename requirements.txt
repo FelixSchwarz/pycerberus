@@ -1,1 +1,2 @@
 PythonicTestcase >= 1.1.0  # assert_raises with context_manager
+six

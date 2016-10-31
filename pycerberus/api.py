@@ -27,10 +27,11 @@ import inspect
 import types
 import warnings
 
+import six
+
 from pycerberus.errors import *
 from pycerberus.i18n import _, GettextTranslation
 from pycerberus.lib import SuperProxy
-from pycerberus.lib import six
 from pycerberus.lib.form_data import FieldData
 
 
