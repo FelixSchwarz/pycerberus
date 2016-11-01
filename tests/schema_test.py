@@ -175,9 +175,9 @@ class SchemaTest(ValidationTest):
     def test_formvalidators_can_modify_fields(self):
         class FormValidator(Validator):
             def convert(self, fields, context):
-                return {'new_field': True, }
+                return {'id': True, }
         schema = self._schema(formvalidators=(FormValidator(),))
-        assert_equals({'new_field': True}, schema.process({'id': '42'}))
+        assert_equals({'id': True}, schema.process({'id': '42'}))
 
     def test_formvalidators_are_not_executed_if_field_validator_failed(self):
         schema = self._schema(formvalidators=(self._failing_validator(), ))
