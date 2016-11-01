@@ -114,6 +114,7 @@ class FormData(object):
         else:
             children = ((name, FieldData()) for name in child_names)
         self.children = dict(children)
+        self.global_errors = ()
 
     def __getattr__(self, name):
         if name not in self.children:
@@ -125,6 +126,8 @@ class FormData(object):
         return 'FormData<children=%r>' % self.children
 
     def contains_errors(self):
+        if self.global_errors:
+            return True
         for child in self.children.values():
             if child.contains_errors():
                 return True
@@ -136,6 +139,9 @@ class FormData(object):
         for name, contexts in self.children.items():
             errors_[name] = contexts.errors
         return errors_
+
+    def _set_global_errors(self, errors):
+        self.global_errors = errors
 
     def _set_values(self, value, initial_value, errors, meta, clear_missing):
         def value_for(child_name, values, default_value=None):
@@ -153,6 +159,10 @@ class FormData(object):
         # setting "errors=None" seems to be quite natural to me and hopefully
         # leads to fewer surprises by callers.
         if errors is None:
+            errors = {}
+        is_dict_like = isinstance(errors, dict)
+        if (not is_dict_like) and (errors is not undefined):
+            self._set_global_errors(errors)
             errors = {}
         ensure_all_keys_known(value)
         ensure_all_keys_known(errors)

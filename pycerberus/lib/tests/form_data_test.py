@@ -45,8 +45,19 @@ class FormDataTest(PythonicTestCase):
         child_container.children = {'baz': FieldData(errors=(self.error(), ))}
         assert_true(child_container.contains_errors())
 
+        assert_false(self.context.contains_errors())
         self.context.children['complex'] = child_container
         assert_true(self.context.contains_errors())
+
+    def test_can_set_global_errors(self):
+        assert_false(self.context.contains_errors())
+
+        errors = (self.error(), )
+        self.context.set(errors=errors)
+        assert_true(self.context.contains_errors())
+        assert_false(self.context.children['foo'].contains_errors())
+        assert_false(self.context.children['bar'].contains_errors())
+        assert_equals(errors, self.context.global_errors)
 
 #    def test_can_detect_errors_for_repeated_children(self):
 #        repeated_context = RepeatingFieldData(None)
