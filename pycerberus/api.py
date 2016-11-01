@@ -183,10 +183,6 @@ class BaseValidator(object):
         if value is None:
             return None
         return six.text_type(value)
-    
-    def to_string(self, *args, **kwargs):
-        warnings.warn("BaseValidator.to_string() is deprecated. Please use 'revert_conversion' instead!", DeprecationWarning)
-        self.revert_conversion(*args, **kwargs)
 
 
 class Validator(BaseValidator):

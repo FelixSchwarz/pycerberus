@@ -8,7 +8,7 @@ Changelog
 - IntegerValidator now implements "revert_conversion()" properly
 - BooleanCheckbox: can set trueish/falsish values at initialization
 - BooleanCheckbox: support arbitrary data types for trueish/falsish
-- BaseValidator: removed deprecated ".error()" method
+- BaseValidator: removed deprecated ".error()" and ".to_string()" methods
 
 
 0.6 (24.11.2014)
