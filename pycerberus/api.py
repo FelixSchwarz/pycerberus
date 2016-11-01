@@ -162,11 +162,7 @@ class BaseValidator(object):
         """Raise an InvalidDataError for the given key."""
         msg_template = self.message_for_key(key, context)
         raise errorclass(msg_template % values, value, key=key, context=context)
-    
-    def error(self, *args, **kwargs):
-        warnings.warn("BaseValidator.error() is deprecated. Please use 'raise_error' instead!", DeprecationWarning)
-        self.raise_error(*args, **kwargs)
-    
+
     def process(self, value, context=None):
         """This is the method to validate your input. The validator returns a
         (Python) representation of the given input ``value``.
