@@ -1,8 +1,19 @@
 Changelog
 ******************************
 
-0.6.1 (...)
+0.7dev (...)
 ====================
+
+pycerberus validators can now return validation errors as result values
+instead of raising exceptions. This change enables a number of interesting
+features on top of pycerberus e.g. returning multiple errors for a single
+field (and ignoring errors), retrieval of "partial" conversions and formvalidators
+being run even if some fields of a schema are invalid.
+
+Currently both ways are supported (Schema even supports mixing both) but
+I will migrate all built-in validators to the new schema in the future
+and version 1.0 will use result instances by default.
+
 - bug fix: email address validator now complains if the domain part is missing
   completely
 - IntegerValidator now implements "revert_conversion()" properly

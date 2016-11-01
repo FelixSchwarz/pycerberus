@@ -62,7 +62,7 @@ def i18n_aware_commands():
 
 
 if __name__ == '__main__':
-    version = '0.6.1dev'
+    version = '0.6.99'
     extra_commands = i18n_aware_commands()
     setuptools.setup(
         name = 'pycerberus',
