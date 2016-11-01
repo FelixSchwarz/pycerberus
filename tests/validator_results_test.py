@@ -149,6 +149,13 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         error = result.errors[0]
         assert_equals('empty', error.key)
 
+    def test_can_return_context_without_permanent_modifications(self):
+        source_context = {'foo': [1, 2, 3]}
+        context = source_context.copy()
+        result = self.process(-2, context=context)
+        assert_equals(-2, result.initial_value)
+        assert_equals(source_context, context)
+
     # --- revert_conversion() -------------------------------------------------
 
     def test_can_use_field_data_to_revert_conversion(self):
