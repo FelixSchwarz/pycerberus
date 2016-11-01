@@ -5,7 +5,7 @@
 
 from pythonic_testcase import *
 
-from pycerberus.api import Validator
+from pycerberus.api import add_error_to_context, Error, Validator
 from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 from pycerberus.lib import AttrDict
 from pycerberus.test_util import ValidationTest
@@ -19,9 +19,38 @@ def exploding_validator():
         raise ValueError('boooom!')
     return AttrDict(process=mock_process)
 
+def failing_validator(fields=None, exception_if_invalid=True):
+    error_fields = fields
+    raising_validator = exception_if_invalid
+
+    # using a real validator here uncovered quite a few integration issues
+    # (e.g. bad context type for FormValidators)
+    class FailingValidator(Validator):
+        exception_if_invalid = raising_validator
+
+        def convert(self, fields, context):
+            if exception_if_invalid:
+                assert (error_fields is None), 'specific fields not supported'
+                raise InvalidDataError('foo', fields, 'key', context)
+            if not error_fields:
+                new_error('key', 'msg for global error', fields, context)
+            else:
+                result = context['result']
+                value = None
+                for fieldname in error_fields:
+                    error = Error('key', 'error for %s', value, context)
+                    result.children[fieldname].add_error(error)
+            return fields
+
+    return FailingValidator()
+
+def new_error(key, msg, value, context):
+    assert context is not None, 'Unable to report errors without context'
+    error = Error(key, msg, value, context)
+    add_error_to_context(error, context)
+
 
 class SchemaTest(ValidationTest):
-    
     def _schema(self, fields=('id',), formvalidators=(), **kwargs):
         schema = SchemaValidator(**kwargs)
         assert set(fields).issubset(set(('id', 'key')))
@@ -119,6 +148,97 @@ class SchemaTest(ValidationTest):
         assert_equals('invalid_type', key_error.key())
 
     # -------------------------------------------------------------------------
+    # results instead of raising exceptions
+
+    def test_can_return_results_for_valid_inputs(self):
+        schema = self._schema(('id', 'key'), exception_if_invalid=False)
+        input_ = {'id': '1', 'key': 'foo'}
+        result = schema.process(input_)
+        assert_equals(input_, result.initial_value)
+        assert_equals({'id': 1, 'key': 'foo'}, result.value)
+        assert_false(result.contains_errors())
+        assert_falseish(result.errors['id'])
+        assert_falseish(result.errors['key'])
+
+    def test_can_return_errors_from_results(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        schema.add('first', IntegerValidator(min=10, exception_if_invalid=False))
+        schema.add('second', IntegerValidator(max=10, exception_if_invalid=False))
+
+        input_ = {'first': '5', 'second': '20'}
+        result = schema.process(input_)
+
+        assert_true(result.contains_errors())
+        first_errors = result.errors['first']
+        assert_length(1, first_errors)
+        assert_equals('too_low', first_errors[0].key)
+        second_errors = result.errors['second']
+        assert_length(1, second_errors)
+        assert_equals('too_big', second_errors[0].key)
+
+    def test_can_gather_return_values_and_exceptions(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        schema.add('first', IntegerValidator(min=10, exception_if_invalid=True))
+        schema.add('second', IntegerValidator(max=10, exception_if_invalid=False))
+
+        input_ = {'first': '5', 'second': '20'}
+        result = schema.process(input_)
+
+        assert_true(result.contains_errors())
+        first_errors = result.errors['first']
+        assert_length(1, first_errors)
+        assert_equals('too_low', first_errors[0].key)
+        second_errors = result.errors['second']
+        assert_length(1, second_errors)
+        assert_equals('too_big', second_errors[0].key)
+
+    def test_can_handle_non_input(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        schema.add('first', IntegerValidator(min=10, exception_if_invalid=True))
+
+        result = schema.process(None)
+        assert_false(result.contains_errors())
+        assert_equals({'first': None}, result.value)
+        assert_equals({'first': None}, result.initial_value)
+
+    def test_can_return_error_for_invalid_input_types(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        schema.add('first', IntegerValidator(min=10, exception_if_invalid=True))
+
+        result = schema.process([])
+        assert_true(result.contains_errors())
+        assert_length(0, result.errors['first'])
+        assert_length(1, result.global_errors)
+        error = result.global_errors[0]
+        assert_equals('invalid_type', error.key)
+
+    def test_can_return_result_for_valid_subschemas(self):
+        subschema = self._schema(fields=('id',), exception_if_invalid=False)
+        schema = self._schema(fields=('id',), exception_if_invalid=False)
+        schema.add('foo', subschema)
+
+        result = schema.process({'id': '10', 'foo': {'id': '20'}})
+        assert_false(result.contains_errors())
+
+    def test_can_return_error_results_from_subschemas(self):
+        subschema = self._schema(fields=('id',), exception_if_invalid=False)
+        schema = self._schema(fields=('id',), exception_if_invalid=False)
+        schema.add('foo', subschema)
+
+        result = schema.process({'id': '10', 'foo': {'id': 'invalid'}})
+        assert_true(result.contains_errors())
+        id_result = result.children['id']
+        assert_false(id_result.contains_errors())
+        foo_container = result.children['foo']
+        assert_true(foo_container.contains_errors())
+
+        foo_id = foo_container.children['id']
+        assert_true(foo_id.contains_errors())
+        assert_length(1, foo_id.errors)
+        error = foo_id.errors[0]
+        assert_equals('invalid_number', error.key)
+
+    # -------------------------------------------------------------------------
     # warn about additional parameters
     
     def test_schema_can_bail_out_if_additional_items_are_detected(self):
@@ -128,6 +248,21 @@ class SchemaTest(ValidationTest):
         schema.set_allow_additional_parameters(False)
         with assert_raises(InvalidDataError):
             schema.process(dict(foo=42))
+
+    def test_can_return_error_if_additional_items_present(self):
+        schema = self._schema(
+            fields=(),
+            exception_if_invalid=False,
+            allow_additional_parameters=False,
+        )
+        result = schema.process(dict(foo=42))
+
+        assert_true(result.contains_errors())
+        assert_length(0, result.global_errors)
+        assert_contains('foo', result.children)
+        foo_errors = result.children['foo'].errors
+        assert_length(1, foo_errors)
+        assert_equals('additional_item', foo_errors[0].key)
 
     def test_exception_contains_information_about_invalid_and_extra_fields(self):
         schema = self._schema(allow_additional_parameters=False)
@@ -168,15 +303,40 @@ class SchemaTest(ValidationTest):
         assert_length(1, schema.formvalidators())
         assert_equals(formvalidator, schema.formvalidators()[0])
 
-    def _failing_validator(self):
-        def mock_process(fields, context=None):
-            raise InvalidDataError('foo', fields, 'key', context)
-        return AttrDict(process=mock_process)
-    
     def test_formvalidators_are_executed(self):
-        schema = self._schema(formvalidators=(self._failing_validator(), ))
-        with assert_raises(Exception):
+        schema = self._schema(formvalidators=(failing_validator(), ))
+        with assert_raises(InvalidDataError):
             schema.process({'id': '42'})
+
+    def test_formvalidators_can_return_global_errors(self):
+        schema = self._schema(
+            formvalidators=(failing_validator(exception_if_invalid=False), ),
+            exception_if_invalid=False
+        )
+        result = schema.process({'id': '42'})
+        assert_true(result.contains_errors())
+        assert_false(result.children['id'].contains_errors())
+        assert_length(1, result.global_errors)
+        assert_equals('key', result.global_errors[0].key)
+
+    def test_formvalidators_can_add_errors_for_specific_fields(self):
+        schema = self._schema(
+            fields=('id', 'key'),
+            formvalidators=(
+                failing_validator(fields=('id', 'key'), exception_if_invalid=False),
+            ),
+            exception_if_invalid=False
+        )
+        result = schema.process({'id': '42', 'key': 'foo'})
+        assert_true(result.contains_errors())
+        assert_length(0, result.global_errors)
+
+        assert_true(result.children['id'].contains_errors())
+        assert_length(1, result.children['id'].errors)
+        assert_equals('key', result.children['id'].errors[0].key)
+        assert_true(result.children['key'].contains_errors())
+        assert_length(1, result.children['key'].errors)
+        assert_equals('key', result.children['key'].errors[0].key)
 
     def test_formvalidators_can_modify_fields(self):
         class FormValidator(Validator):
@@ -192,9 +352,22 @@ class SchemaTest(ValidationTest):
         error = result.caught_exception
         assert_equals(('id',), tuple(error.error_dict().keys()))
 
+    def test_formvalidators_with_result_values_are_not_executed_if_field_validator_failed(self):
+        schema = self._schema(
+            formvalidators=(exploding_validator(), ),
+            exception_if_invalid=False
+        )
+        result = schema.process({'id': 'invalid'})
+        assert_true(result.contains_errors())
+        assert_length(1, result.children['id'].errors)
+        id_error = result.children['id'].errors[0]
+        assert_equals('invalid_number', id_error.key)
+        assert_length(0, result.global_errors)
+
     def test_formvalidators_are_executed_after_field_validators(self):
         def mock_process(fields, context=None):
             assert fields == {'id': 42}
+            return fields
         formvalidator = AttrDict(process=mock_process)
         schema = self._schema(formvalidators=(formvalidator, ))
         with assert_not_raises():
@@ -205,12 +378,14 @@ class SchemaTest(ValidationTest):
         def first_mock_process(fields, context):
             assert context['state'] == 0
             context['state'] = 1
+            return fields
         first_validator = AttrDict(process=first_mock_process)
         schema.add_formvalidator(first_validator)
         
         def second_mock_process(fields, context=None):
             assert context['state'] == 1
             context['state'] = 2
+            return fields
         second_validator = AttrDict(process=second_mock_process)
         schema.add_formvalidator(second_validator)
         
@@ -224,10 +399,31 @@ class SchemaTest(ValidationTest):
             raise InvalidDataError('a message', fields, key='expected', context=context)
         first_validator = AttrDict(process=mock_process)
         schema.add_formvalidator(first_validator)
-        schema.add_formvalidator(self._failing_validator())
-        
+        schema.add_formvalidator(failing_validator())
+        schema.add_formvalidator(exploding_validator())
+
         error = assert_raises(InvalidDataError, lambda: schema.process({'id': '42'}))
         assert_equals('expected', error.details().key())
+
+    def test_execute_no_formvalidators_after_one_returned_error_result(self):
+        schema = self._schema(
+            fields=('id', 'key'),
+            formvalidators=(
+                failing_validator(fields=('id', 'key'), exception_if_invalid=False),
+                exploding_validator(),
+            ),
+            exception_if_invalid=False
+        )
+        result = schema.process({'id': '42', 'key': 'foo'})
+        assert_true(result.contains_errors())
+        assert_length(0, result.global_errors)
+
+        assert_true(result.children['id'].contains_errors())
+        assert_length(1, result.children['id'].errors)
+        assert_equals('key', result.children['id'].errors[0].key)
+        assert_true(result.children['key'].contains_errors())
+        assert_length(1, result.children['key'].errors)
+        assert_equals('key', result.children['key'].errors[0].key)
 
     # -------------------------------------------------------------------------
     # sub-schemas

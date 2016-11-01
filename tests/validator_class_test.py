@@ -7,6 +7,7 @@ from pythonic_testcase import *
 
 from pycerberus import EmptyError, InvalidArgumentsError, Validator
 from pycerberus.api import NoValueSet
+from pycerberus.lib.form_data import is_result
 from pycerberus.test_util import ValidationTest
 
 
@@ -65,8 +66,10 @@ class DefaultAndRequiredValuesTest(ValidationTest):
         self.assert_equals(42, self.process('empty'))
         # special check to ensure that other tests are not affected by this
         self.assert_not_equals(self.not_implemented, self.validator().convert)
-    
-    def test_validator_provides_empty_dict_if_no_context_was_given(self):
+
+    def test_validator_provides_almost_empty_dict_if_no_context_was_given(self):
+        # we need a "result" in our context so validators can properly report
+        # results
         dummy = self.AttributeHolder()
         dummy.given_context = None
         
@@ -76,6 +79,11 @@ class DefaultAndRequiredValuesTest(ValidationTest):
         self.init_validator(required=False)
         self.validator().empty_value = store_empty
         self.assert_equals(21, self.process('empty'))
+
+        assert_not_none(dummy.given_context)
+        result = dummy.given_context.pop('result', None)
+        assert_true(is_result(result),
+            message='context must contain a result instance to return errors without using exceptions')
         self.assert_equals({}, dummy.given_context)
         # check that we did not change the real class used in other test cases
         self.assert_not_equals(store_empty, self.init_validator().empty_value)

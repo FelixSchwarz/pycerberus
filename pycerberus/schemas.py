@@ -79,11 +79,13 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         fields = self._map_arguments_to_named_fields(value, context or {})
         return self.super(fields, context=context)
 
-    def _raise_exception(self, exceptions, context):
-        if '_extra' in exceptions:
-            error = exceptions['_extra']
-            del exceptions['_extra']
-            value = error.details().value()
-            exceptions['_extra'] = self.exception('additional_item', value, context, additional_item=value)
+    def _raise_exception(self, result, context):
+        if '_extra' in result.children:
+            extra_child = result.children['_extra']
+            assert extra_child.contains_errors()
+            error = extra_child.errors[0]
+            value = error.value
+            new_error = self._error(error.key, value, context, dict(additional_item=value))
+            extra_child.set(errors=(new_error,))
         self.super()
 

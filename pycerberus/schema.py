@@ -3,14 +3,17 @@
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
 
+import warnings
+
 import six
 
 from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
-from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
 from pycerberus.i18n import _
+from pycerberus.lib.form_data import is_result, FieldData, FormData
+
 
 __all__ = ['SchemaValidator']
-
 
 class SchemaMeta(EarlyBindForMethods):
     def __new__(cls, classname, direct_superclasses, class_attributes_dict):
@@ -166,8 +169,17 @@ class SchemaValidator(Validator):
         if fields is None:
             return self.empty_value(context)
         if not isinstance(fields, dict):
-            self.raise_error('invalid_type', fields, context, classname=fields.__class__)
-        return self._process_fields(fields, context)
+            self.new_error('invalid_type',
+                fields, context,
+                msg_values=dict(classname=fields.__class__.__name__),
+            )
+            return None
+
+        result = context['result']
+        self._process_fields(fields, result, context)
+        # even though this seems duplicated (all information is also present
+        # in "result" we should keep API compatibility
+        return result.value
     
     def is_empty(self, value, context):
         # Schemas have a different notion of being "empty"
@@ -175,7 +187,26 @@ class SchemaValidator(Validator):
     
     def empty_value(self, context):
         return {}
-    
+
+    # overriden from Validator
+    def new_result(self, initial_value):
+        result = self._add_result_containers_for_fields(self, initial_value)
+        if isinstance(initial_value, dict):
+            result.set(initial_value=initial_value)
+        return result
+
+    def _add_result_containers_for_fields(self, schema, initial_values):
+        result = FormData()
+        for field_name, field_validator in schema._fields.items():
+            is_schema = isinstance(field_validator, SchemaValidator)
+            if not is_schema:
+                result.children[field_name] = FieldData()
+            else:
+                subschema = field_validator
+                subresult = subschema.new_result(initial_values)
+                result.children[field_name] = subresult
+        return result
+
     # -------------------------------------------------------------------------
     # private
     
@@ -183,47 +214,88 @@ class SchemaValidator(Validator):
         if field_name in fields:
             return fields[field_name]
         return validator.empty_value(context)
-    
-    def _process_field(self, key, validator, fields, context, validated_fields, exceptions):
+
+    def _process_field(self, key, validator, fields, context, schema_result):
+        original_value = self._value_for_field(key, validator, fields, context)
+        field_result = schema_result.children[key]
+        field_result.set(initial_value=original_value)
+        form_result = context.pop('result')
+        context['result'] = field_result
         try:
-            original_value = self._value_for_field(key, validator, fields, context)
-            converted_value = validator.process(original_value, context)
-            validated_fields[key] = converted_value
+            validator_result = validator.process(original_value, context)
         except InvalidDataError as e:
-            exceptions[key] = e
-    
-    def _process_field_validators(self, fields, context):
-        validated_fields = {}
-        exceptions = {}
+            d = e.details()
+            error = Error(key=d.key(),
+                msg=d.msg(), value=original_value, context=context,
+            )
+            field_result.add_error(error)
+            validator_result = field_result
+        context['result'] = form_result
+        self._handle_field_validation_result(validator_result, field_result)
+
+    def _handle_field_validation_result(self, processed_value, result):
+        if not is_result(processed_value):
+            # this can only happen for old-style validators (exception on error,
+            # so this case must be a successful validation)
+            result.set(value=processed_value)
+            return
+        assert id (processed_value) == id(result)
+
+    def _process_field_validators(self, fields, result, context):
         for key, validator in self.fieldvalidators().items():
-            self._process_field(key, validator, fields, context, validated_fields, exceptions)
+            self._process_field(key, validator, fields, context, result)
+
         additional_items = set(fields).difference(set(self.fieldvalidators()))
         if (not self.allow_additional_parameters) and additional_items:
             for item_key in additional_items:
-                error = self.exception('additional_item', fields[item_key], context, additional_item=item_key)
-                exceptions[item_key] = error
+                default = FieldData(initial_value=fields[item_key])
+                field_result = result.children.setdefault(item_key, default)
+                error = self._error('additional_item',
+                    fields[item_key], context, dict(additional_item=item_key)
+                )
+                field_result.set(errors=(error,))
         if not self.filter_unvalidated_parameters:
             for key in additional_items:
-                validated_fields[key] = fields[key]
-        if len(exceptions) > 0:
-            self._raise_exception(exceptions, context)
-        return validated_fields
-    
-    def _process_form_validators(self, validated_fields, context):
+                default = FieldData(initial_value=fields[key])
+                field_result = result.children.setdefault(key, default)
+                field_result.set(value=fields[key])
+        if result.contains_errors() and self._exception_if_invalid:
+            self._raise_exception(result, context)
+
+    def _process_form_validators(self, result, context):
+        if result.contains_errors():
+            return
         for formvalidator in self.formvalidators():
-            validated_fields = formvalidator.process(validated_fields, context=context)
-        return validated_fields
-    
-    def _process_fields(self, fields, context):
-        validated_fields = self._process_field_validators(fields, context)
-        return self._process_form_validators(validated_fields, context)
-    
-    def _raise_exception(self, exceptions, context):
-        first_field_with_error = tuple(exceptions.keys())[0]
-        first_error = exceptions[first_field_with_error].details()
-        raise InvalidDataError(first_error.msg(), first_error.value(), first_error.key(), 
-                               context, error_dict=exceptions)
-    
+            previous_errors = result.errors
+            values = formvalidator.process(result.value, context=context)
+            if not is_result(values):
+                if values is None:
+                    warnings.warn('form validator %r returned None' % formvalidator)
+                    continue
+                result.set(value=values)
+            if previous_errors != result.errors:
+                # do not execute additional form validators if one of them
+                # found an error
+                break
+
+    def _process_fields(self, fields, result, context):
+        self._process_field_validators(fields, result, context)
+        self._process_form_validators(result, context)
+
+    def _raise_exception(self, result, context):
+        def error_to_exc(error, context, **kwargs):
+            return InvalidDataError(error.msg, error.value, error.key, context, **kwargs)
+
+        first_error = None
+        error_dict = {}
+        for field_name, field_errors in result.errors.items():
+            if not field_errors:
+                continue
+            if first_error is None:
+                first_error = field_errors[0]
+            error_dict[field_name] = error_to_exc(field_errors[0], context)
+        raise error_to_exc(first_error, context, error_dict=error_dict)
+
     def set_allow_additional_parameters(self, value):
         self.allow_additional_parameters = value
     

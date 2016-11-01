@@ -6,6 +6,7 @@
 from pythonic_testcase import *
 
 from pycerberus import InvalidDataError
+from pycerberus.lib.form_data import is_result
 from pycerberus.lib.simple_super import SuperProxy
 
 
@@ -45,7 +46,9 @@ class ValidationTest(PythonicTestCase):
     
     def process(self, *args, **kwargs):
         if len(args) == 1 and 'context' not in kwargs:
-            kwargs['context'] = {}
+            initial_value = args[0]
+            result = self._validator.new_result(initial_value)
+            kwargs['context'] = {'result': result}
         return self._validator.process(*args, **kwargs)
     
     def revert_conversion(self, *args, **kwargs):
@@ -55,9 +58,18 @@ class ValidationTest(PythonicTestCase):
     
     def assert_error(self, value, *args, **kwargs):
         message = kwargs.pop('message', None)
-        call = lambda: self.process(value, *args, **kwargs)
-        return assert_raises(InvalidDataError, call, message=message)
-    
+        try:
+            result = self.process(value, *args, **kwargs)
+        except InvalidDataError as e:
+            return e
+        else:
+            if (not is_result(result)) or (not result.contains_errors()):
+                default_message = 'InvalidDataError not raised!'
+                if message is None:
+                    raise AssertionError(default_message)
+                raise AssertionError(default_message + ' ' + message)
+            return result
+
     def assert_error_with_locale(self, value, locale='en', *args, **kwargs):
         """Process the given value and assert that this raises a validation
         exception - return that exception."""

@@ -4,8 +4,15 @@
 from copy import deepcopy
 
 
-__all__ = ['FieldData', 'FormData']
+__all__ = ['is_result', 'FieldData', 'FormData']
 
+def is_result(value):
+    return (
+        hasattr(value, 'value') and
+        hasattr(value, 'initial_value') and
+        hasattr(value, 'errors') and
+        hasattr(value, 'meta')
+    )
 
 class undefined(object):
     pass

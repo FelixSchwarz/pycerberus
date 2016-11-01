@@ -185,6 +185,12 @@ class BaseValidator(object):
         return six.text_type(value)
 
 
+def add_error_to_context(error, context):
+    errors = context.setdefault('errors', [])
+    errors.append(error)
+    return error
+
+
 class Validator(BaseValidator):
     """The Validator is the base class of most validators and implements 
     some commonly used features like required values (raise exception if no
@@ -293,13 +299,13 @@ class Validator(BaseValidator):
             error_dict=error_dict, error_list=error_list, **values)
     
     def process(self, value, context=None):
-        if context is None:
-            context = {}
-        result = FieldData(initial_value=value)
+        old_result = (context or {}).get('result', NoValueSet)
+        context = self.build_context(value, context)
         if self._strip_input and hasattr(value, 'strip'):
             value = value.strip()
         value = super(Validator, self).process(value, context)
 
+        result = self.get_result(value, context)
         if self.is_empty(value, context) == True:
             result.set(initial_value=value)
             if self.is_required() == False:
@@ -314,22 +320,46 @@ class Validator(BaseValidator):
                 result.set(errors=(empty_error,))
             return result
 
+        context['result'] = result
         converted_value = self.convert(value, context)
         convert_errors = context.get('errors')
         if not convert_errors:
             self.validate(converted_value, context)
+        context.pop('result')
+        if old_result is not NoValueSet:
+            context['result'] = old_result
+
+        return self._handle_validator_result(converted_value, result, context)
+
+    def _handle_validator_result(self, converted_value, result, context):
         errors = context.pop('errors', ())
-        if not errors:
-            if self._exception_if_invalid:
+        if self._exception_if_invalid:
+            if errors:
+                error = errors[0]
+                raise InvalidDataError(error.msg, error.value, error.key, context)
+            else:
                 return converted_value
-            result.set(value=converted_value)
-        elif self._exception_if_invalid:
-            error = errors[0]
-            raise InvalidDataError(error.msg, error.value, error.key, context)
-        else:
+        if errors:
             result.set(errors=errors)
+        else:
+            result.set(value=converted_value)
         return result
-    
+
+    def get_result(self, initial_value, context):
+        result = context.get('result')
+        assert (result is not None), 'not "result" in context (should never happen)'
+        return result
+
+    def build_context(self, initial_value, context):
+        if context is None:
+            context = {}
+        if 'result' not in context:
+            context['result'] = self.new_result(initial_value)
+        return context
+
+    def new_result(self, initial_value):
+        return FieldData(initial_value=initial_value)
+
     # --------------------------------------------------------------------------
     # Defining a convenience API
     
@@ -353,8 +383,7 @@ class Validator(BaseValidator):
         if self._exception_if_invalid:
             self.raise_error(key, value, context, **(msg_values or {}))
         error = self._error(key, value, context, msg_values=msg_values)
-        errors = context.setdefault('errors', [])
-        errors.append(error)
+        add_error_to_context(error, context)
         return error
 
     # REFACT: rename to default_value()
