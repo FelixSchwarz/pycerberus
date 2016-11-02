@@ -58,3 +58,17 @@ class ErrorTest(PythonicTestCase):
             message='the alias is sometimes helpful as well')
         assert_equals('baz', error.value)
         assert_equals(context, error.context)
+        expected_repr = "Error(key='foo', msg='bar', value='baz', context={'quox': 21})"
+        assert_equals(expected_repr, repr(error))
+
+    def test_can_store_custom_attributes(self):
+        error = Error(key='foo', msg='bar', value='baz', context={}, quox=42, foobar=21)
+        repr_tmpl = "Error(key='foo', msg='bar', value='baz', context={}, foobar=21, quox=%d)"
+        assert_equals(repr_tmpl % 42, repr(error))
+
+        assert_equals(42, error.quox)
+        assert_equals(21, error.foobar)
+
+        error.quox = 12
+        assert_equals(12, error.quox)
+        assert_equals(repr_tmpl % 12, repr(error))

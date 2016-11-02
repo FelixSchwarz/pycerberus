@@ -3,7 +3,7 @@
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
 
-from pycerberus.lib import AttrDict, SuperProxy
+from pycerberus.lib import AttrDict
 
 __all__ = ['EmptyError', 'Error', 'InvalidArgumentsError', 'InvalidDataError',
            'ThreadSafetyError', 'ValidationError']
@@ -92,17 +92,34 @@ class ThreadSafetyError(ValidationError):
 
 
 class Error(object):
-    def __init__(self, key, msg, value, context):
+    def __init__(self, key, msg, value, context, **custom_attrs):
         self.key = key
         self.msg = msg
         self.value = value
         self.context = context
+        self._custom_attrs = custom_attrs
+
+    def __getattr__(self, attr_name):
+        if ('_custom_attrs' in self.__dict__) and (attr_name in self._custom_attrs):
+            return self._custom_attrs[attr_name]
+        super(Error, self).__getattr__(attr_name)
+
+    def __setattr__(self, attr_name, value):
+        if ('_custom_attrs' in self.__dict__) and (attr_name in self._custom_attrs):
+            self._custom_attrs[attr_name] = value
+        object.__setattr__(self, attr_name, value)
 
     @property
     def message(self):
         return self.msg
 
     def __repr__(self):
-        tmpl = 'Error(key=%r, msg=%r, value=%r, context=%r)'
-        return tmpl % (self.key, self.msg, self.value, self.context)
+        tmpl = 'Error(key=%r, msg=%r, value=%r, context=%r%s)'
+        custom_attrs = []
+        keys = sorted(self._custom_attrs.keys())
+        for key in keys:
+            value = self._custom_attrs[key]
+            custom_attrs.append('%s=%r' % (key, value))
+        custom_str = ''.join(map(lambda s: (', ' + s), custom_attrs))
+        return tmpl % (self.key, self.msg, self.value, self.context, custom_str)
 
