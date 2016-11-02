@@ -5,7 +5,7 @@
 
 from pythonic_testcase import *
 
-from pycerberus import InvalidArgumentsError, InvalidDataError
+from pycerberus import InvalidArgumentsError
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import StringValidator
 
@@ -20,13 +20,13 @@ class StringValidatorTest(ValidationTest):
         self.assert_equals(u'bär', self.process(u'bär'))
     
     def test_reject_bad_types(self):
-        assert_raises(InvalidDataError, lambda: self.process([]))
-        assert_raises(InvalidDataError, lambda: self.process({}))
-        assert_raises(InvalidDataError, lambda: self.process(object))
-        assert_raises(InvalidDataError, lambda: self.process(5))
-    
+        self.assert_error([])
+        self.assert_error({})
+        self.assert_error(object)
+        self.assert_error(5)
+
     def test_show_class_name_in_error_message(self):
-        e = self.assert_raises(InvalidDataError, lambda: self.process([]))
+        e = self.assert_error([])
         self.assert_contains(u'(expected string, got "list")', e.details().msg())
     
     def test_empty_string_is_also_empty(self):
@@ -53,10 +53,10 @@ class StringValidatorTest(ValidationTest):
         self.process('fo')
         self.process('foo')
         self.assert_error('foobar')
-    
+
     def test_min_length_must_be_smaller_or_equal_max_length(self):
-        assert_raises(InvalidArgumentsError, 
-            lambda: StringValidator(min_length=2, max_length=1))
+        with assert_raises(InvalidArgumentsError):
+            StringValidator(min_length=2, max_length=1)
 
 
 class ValidatorsDerivedFromStringTest(ValidationTest):
@@ -70,5 +70,6 @@ class ValidatorsDerivedFromStringTest(ValidationTest):
         self.process('5')
         
         self.init_validator(self.validator_class(min_length=0))
-        assert_raises(TypeError, lambda: self.process('5'))
+        with assert_raises(TypeError):
+            self.process('5')
 

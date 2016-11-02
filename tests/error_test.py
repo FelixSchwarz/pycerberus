@@ -17,9 +17,9 @@ class InvalidDataErrorTest(PythonicTestCase):
     def test_can_not_set_error_dict_and_error_list(self):
         InvalidDataError('a message', 42, error_dict={}, error_list=['foo'])
         InvalidDataError('a message', 42, error_dict={'foo': 'bar'}, error_list=[])
-        
-        assert_raises(InvalidArgumentsError, 
-            lambda: InvalidDataError('a message', 42, error_dict={'foo': 'bar'}, error_list=['foo']))
+
+        with assert_raises(InvalidArgumentsError):
+            InvalidDataError('a message', 42, error_dict={'foo': 'bar'}, error_list=['foo'])
     
     def test_errors_can_generate_list_of_errors_from_error_dict(self):
         e = InvalidDataError('a message', 42, error_dict={'foo': 42, 'bar': 21})
