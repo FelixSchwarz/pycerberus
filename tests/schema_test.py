@@ -267,7 +267,7 @@ class SchemaTest(ValidationTest):
     def test_exception_contains_information_about_invalid_and_extra_fields(self):
         schema = self._schema(allow_additional_parameters=False)
 
-        exception = assert_raises(InvalidDataError, 
+        exception = assert_raises(InvalidDataError,
             lambda: schema.process({'id': 'invalid', 'foo':'heh'}))
         assert_equals(2, len(exception.error_dict().items()))
 
@@ -435,7 +435,7 @@ class SchemaTest(ValidationTest):
         return user_schema
     
     def _schema_with_user_subschema(self):
-        schema = self._schema(fields=())    
+        schema = self._schema(fields=())
         schema.add('user', self._user_schema())
         return schema
     

@@ -94,7 +94,6 @@ class SchemaMeta(EarlyBindForMethods):
 
 @six.add_metaclass(SchemaMeta)
 class SchemaValidator(Validator):
-    
     def __init__(self, allow_additional_parameters=None, 
             filter_unvalidated_parameters=None, *args, **kwargs):
         self._fields = {}
