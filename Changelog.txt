@@ -36,36 +36,36 @@ and version 1.0 will use result instances by default.
 - 'allow_additional_parameters' can now be specified in the schema constructor
   directly as well as a parameter for a declarative schema
 - new ForEach validator to validate a list of items with the same validator
-- InvalidDataErrors can return a list of errors using '.errors()'. 
-- added 'min_length', 'max_length' parameters when instantiating a 
+- InvalidDataErrors can return a list of errors using '.errors()'.
+- added 'min_length', 'max_length' parameters when instantiating a
   StringValidator
 - All validator messages can be overridden during instantiation by specifying
   ``messages`` attribute,
 - new OneOf validator to validate that a value is in a given list of allowed
   values
-- added constructor parameter 'filter_unvalidated_parameters' (default True) 
+- added constructor parameter 'filter_unvalidated_parameters' (default True)
   for SchemaValidators to pass unvalidated parameters instead of removing them
 - InvalidDataErrors can "unpack" their errors so that an ordinary dict is used
-  as container for sub-errors (instead of another InvalidDataError with an 
+  as container for sub-errors (instead of another InvalidDataError with an
   error_dict)
 - new BooleanCheckbox validator to validate typical HTML checkboxes
 - new API method for all validators: '.copy()' returns a clone of the validator
-- new MatchingFields form validator (typically used to verify a password 
+- new MatchingFields form validator (typically used to verify a password
   confirmation field)
-- new AgreeToConditionsCheckbox validator which works like a BooleanCheckbox 
+- new AgreeToConditionsCheckbox validator which works like a BooleanCheckbox
   but enforces a trueish value
 - EmailAddressValidator accepts also '-' and '+' characters in local part
 
 API changes:
 ------------
  - BaseValidator.error() is deprecated now as the name does not really reflect
-   that the method also raised the exception. I added a new method named 
-   '.raise_error()' which behaves exactly like the old .error() method. In 
+   that the method also raised the exception. I added a new method named
+   '.raise_error()' which behaves exactly like the old .error() method. In
    addition there is a new method '.exception()' which only creates an exception
    instance.
  - IntegerValidator now treats '' and None as empty
  - BaseValidator.to_string() changed to BaseValidator.revert_conversion()
-   which reflects the actual purpose better. Validators are not required to 
+   which reflects the actual purpose better. Validators are not required to
    return a string anymore.
 
 0.4.2 (05.05.2011)
@@ -80,7 +80,7 @@ API changes:
 ====================
 - pycerberus now supports Python 3!
 - Fix installation/egg generation without babel
-- Added a schema which can parse positional parameters from a string into a 
+- Added a schema which can parse positional parameters from a string into a
   dict before processing the data like a normal schema would do
 
 0.3.3 (04.07.2010)
@@ -92,7 +92,7 @@ API changes:
 - Fix egg file generation: Include all necessary packages in eggs
 - added babel support to setup.py
 - updated pot file and completed German translation
-- fix exception if translations for preferred locale are not available (fall 
+- fix exception if translations for preferred locale are not available (fall
   back to english messages)
 
 0.3.1 (07.04.2010)
