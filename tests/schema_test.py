@@ -14,6 +14,12 @@ from pycerberus.validators import IntegerValidator, StringValidator
 
 
 
+def exploding_validator():
+    def mock_process(fields, context=None):
+        raise ValueError('boooom!')
+    return AttrDict(process=mock_process)
+
+
 class SchemaTest(ValidationTest):
     
     def _schema(self, fields=('id',), formvalidators=(), **kwargs):
@@ -180,8 +186,10 @@ class SchemaTest(ValidationTest):
         assert_equals({'id': True}, schema.process({'id': '42'}))
 
     def test_formvalidators_are_not_executed_if_field_validator_failed(self):
-        schema = self._schema(formvalidators=(self._failing_validator(), ))
-        error = assert_raises(InvalidDataError, lambda: schema.process({'id': 'invalid'}))
+        schema = self._schema(formvalidators=(exploding_validator(), ))
+        with assert_raises(InvalidDataError) as result:
+            schema.process({'id': 'invalid'})
+        error = result.caught_exception
         assert_equals(('id',), tuple(error.error_dict().keys()))
 
     def test_formvalidators_are_executed_after_field_validators(self):

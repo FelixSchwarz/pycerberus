@@ -34,6 +34,11 @@ class FieldData(object):
     def contains_errors(self):
         return (self.errors is not None) and (len(self.errors) > 0)
 
+    def add_error(self, error):
+        _errors = list(self.errors)
+        _errors.append(error)
+        self.errors = tuple(_errors)
+
     def update(self, value=undefined, initial_value=undefined, errors=undefined, meta=undefined):
         if value is not undefined:
             self.value = value

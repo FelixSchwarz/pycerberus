@@ -81,6 +81,13 @@ class FieldDataTest(PythonicTestCase):
         assert_false(context.contains_errors())
         assert_equals((), context.errors)
 
+    def test_can_add_error(self):
+        context = FieldData()
+        context.update(errors=(4, ))
+        assert_equals((4,), context.errors)
+        context.add_error(6)
+        assert_equals((4, 6), context.errors)
+
     def test_update_as_alias_for_set(self):
         self.context.set(value='bar')
 
