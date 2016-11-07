@@ -1,6 +1,7 @@
 # This file was part of GrumpyWidgets, copyright (c) 2012 Felix Schwarz
 # The source code contained in this file is licensed under the MIT license.
 
+from collections import OrderedDict
 from copy import deepcopy
 
 
@@ -125,7 +126,7 @@ class FormData(object):
             children = ()
         else:
             children = ((name, FieldData()) for name in child_names)
-        self.children = dict(children)
+        self.children = OrderedDict(children)
         self.global_errors = ()
 
     def __getattr__(self, name):
