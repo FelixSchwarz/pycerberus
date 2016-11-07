@@ -3,6 +3,8 @@
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
 
+import operator
+
 from pythonic_testcase import *
 
 from pycerberus import InvalidDataError
@@ -13,8 +15,12 @@ from pycerberus.lib.simple_super import SuperProxy
 __all__ = [
     'assert_all_errors_critical',
     'assert_no_critical_errors',
+    'error_keys',
     'ValidationTest'
 ]
+
+def error_keys(errors):
+    return tuple(map(operator.attrgetter('key'), errors))
 
 def assert_all_errors_critical(errors):
     for error in errors:
