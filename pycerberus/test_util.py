@@ -10,6 +10,21 @@ from pycerberus.lib.form_data import is_result
 from pycerberus.lib.simple_super import SuperProxy
 
 
+__all__ = [
+    'assert_all_errors_critical',
+    'assert_no_critical_errors',
+    'ValidationTest'
+]
+
+def assert_all_errors_critical(errors):
+    for error in errors:
+        assert_true(error.is_critical, message='Non-critical error found %r' % (error,))
+
+def assert_no_critical_errors(errors):
+    for error in errors:
+        assert_false(error.is_critical, message='Critical error found %r' % (error,))
+
+
 class ValidationTest(PythonicTestCase):
     
     super = SuperProxy()

@@ -85,7 +85,10 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
             assert extra_child.contains_errors()
             error = extra_child.errors[0]
             value = error.value
-            new_error = self._error(error.key, value, context, dict(additional_item=value))
+            new_error = self._error(error.key,
+                value, context, dict(additional_item=value),
+                is_critical=False,
+            )
             extra_child.set(errors=(new_error,))
         self.super()
 

@@ -51,19 +51,19 @@ class InvalidDataErrorTest(PythonicTestCase):
 class ErrorTest(PythonicTestCase):
     def test_can_store_attributes(self):
         context = {'quox': 21}
-        error = Error(key='foo', msg='bar', value='baz', context=context.copy())
+        error = Error(key='foo', msg='bar', value='baz', context=context.copy(), is_critical=False)
         assert_equals('foo', error.key)
         assert_equals('bar', error.msg)
         assert_equals('bar', error.message,
             message='the alias is sometimes helpful as well')
         assert_equals('baz', error.value)
         assert_equals(context, error.context)
-        expected_repr = "Error(key='foo', msg='bar', value='baz', context={'quox': 21})"
+        expected_repr = "Error(key='foo', msg='bar', value='baz', context={'quox': 21}, is_critical=False)"
         assert_equals(expected_repr, repr(error))
 
     def test_can_store_custom_attributes(self):
         error = Error(key='foo', msg='bar', value='baz', context={}, quox=42, foobar=21)
-        repr_tmpl = "Error(key='foo', msg='bar', value='baz', context={}, foobar=21, quox=%d)"
+        repr_tmpl = "Error(key='foo', msg='bar', value='baz', context={}, is_critical=True, foobar=21, quox=%d)"
         assert_equals(repr_tmpl % 42, repr(error))
 
         assert_equals(42, error.quox)

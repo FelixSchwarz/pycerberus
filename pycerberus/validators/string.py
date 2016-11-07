@@ -40,6 +40,7 @@ class StringValidator(Validator):
             classname = value.__class__.__name__
             self.new_error('invalid_type',
                 value, context, dict(classname=classname),
+                is_critical=True
             )
             return None
         return value
@@ -48,10 +49,12 @@ class StringValidator(Validator):
         if self._min_length != NoValueSet and len(value) < self._min_length:
             self.new_error('too_short',
                 value, context, dict(min=self._min_length),
+                is_critical=False
             )
         if self._max_length != NoValueSet and len(value) > self._max_length:
             self.new_error('too_long',
                 value, context, dict(max=self._max_length),
+                is_critical=False
             )
 
     def is_empty(self, value, context):

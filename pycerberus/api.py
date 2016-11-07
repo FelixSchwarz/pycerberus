@@ -380,10 +380,12 @@ class Validator(BaseValidator):
         This method must not modify the ``converted_value``."""
         pass
 
-    def new_error(self, key, value, context, msg_values=None):
+    def new_error(self, key, value, context, msg_values=None, is_critical=True):
         if self._exception_if_invalid:
+            # all exceptions should be treated as critical because it is hard
+            # to ensure all checks did pass so just ignore "is_critical"
             self.raise_error(key, value, context, **(msg_values or {}))
-        error = self._error(key, value, context, msg_values=msg_values)
+        error = self._error(key, value, context, msg_values=msg_values, is_critical=is_critical)
         add_error_to_context(error, context)
         return error
 
@@ -457,9 +459,9 @@ class Validator(BaseValidator):
             raise ThreadSafetyError('Do not store state in a validator instance as this violates thread safety.')
         self.__dict__[name] = value
 
-    def _error(self, key, value, context, msg_values=None):
+    def _error(self, key, value, context, msg_values=None, is_critical=True):
         msg = self.message(key, context, **(msg_values or {}))
-        return Error(key, msg, value, context)
+        return Error(key, msg, value, context, is_critical=is_critical)
 
     # -------------------------------------------------------------------------
 

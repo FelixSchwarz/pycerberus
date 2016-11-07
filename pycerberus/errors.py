@@ -92,11 +92,12 @@ class ThreadSafetyError(ValidationError):
 
 
 class Error(object):
-    def __init__(self, key, msg, value, context, **custom_attrs):
+    def __init__(self, key, msg, value, context, is_critical=True, **custom_attrs):
         self.key = key
         self.msg = msg
         self.value = value
         self.context = context
+        self.is_critical = is_critical
         self._custom_attrs = custom_attrs
 
     def __getattr__(self, attr_name):
@@ -114,12 +115,12 @@ class Error(object):
         return self.msg
 
     def __repr__(self):
-        tmpl = 'Error(key=%r, msg=%r, value=%r, context=%r%s)'
+        tmpl = 'Error(key=%r, msg=%r, value=%r, context=%r, is_critical=%r%s)'
         custom_attrs = []
         keys = sorted(self._custom_attrs.keys())
         for key in keys:
             value = self._custom_attrs[key]
             custom_attrs.append('%s=%r' % (key, value))
         custom_str = ''.join(map(lambda s: (', ' + s), custom_attrs))
-        return tmpl % (self.key, self.msg, self.value, self.context, custom_str)
+        return tmpl % (self.key, self.msg, self.value, self.context, self.is_critical, custom_str)
 

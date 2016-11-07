@@ -171,6 +171,7 @@ class SchemaValidator(Validator):
             self.new_error('invalid_type',
                 fields, context,
                 msg_values=dict(classname=fields.__class__.__name__),
+                is_critical=True
             )
             return None
 
@@ -226,6 +227,7 @@ class SchemaValidator(Validator):
             d = e.details()
             error = Error(key=d.key(),
                 msg=d.msg(), value=original_value, context=context,
+                is_critical=True
             )
             field_result.add_error(error)
             validator_result = field_result
@@ -250,7 +252,8 @@ class SchemaValidator(Validator):
                 default = FieldData(initial_value=fields[item_key])
                 field_result = result.children.setdefault(item_key, default)
                 error = self._error('additional_item',
-                    fields[item_key], context, dict(additional_item=item_key)
+                    fields[item_key], context, dict(additional_item=item_key),
+                    is_critical=False,
                 )
                 field_result.set(errors=(error,))
         if not self.filter_unvalidated_parameters:

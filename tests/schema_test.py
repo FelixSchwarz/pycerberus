@@ -185,12 +185,15 @@ class SchemaTest(ValidationTest):
         result = schema.process(input_)
 
         assert_true(result.contains_errors())
+        assert_is_not_empty(result.errors)
         first_errors = result.errors['first']
         assert_length(1, first_errors)
         assert_equals('too_low', first_errors[0].key)
+        assert_true(first_errors[0].is_critical)
         second_errors = result.errors['second']
         assert_length(1, second_errors)
         assert_equals('too_big', second_errors[0].key)
+        assert_false(second_errors[0].is_critical)
 
     def test_can_handle_non_input(self):
         schema = SchemaValidator(exception_if_invalid=False)
@@ -211,6 +214,7 @@ class SchemaTest(ValidationTest):
         assert_length(1, result.global_errors)
         error = result.global_errors[0]
         assert_equals('invalid_type', error.key)
+        assert_true(error.is_critical)
 
     def test_can_return_result_for_valid_subschemas(self):
         subschema = self._schema(fields=('id',), exception_if_invalid=False)
@@ -263,6 +267,7 @@ class SchemaTest(ValidationTest):
         foo_errors = result.children['foo'].errors
         assert_length(1, foo_errors)
         assert_equals('additional_item', foo_errors[0].key)
+        assert_false(foo_errors[0].is_critical)
 
     def test_exception_contains_information_about_invalid_and_extra_fields(self):
         schema = self._schema(allow_additional_parameters=False)

@@ -36,19 +36,21 @@ class IntegerValidator(Validator):
     def convert(self, value, context):
         if not isinstance(value, (int, six.string_types)):
             classname = value.__class__.__name__
-            self.new_error('invalid_type', value, context, dict(classname=classname))
+            self.new_error('invalid_type',
+                value, context, dict(classname=classname),
+                is_critical=True
+            )
             return
         try:
             return int(value)
         except ValueError:
-            self.new_error('invalid_number', value, context)
+            self.new_error('invalid_number', value, context, is_critical=True)
 
     def validate(self, value, context):
         if (self.min is not None) and (value < self.min):
-            self.new_error('too_low', value, context, dict(min=self.min))
-
+            self.new_error('too_low', value, context, dict(min=self.min), is_critical=False)
         if (self.max is not None) and (value > self.max):
-            self.new_error('too_big', value, context, dict(max=self.max))
+            self.new_error('too_big', value, context, dict(max=self.max), is_critical=False)
 
     def revert_conversion(self, value, context=None):
         if hasattr(value, 'initial_value'):
