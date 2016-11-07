@@ -149,6 +149,8 @@ class FormData(object):
     def errors(self):
         errors_ = {}
         for name, contexts in self.children.items():
+            if not contexts.errors:
+                continue
             errors_[name] = contexts.errors
         return errors_
 

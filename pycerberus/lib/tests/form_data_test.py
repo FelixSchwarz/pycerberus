@@ -144,7 +144,7 @@ class FormDataTest(PythonicTestCase):
         values = {'foo': ('too big', ), 'bar': None}
         self.context.set(errors=values)
 
-        assert_equals({'foo': ('too big',), 'bar': ()}, self.context.errors)
+        assert_equals({'foo': ('too big',)}, self.context.errors)
 
     def test_can_set_errors_as_none(self):
         self.context.set(errors={'foo': ('too big', ), 'bar': None})
@@ -153,7 +153,7 @@ class FormDataTest(PythonicTestCase):
         # setting errors=None to mean "no errors" seems like a "natural" API me
         self.context.set(errors=None)
         assert_false(self.context.contains_errors())
-        assert_equals({'foo': (), 'bar': ()}, self.context.errors)
+        assert_equals({}, self.context.errors)
 
     def test_raises_exception_if_values_contain_unknown_key(self):
         values = dict(foo='s1', bar='e1', invalid=None)

@@ -157,8 +157,8 @@ class SchemaTest(ValidationTest):
         assert_equals(input_, result.initial_value)
         assert_equals({'id': 1, 'key': 'foo'}, result.value)
         assert_false(result.contains_errors())
-        assert_falseish(result.errors['id'])
-        assert_falseish(result.errors['key'])
+        assert_falseish(result.errors.get('id'))
+        assert_falseish(result.errors.get('key'))
 
     def test_can_return_errors_from_results(self):
         schema = SchemaValidator(exception_if_invalid=False)
@@ -207,7 +207,7 @@ class SchemaTest(ValidationTest):
 
         result = schema.process([])
         assert_true(result.contains_errors())
-        assert_length(0, result.errors['first'])
+        assert_length(0, result.errors.get('first', ()))
         assert_length(1, result.global_errors)
         error = result.global_errors[0]
         assert_equals('invalid_type', error.key)
