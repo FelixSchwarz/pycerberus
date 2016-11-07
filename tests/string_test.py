@@ -25,6 +25,17 @@ class StringValidatorTest(ValidationTest):
         self.assert_error(object)
         self.assert_error(5)
 
+    def test_can_reject_bad_types_with_error_result(self):
+        self.init_validator(StringValidator(exception_if_invalid=False))
+
+        result = self.process([])
+        assert_true(result.contains_errors())
+        assert_length(1, result.errors)
+        error = result.errors[0]
+        assert_equals('invalid_type', error.key)
+        assert_true(error.is_critical)
+
+
     def test_show_class_name_in_error_message(self):
         e = self.assert_error([])
         self.assert_contains(u'(expected string, got "list")', e.details().msg())
@@ -53,6 +64,17 @@ class StringValidatorTest(ValidationTest):
         self.process('fo')
         self.process('foo')
         self.assert_error('foobar')
+
+    def test_can_return_error_results_from_validate(self):
+        validator = StringValidator(min_length=2, max_length=3, exception_if_invalid=False)
+        self.init_validator(validator)
+
+        result = self.process('f')
+        assert_true(result.contains_errors())
+        assert_length(1, result.errors)
+        error = result.errors[0]
+        assert_equals('too_short', error.key)
+        assert_false(error.is_critical)
 
     def test_min_length_must_be_smaller_or_equal_max_length(self):
         with assert_raises(InvalidArgumentsError):

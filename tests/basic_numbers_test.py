@@ -124,3 +124,30 @@ class IntegerValidatorTest(ValidationTest):
         assert_equals('invalid', result.initial_value)
         assert_none(result.value)
         assert_length(1, result.errors)
+
+    def test_can_return_error_result_from_convert(self):
+        self.init_validator(exception_if_invalid=False)
+        with assert_not_raises():
+            result = self.process('invalid')
+        assert_equals('invalid', result.initial_value)
+        assert_equals(None, result.value)
+
+        assert_true(result.contains_errors())
+        assert_length(1, result.errors)
+        error = result.errors[0]
+        assert_equals('invalid_number', error.key)
+        assert_equals('Please enter a number.', error.message)
+
+    def test_can_return_error_result_from_validate(self):
+        self.init_validator(max=10, exception_if_invalid=False)
+        with assert_not_raises():
+            result = self.process(20)
+        assert_equals(20, result.initial_value)
+        assert_equals(None, result.value)
+
+        assert_true(result.contains_errors())
+        assert_length(1, result.errors)
+        error = result.errors[0]
+        assert_equals('too_big', error.key)
+        assert_equals('Number must be 10 or smaller.', error.message)
+
