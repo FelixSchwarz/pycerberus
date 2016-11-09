@@ -180,7 +180,19 @@ class SchemaValidator(Validator):
         # even though this seems duplicated (all information is also present
         # in "result" we should keep API compatibility
         return result.value
-    
+
+    # overriden from Validator
+    def _handle_validator_result(self, converted_value, result, context, errors=None):
+        if errors is None:
+            errors = result.global_errors
+        return super(SchemaValidator, self)._handle_validator_result(converted_value, result, context, errors=errors)
+
+    def new_error(self, key, value, context, msg_values=None, is_critical=True):
+        result = context['result']
+        error = self._error(key, value, context, msg_values=msg_values, is_critical=is_critical)
+        result.global_errors = result.global_errors + (error,)
+        return error
+
     def is_empty(self, value, context):
         # Schemas have a different notion of being "empty"
         return False

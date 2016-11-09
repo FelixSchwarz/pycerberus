@@ -185,12 +185,6 @@ class BaseValidator(object):
         return six.text_type(value)
 
 
-def add_error_to_context(error, context):
-    errors = context.setdefault('errors', [])
-    errors.append(error)
-    return error
-
-
 class Validator(BaseValidator):
     """The Validator is the base class of most validators and implements 
     some commonly used features like required values (raise exception if no
@@ -317,14 +311,13 @@ class Validator(BaseValidator):
             else:
                 if self._exception_if_invalid:
                     self.raise_error('empty', value, context, errorclass=EmptyError)
-                empty_error = self.new_error('empty', value, context)
-                result.set(errors=(empty_error,))
+                self.new_error('empty', value, context)
             return result
 
         context['result'] = result
+        convert_errors = result.errors
         converted_value = self.convert(value, context)
-        convert_errors = context.get('errors')
-        if not convert_errors:
+        if convert_errors == result.errors:
             self.validate(converted_value, context)
         context.pop('result')
         if old_result is not NoValueSet:
@@ -332,8 +325,9 @@ class Validator(BaseValidator):
 
         return self._handle_validator_result(converted_value, result, context)
 
-    def _handle_validator_result(self, converted_value, result, context):
-        errors = context.pop('errors', ())
+    def _handle_validator_result(self, converted_value, result, context, errors=None):
+        if errors is None:
+            errors = result.errors
         if self._exception_if_invalid:
             if errors:
                 error = errors[0]
@@ -386,7 +380,8 @@ class Validator(BaseValidator):
             # to ensure all checks did pass so just ignore "is_critical"
             self.raise_error(key, value, context, **(msg_values or {}))
         error = self._error(key, value, context, msg_values=msg_values, is_critical=is_critical)
-        add_error_to_context(error, context)
+        result = context['result']
+        result.add_error(error)
         return error
 
     # REFACT: rename to default_value()

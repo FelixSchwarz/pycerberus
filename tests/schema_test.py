@@ -5,10 +5,10 @@
 
 from pythonic_testcase import *
 
-from pycerberus.api import add_error_to_context, Error, Validator
+from pycerberus.api import Error, Validator
 from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 from pycerberus.lib import AttrDict
-from pycerberus.test_util import ValidationTest
+from pycerberus.test_util import error_keys, ValidationTest
 from pycerberus.schema import SchemaValidator
 from pycerberus.validators import IntegerValidator, StringValidator
 
@@ -33,7 +33,9 @@ def failing_validator(fields=None, exception_if_invalid=True):
                 assert (error_fields is None), 'specific fields not supported'
                 raise InvalidDataError('foo', fields, 'key', context)
             if not error_fields:
-                new_error('key', 'msg for global error', fields, context)
+                result = context['result']
+                error = Error('key', 'msg for global error', fields, context)
+                result.global_errors = result.global_errors + (error,)
             else:
                 result = context['result']
                 value = None
@@ -44,10 +46,6 @@ def failing_validator(fields=None, exception_if_invalid=True):
 
     return FailingValidator()
 
-def new_error(key, msg, value, context):
-    assert context is not None, 'Unable to report errors without context'
-    error = Error(key, msg, value, context)
-    add_error_to_context(error, context)
 
 
 class SchemaTest(ValidationTest):
@@ -175,6 +173,23 @@ class SchemaTest(ValidationTest):
         second_errors = result.errors['second']
         assert_length(1, second_errors)
         assert_equals('too_big', second_errors[0].key)
+
+    def test_can_gather_empty_errors_correctly(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        schema.add('first', IntegerValidator(required=True, exception_if_invalid=False))
+        schema.add('second', IntegerValidator(required=False, exception_if_invalid=False))
+
+        from collections import OrderedDict
+        input_ = OrderedDict((('first', ''), ('second', '')))
+        result = schema.process(input_)
+
+        assert_true(result.contains_errors())
+        first = result.children['first']
+        assert_true(first.contains_errors(),
+            message='"first" is required and got an empty string as input')
+        assert_equals(('empty',), error_keys(first.errors))
+        second = result.children['second']
+        assert_false(second.contains_errors())
 
     def test_can_gather_return_values_and_exceptions(self):
         schema = SchemaValidator(exception_if_invalid=False)
