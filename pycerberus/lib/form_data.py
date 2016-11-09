@@ -42,6 +42,14 @@ class FieldData(object):
     def contains_errors(self):
         return (self.errors is not None) and (len(self.errors) > 0)
 
+    def contains_critical_error(self):
+        if not self.contains_errors():
+            return False
+        for error in self.errors:
+            if error.is_critical:
+                return True
+        return False
+
     def add_error(self, error):
         _errors = list(self.errors)
         _errors.append(error)
@@ -143,6 +151,17 @@ class FormData(object):
             return True
         for child in self.children.values():
             if child.contains_errors():
+                return True
+        return False
+
+    def contains_critical_error(self):
+        if not self.contains_errors():
+            return False
+        for error in (self.global_errors or ()):
+            if error.is_critical:
+                return True
+        for child in self.children.values():
+            if child.contains_critical_error():
                 return True
         return False
 
