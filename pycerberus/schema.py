@@ -28,15 +28,16 @@ class SchemaMeta(EarlyBindForMethods):
         inherited_filter_unvalidated_parameters = getattr(schema_class, 'filter_unvalidated_parameters', True)
         schema_class.filter_unvalidated_parameters = class_attributes_dict.get('filter_unvalidated_parameters', inherited_filter_unvalidated_parameters)
         return schema_class
-    
+
+    @classmethod
     def is_validator(cls, value):
         if isinstance(value, BaseValidator):
             return True
         elif isinstance(value, type) and issubclass(value, BaseValidator):
             return True
         return False
-    is_validator = classmethod(is_validator)
-    
+
+    @classmethod
     def _filter_validators(cls, items):
         validators = []
         for item in items:
@@ -47,8 +48,8 @@ class SchemaMeta(EarlyBindForMethods):
                 continue
             validators.append(item)
         return validators
-    _filter_validators = classmethod(_filter_validators)
-    
+
+    @classmethod
     def extract_fieldvalidators(cls, class_attributes_dict, superclasses):
         fields = {}
         for superclass in superclasses:
@@ -63,8 +64,8 @@ class SchemaMeta(EarlyBindForMethods):
             fields[key] = validator
             del class_attributes_dict[key]
         return fields
-    extract_fieldvalidators = classmethod(extract_fieldvalidators)
-    
+
+    @classmethod
     def extract_formvalidators(cls, class_attributes_dict, superclasses):
         formvalidators = []
         for superclass in superclasses:
@@ -77,8 +78,8 @@ class SchemaMeta(EarlyBindForMethods):
             if not callable(validators):
                 formvalidators.extend(cls._filter_validators(validators))
         return tuple(formvalidators)
-    extract_formvalidators = classmethod(extract_formvalidators)
-    
+
+    @classmethod
     def restore_overwritten_methods(cls, direct_superclasses, class_attributes_dict):
         super_class = direct_superclasses[0]
         for name in dir(super_class):
