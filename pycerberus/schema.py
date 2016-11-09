@@ -3,6 +3,7 @@
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
 
+from collections import OrderedDict
 import warnings
 
 import six
@@ -51,14 +52,13 @@ class SchemaMeta(EarlyBindForMethods):
 
     @classmethod
     def extract_fieldvalidators(cls, class_attributes_dict, superclasses):
-        fields = {}
+        fields = OrderedDict()
         for superclass in superclasses:
             if not hasattr(superclass, '_fields'):
                 continue
             validators = cls._filter_validators(superclass._fields.items())
-            # In Python 2.3 you can only pass dicts to {}.update()
-            fields.update(dict(validators))
-        
+            fields.update(validators)
+
         new_validators = cls._filter_validators(class_attributes_dict.items())
         for key, validator in new_validators:
             fields[key] = validator
@@ -90,14 +90,13 @@ class SchemaMeta(EarlyBindForMethods):
             if name != 'formvalidators' and not cls.is_validator(new_value):
                 continue
             class_attributes_dict[name] = old_value
-    restore_overwritten_methods = classmethod(restore_overwritten_methods)
 
 
 @six.add_metaclass(SchemaMeta)
 class SchemaValidator(Validator):
     def __init__(self, allow_additional_parameters=None, 
             filter_unvalidated_parameters=None, *args, **kwargs):
-        self._fields = {}
+        self._fields = OrderedDict()
         self._formvalidators = []
         
         if allow_additional_parameters is not None:
