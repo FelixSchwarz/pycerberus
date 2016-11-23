@@ -72,8 +72,9 @@ class ValidationTest(PythonicTestCase):
         return self._validator.revert_conversion(*args, **kwargs)
     
     def assert_error(self, value, *args, **kwargs):
+        message = kwargs.pop('message', None)
         call = lambda: self.process(value, *args, **kwargs)
-        return assert_raises(InvalidDataError, call)
+        return assert_raises(InvalidDataError, call, message=message)
     
     def assert_error_with_locale(self, value, locale='en', *args, **kwargs):
         """Process the given value and assert that this raises a validation
