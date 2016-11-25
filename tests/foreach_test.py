@@ -84,9 +84,9 @@ class ForEachTest(ValidationTest):
         self.assert_raises_error_with_key((21, 42), 'too_long')
     
     def test_min_length_must_be_smaller_or_equal_max_length(self):
-        assert_raises(InvalidArgumentsError, 
-            lambda: ForEach(IntegerValidator, min_length=2, max_length=1))
-    
+        with assert_raises(InvalidArgumentsError):
+            ForEach(IntegerValidator, min_length=2, max_length=1)
+
     def test_returns_empty_tuple_if_not_required_and_no_value_given(self):
         validator = ForEach(IntegerValidator, required=False)
         assert_equals((), validator.empty_value({}))
