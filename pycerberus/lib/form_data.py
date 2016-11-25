@@ -61,9 +61,17 @@ class FieldData(object):
         if initial_value is not undefined:
             self.initial_value = initial_value
         if errors is not undefined:
-            # "or ()" catches "errors=None" which is convenient when passing
-            # a form validation result from pycerberus
-            self.errors = tuple(errors or ())
+            if errors is None:
+                # I find this convenient when passing a form validation result from pycerberus
+                errors = ()
+            elif isinstance(errors, Exception):
+                # unfortunately tuple(exception) -> tuple((exception_msg,)) in
+                # Python 2 (Python 3 fixed that, Exception is not iterable
+                # anymore)
+                errors = (errors, )
+            else:
+                errors = tuple(errors)
+            self.errors = errors
         if meta is not undefined:
             self.meta = meta
 

@@ -88,6 +88,19 @@ class FieldDataTest(PythonicTestCase):
         context.add_error(6)
         assert_equals((4, 6), context.errors)
 
+    def test_can_set_exception_for_errors(self):
+        # Python 2 happily converts tuple(exception) to tuple((exception_msg,))
+        # which I found highly surprising. This test ensures that we take care
+        # of the special case.
+        # This is not a problem in Python 3 where Exception is not iterable
+        # anymore
+        e = Exception('foo')
+        context = FieldData()
+        context.update(errors=e)
+        assert_true(context.contains_errors())
+        assert_equals((e, ), context.errors,
+            message='we should get the initial exception instance even in Python 2')
+
     def test_update_as_alias_for_set(self):
         self.context.set(value='bar')
 
