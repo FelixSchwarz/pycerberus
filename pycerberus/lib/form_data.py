@@ -80,60 +80,73 @@ class FieldData(object):
     # all classes must provide the same API.
     set = update
 
-# class RepeatingFieldData(object):
-#     def __init__(self, child_creator):
-#         self.items = []
-#         self.child_creator = child_creator
-#         self.count = 0
-#
-#     def contains_errors(self):
-#         for item in self.items:
-#             if item.contains_errors():
-#                 return True
-#         return False
-#
-#     @property
-#     def errors(self):
-#         errors_ = []
-#         for context in self.items:
-#             errors_.append(context.errors)
-#         return tuple(errors_)
-#
-#     def update_value(self, value=None, initial_value=None, errors=None):
-#         if initial_value is not None:
-#             attr_name = 'initial_value'
-#             values = initial_value
-#         elif errors is not None:
-#             attr_name = 'errors'
-#             values = errors
-#         else:
-#             attr_name = 'value'
-#             values = value
-#         if len(self.items) == 0:
-#             self._create_new_items(n=len(values))
-#         else:
-#             assert_equals(len(self.items), len(values))
-#         for context, value_ in zip(self.items, values):
-#             context.update_value(**{attr_name: value_})
-#
-#     def _create_new_items(self, n):
-#         for i in range(n):
-#             context = self.child_creator()
-#             self.items.append(context)
-#
-#     @property
-#     def value(self):
-#         values = []
-#         for context in self.items:
-#             values.append(context.value)
-#         return tuple(values)
-#
-#     @property
-#     def initial_value(self):
-#         values = []
-#         for context in self.items:
-#             values.append(context.initial_value)
-#         return tuple(values)
+
+class RepeatingFieldData(object):
+    def __init__(self, child_creator):
+        self.items = []
+        self.child_creator = child_creator
+        self.count = 0
+
+    def __repr__(self):
+        return 'RepeatingFieldData<items=%r>' % (self.items)
+
+    def contains_errors(self):
+        for item in self.items:
+            if item.contains_errors():
+                return True
+        return False
+
+    @property
+    def errors(self):
+        errors_ = []
+        for context in self.items:
+            errors_.append(context.errors or None)
+        return tuple(errors_)
+
+    def update(self, value=undefined, initial_value=undefined, errors=undefined, meta=undefined):
+        # LATER: meta not implemented
+        if initial_value is not undefined:
+            attr_name = 'initial_value'
+            values = initial_value
+        elif errors is not undefined:
+            attr_name = 'errors'
+            values = errors
+        elif value is not undefined:
+            attr_name = 'value'
+            values = value
+        if len(self.items) == 0:
+            self._create_new_items(n=len(values))
+        else:
+            assert (len(self.items) == len(values))
+        for context, value_ in zip(self.items, values):
+            context.update(**{attr_name: value_})
+    set = update
+
+    def _create_new_items(self, n):
+        for i in range(n):
+            context = self.child_creator()
+            self.items.append(context)
+
+    @property
+    def value(self):
+        values = []
+        for context in self.items:
+            values.append(context.value)
+        return tuple(values)
+
+    @property
+    def initial_value(self):
+        values = []
+        for context in self.items:
+            values.append(context.initial_value)
+        return tuple(values)
+
+    @property
+    def meta(self):
+        values = []
+        for item in self.items:
+            values.append(item.meta)
+        return tuple(values)
 
 
 class FormData(object):

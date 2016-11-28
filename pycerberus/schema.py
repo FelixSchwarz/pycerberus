@@ -210,12 +210,7 @@ class SchemaValidator(Validator):
     def _add_result_containers_for_fields(self, schema, initial_values):
         result = FormData()
         for field_name, field_validator in schema._fields.items():
-            is_schema = isinstance(field_validator, SchemaValidator)
-            if not is_schema:
-                subresult = FieldData()
-            else:
-                subschema = field_validator
-                subresult = subschema.new_result(initial_values)
+            subresult = field_validator.new_result(initial_values)
             result.children[field_name] = subresult
         return result
 
