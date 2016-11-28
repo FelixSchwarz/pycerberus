@@ -212,11 +212,11 @@ class SchemaValidator(Validator):
         for field_name, field_validator in schema._fields.items():
             is_schema = isinstance(field_validator, SchemaValidator)
             if not is_schema:
-                result.children[field_name] = FieldData()
+                subresult = FieldData()
             else:
                 subschema = field_validator
                 subresult = subschema.new_result(initial_values)
-                result.children[field_name] = subresult
+            result.children[field_name] = subresult
         return result
 
     # -------------------------------------------------------------------------
