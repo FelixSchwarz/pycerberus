@@ -39,8 +39,10 @@ class InvalidDataError(ValidationError):
     def __repr__(self):
         cls_name = self.__class__.__name__
         e = self.details()
-        values = (cls_name, repr(e.msg()), repr(e.value()), repr(e.key()), repr(e.context()))
-        return '%s(%s, %s, key=%s, context=%s)' % values
+        context = e.context()
+        #context = '[...]'
+        values = (cls_name, e.msg(), e.value(), e.key(), context)
+        return '%s(%r, %r, key=%r, context=%r)' % values
     __str__ = __repr__
     
     def details(self):
@@ -122,5 +124,7 @@ class Error(object):
             value = self._custom_attrs[key]
             custom_attrs.append('%s=%r' % (key, value))
         custom_str = ''.join(map(lambda s: (', ' + s), custom_attrs))
-        return tmpl % (self.key, self.msg, self.value, self.context, self.is_critical, custom_str)
+        context = self.context
+        #context ='[...]'
+        return tmpl % (self.key, self.msg, self.value, context, self.is_critical, custom_str)
 
