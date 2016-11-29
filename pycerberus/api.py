@@ -322,23 +322,22 @@ class Validator(BaseValidator):
         context.pop('result')
         if old_result is not NoValueSet:
             context['result'] = old_result
+        return self.handle_validator_result(converted_value, result, context)
 
-        return self._handle_validator_result(converted_value, result, context)
+    def handle_validator_result(self, converted_value, result, context, errors=None):
+        if not self._exception_if_invalid:
+            if not result.contains_errors():
+                result.set(value=converted_value)
+            return result
 
-    def _handle_validator_result(self, converted_value, result, context, errors=None):
         if errors is None:
             errors = result.errors
-        if self._exception_if_invalid:
-            if errors:
-                error = errors[0]
-                raise InvalidDataError(error.msg, error.value, error.key, context)
-            else:
-                return converted_value
         if errors:
-            result.set(errors=errors)
+            # the exception-based API only supports a single error per field
+            error = errors[0]
+            raise InvalidDataError(error.msg, error.value, error.key, context)
         else:
-            result.set(value=converted_value)
-        return result
+            return converted_value
 
     def get_result(self, initial_value, context):
         result = context.get('result')

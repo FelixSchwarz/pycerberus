@@ -9,6 +9,7 @@ from pycerberus import EmptyError, InvalidArgumentsError, Validator
 from pycerberus.api import NoValueSet
 from pycerberus.lib.form_data import is_result
 from pycerberus.test_util import ValidationTest
+from pycerberus.validators import IntegerValidator
 
 
 class ValidatorTest(ValidationTest):
@@ -35,6 +36,19 @@ class ValidatorTest(ValidationTest):
         
         assert_contains(4, a.acceptable_values)
         assert_not_contains(4, b.acceptable_values)
+
+    def test_can_override_result_handling(self):
+        """While this is not an official API this is used by some projects and
+        pycerberus should not break them accidentally without providing similar
+        functionality via some API."""
+        class CustomHandlingValidator(IntegerValidator):
+            def handle_validator_result(self, converted_value, result, context, errors=None):
+                result.set(value=42)
+                return result
+
+        validator = CustomHandlingValidator(exception_if_invalid=False)
+        result = validator.process('invalid')
+        assert_equals(42, result.value)
 
 
 class DefaultAndRequiredValuesTest(ValidationTest):
