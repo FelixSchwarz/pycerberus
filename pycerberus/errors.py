@@ -5,10 +5,15 @@
 
 from pycerberus.lib import AttrDict
 
-__all__ = ['EmptyError', 'Error', 'InvalidArgumentsError', 'InvalidDataError',
-           'ThreadSafetyError', 'ValidationError']
 
-
+__all__ = [
+    'EmptyError',
+    'Error',
+    'InvalidArgumentsError',
+    'InvalidDataError',
+    'ThreadSafetyError',
+    'ValidationError',
+]
 
 class ValidationError(Exception):
     "All exceptions thrown by this library must be derived from this base class"
