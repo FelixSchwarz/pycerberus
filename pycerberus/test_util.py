@@ -83,13 +83,12 @@ class ValidationTest(PythonicTestCase):
             result = self.process(value, *args, **kwargs)
         except InvalidDataError as e:
             return e
-        else:
-            if (not is_result(result)) or (not result.contains_errors()):
-                default_message = 'InvalidDataError not raised!'
-                if message is None:
-                    raise AssertionError(default_message)
-                raise AssertionError(default_message + ' ' + message)
-            return result
+        if (not is_result(result)) or (not result.contains_errors()):
+            default_message = 'InvalidDataError not raised!'
+            if message is None:
+                raise AssertionError(default_message)
+            raise AssertionError(default_message + ' ' + message)
+        return result
 
     def assert_error_with_locale(self, value, locale='en', *args, **kwargs):
         """Process the given value and assert that this raises a validation
