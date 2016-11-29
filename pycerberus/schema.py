@@ -9,7 +9,8 @@ import warnings
 import six
 
 from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
-from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
+from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.error_conversion import error_from_exception
 from pycerberus.i18n import _
 from pycerberus.lib.form_data import is_result, FieldData, FormData
 
@@ -231,11 +232,7 @@ class SchemaValidator(Validator):
         try:
             validator_result = validator.process(original_value, context)
         except InvalidDataError as e:
-            d = e.details()
-            error = Error(key=d.key(),
-                msg=d.msg(), value=original_value, context=context,
-                is_critical=True
-            )
+            error = error_from_exception(e)
             field_result.add_error(error)
             validator_result = field_result
         context['result'] = form_result
