@@ -8,9 +8,9 @@ from pythonic_testcase import *
 from pycerberus.api import Error, Validator
 from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 from pycerberus.lib import AttrDict
-from pycerberus.test_util import error_keys, ValidationTest
 from pycerberus.schema import SchemaValidator
-from pycerberus.validators import IntegerValidator, StringValidator
+from pycerberus.test_util import error_keys, ValidationTest
+from pycerberus.validators import ForEach, IntegerValidator, StringValidator
 
 
 
@@ -256,6 +256,23 @@ class SchemaTest(ValidationTest):
         assert_length(1, foo_id.errors)
         error = foo_id.errors[0]
         assert_equals('invalid_number', error.key)
+
+    def test_can_return_errors_from_list_children(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        foo_list = ForEach(IntegerValidator())
+        schema.add('foo', foo_list)
+
+        result = schema.process({'foo': ['abc']})
+        assert_true(result.contains_errors())
+        assert_equals(('foo',), tuple(result.errors))
+        foo_errors = result.errors['foo']
+
+        assert_length(1, foo_errors)
+        int_errors = foo_errors[0]
+        assert_length(1, int_errors)
+        int_error = int_errors[0]
+        assert_isinstance(int_error, Error)
+        assert_equals('invalid_number', int_error.key)
 
     # -------------------------------------------------------------------------
     # warn about additional parameters

@@ -5,7 +5,8 @@
 
 from pythonic_testcase import *
 
-from pycerberus.errors import InvalidArgumentsError
+from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.schema import SchemaValidator
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import ForEach, IntegerValidator
 
@@ -32,6 +33,7 @@ class ForEachTest(ValidationTest):
         errors = self.assert_error(['bar']).errors()
         
         assert_length(1, errors)
+        assert_isinstance(errors[0], InvalidDataError)
         assert_equals(self._invalid_message(), errors[0].msg())
     
     def test_applies_validator_to_every_item(self):
@@ -94,4 +96,63 @@ class ForEachTest(ValidationTest):
     def test_can_set_validator_arguments_for_constructor(self):
         self.init_validator(ForEach(IntegerValidator, default=[], required=False))
         assert_equals([], self.process(None))
+
+    def test_can_return_results_from_subvalidators(self):
+        validator = ForEach(
+            IntegerValidator(exception_if_invalid=False),
+            exception_if_invalid=False
+        )
+        result = validator.process(('invalid',))
+
+        assert_true(result.contains_errors())
+        assert_length(1, result.errors) # maybe 2 when we add global errors here?
+        int_errors = result.errors[0]
+
+        assert_length(1, int_errors)
+        int_error = int_errors[0]
+        assert_equals('invalid_number', int_error.key)
+
+    def test_can_return_error_list_from_subvalidator(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        schema.add('number', IntegerValidator(exception_if_invalid=False))
+        validator = ForEach(schema, exception_if_invalid=True)
+
+        with assert_raises(InvalidDataError) as c:
+            validator.process([{'number': '42'}, {'number': 'invalid'}, ])
+        e = c.caught_exception
+        list_errors = e.errors()
+        assert_length(2, list_errors)
+        assert_not_equals((None, None), list_errors)
+
+        assert_none(list_errors[0])
+        nr2_error = list_errors[1]
+        assert_not_none(nr2_error)
+        assert_isinstance(nr2_error, InvalidDataError,
+            message='Schema raises on error so pycerberus only supports one error per field')
+        assert_equals('invalid_number', nr2_error.details().key())
+
+    def test_can_return_errors_from_subschemas(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        schema.add('foo', IntegerValidator(exception_if_invalid=False))
+        foreach = ForEach(schema, exception_if_invalid=False)
+
+        result = foreach.process([{'foo': 'invalid'}, ])
+        assert_true(result.contains_errors())
+
+        assert_length(1, result.errors)
+        item_errors = result.errors[0]
+        assert_equals(set(('foo',)), set(item_errors))
+
+    def test_can_return_exceptions_from_subschemas_as_errors(self):
+        schema = SchemaValidator(exception_if_invalid=True)
+        schema.add('foo', IntegerValidator(exception_if_invalid=True))
+        foreach = ForEach(schema, exception_if_invalid=False)
+
+        with assert_not_raises(message='foreach should be able to return results'):
+            result = foreach.process([{'foo': 'invalid'}, ])
+        assert_true(result.contains_errors())
+        assert_length(1, result.errors)
+
+        schema_error = result.errors[0]
+        assert_equals(set(('foo',)), set(schema_error))
 

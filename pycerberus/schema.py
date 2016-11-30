@@ -9,8 +9,8 @@ import warnings
 import six
 
 from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
-from pycerberus.errors import InvalidArgumentsError, InvalidDataError
-from pycerberus.error_conversion import error_from_exception
+from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
+from pycerberus.error_conversion import exception_from_errors, exception_to_errors
 from pycerberus.i18n import _
 from pycerberus.lib.form_data import is_result, FieldData, FormData
 
@@ -232,8 +232,10 @@ class SchemaValidator(Validator):
         try:
             validator_result = validator.process(original_value, context)
         except InvalidDataError as e:
-            error = error_from_exception(e)
-            field_result.add_error(error)
+            errors = exception_to_errors(e)
+            if isinstance(errors, Error):
+                errors = (errors,)
+            field_result.set(errors=errors)
             validator_result = field_result
         context['result'] = form_result
         self._handle_field_validation_result(validator_result, field_result)
@@ -289,18 +291,8 @@ class SchemaValidator(Validator):
         self._process_form_validators(result, context)
 
     def _raise_exception(self, result, context):
-        def error_to_exc(error, context, **kwargs):
-            return InvalidDataError(error.msg, error.value, error.key, context, **kwargs)
-
-        first_error = None
-        error_dict = {}
-        for field_name, field_errors in result.errors.items():
-            if not field_errors:
-                continue
-            if first_error is None:
-                first_error = field_errors[0]
-            error_dict[field_name] = error_to_exc(field_errors[0], context)
-        raise error_to_exc(first_error, context, error_dict=error_dict)
+        # PositionalParametersParsingSchema overrides this (and needs 'context')
+        raise exception_from_errors(result.errors)
 
     def set_allow_additional_parameters(self, value):
         self.allow_additional_parameters = value

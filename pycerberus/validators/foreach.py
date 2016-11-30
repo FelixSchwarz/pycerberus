@@ -4,12 +4,13 @@
 # See LICENSE.txt in the main project directory, for more information.
 
 from pycerberus.api import NoValueSet, Validator
-from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
+from pycerberus.error_conversion import exception_from_errors, exception_to_errors
 from pycerberus.i18n import _
+from pycerberus.lib.form_data import is_iterable, is_result, FieldData, RepeatingFieldData
 
 
 __all__ = ['ForEach']
-
 
 class ForEach(Validator):
     """Apply a validator to every item of an iterable (like map). Also you
@@ -35,42 +36,72 @@ class ForEach(Validator):
         }
 
     def convert(self, values, context):
-        exceptions = []
-        if not self._is_iterable(values):
-            self.raise_error('invalid_type', values, context, classname=values.__class__.__name__)
+        result = context['result']
+        assert isinstance(result, RepeatingFieldData), repr(result)
+        if not is_iterable(values):
+            classname = values.__class__.__name__
+            self.new_error('invalid_type',
+                values, context, is_critical=None,
+                msg_values={'classname': classname}
+            )
+            return
         if self._min_length and len(values) < self._min_length:
             self.raise_error('too_short', values, context, min=self._min_length)
         if self._max_length != NoValueSet and len(values) > self._max_length:
             self.raise_error('too_long', values, context, max=self._max_length)
-        
-        validated = []
-        for value in values:
-            try:
-                validated.append(self._validator.process(value, context))
-            except InvalidDataError as e:
-                exceptions.append(e)
-            else:
-                exceptions.append(None)
-        if list(filter(None, exceptions)):
-            self._raise_exception(exceptions, context)
-        return tuple(validated)
-    
-    def _is_iterable(self, value):
+
+        field_results = []
+        for i, value in enumerate(values):
+            field_result = self._process_field(value, context)
+            field_results.append(field_result)
+        result.items = field_results
+        if self._exception_if_invalid and result.contains_errors():
+            raise exception_from_errors(result.errors)
+        return result.value
+
+    def _process_field(self, initial_value, context):
+        field_result = self._validator.new_result(initial_value)
+        list_result = context.pop('result')
+        context['result'] = field_result
         try:
-            iter(value)
-        except TypeError:
-            return False
-        return True
-    
+            validator_result = self._validator.process(initial_value, context)
+        except InvalidDataError as e:
+            if not field_result.contains_errors():
+                errors = exception_to_errors(e)
+                if isinstance(errors, Error):
+                    errors = (errors, )
+                field_result.update(errors=errors)
+            validator_result = field_result
+        if not is_result(validator_result):
+            # this can only happen for old-style validators (exception on error,
+            # so this case must be a successful validation)
+            field_result.set(value=validator_result)
+        context['result'] = list_result
+        return field_result
+
+    # overriden from Validator
+    def handle_validator_result(self, converted_value, result, context, errors=None):
+        # not calling super() as our errors are special
+        if errors is None:
+            errors = result.errors
+
+        if not self._exception_if_invalid:
+            if not result.contains_errors():
+                result.set(value=converted_value)
+            return result
+        for item_errors in errors:
+            if (item_errors is None) or (len(item_errors) == 0):
+                continue
+            error = item_errors[0]
+            raise InvalidDataError(error.msg, error.value, error.key, context)
+        return result.value
+
+    # overriden from Validator
+    def new_result(self, initial_value):
+        return RepeatingFieldData(child_creator=lambda: FieldData())
+
     def _init_validator(self, validator):
         if isinstance(validator, type):
             validator = validator()
-        return validator    
-    
-    def _raise_exception(self, exceptions, context):
-        first_error = list(filter(None, exceptions))[0].details()
-        # can't use self.exception() as all values are already filled
-        raise InvalidDataError(first_error.msg(), first_error.value(), first_error.key(), 
-                               context, error_list=exceptions)
-
+        return validator
 

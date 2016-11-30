@@ -15,6 +15,28 @@ def is_result(value):
         hasattr(value, 'meta')
     )
 
+def is_iterable(value):
+    try:
+        iter(value)
+    except TypeError:
+        return False
+    if isinstance(value, Exception):
+        # exceptions are iterable too (in Python 2), will iterable over .args
+        return False
+    return True
+
+def is_simple_error(e):
+    """
+    The module should work will all kind of "error" instances but we should
+    have some kind of duck typing here.
+    """
+    attr_names = ('key', 'message', 'value', 'context')
+    for attr_name in attr_names:
+        if not hasattr(e, attr_name):
+            return False
+    return True
+
+
 class undefined(object):
     pass
 
@@ -64,10 +86,8 @@ class FieldData(object):
             if errors is None:
                 # I find this convenient when passing a form validation result from pycerberus
                 errors = ()
-            elif isinstance(errors, Exception):
-                # unfortunately tuple(exception) -> tuple((exception_msg,)) in
-                # Python 2 (Python 3 fixed that, Exception is not iterable
-                # anymore)
+            elif is_simple_error(errors) or isinstance(errors, Exception):
+                # exceptions are iterable too (in Python 2), see is_iterable()
                 errors = (errors, )
             else:
                 errors = tuple(errors)
@@ -115,6 +135,8 @@ class RepeatingFieldData(object):
             attr_name = 'value'
             values = value
         if len(self.items) == 0:
+            if not is_iterable(values):
+                values = (values,)
             self._create_new_items(n=len(values))
         else:
             assert (len(self.items) == len(values))
