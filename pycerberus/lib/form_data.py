@@ -151,11 +151,8 @@ class RepeatingFieldData(object):
 
 class FormData(object):
     def __init__(self, child_names=None):
-        if not child_names:
-            children = ()
-        else:
-            children = ((name, FieldData()) for name in child_names)
-        self.children = OrderedDict(children)
+        self.child_names = child_names or ()
+        self.children = OrderedDict()
         self.global_errors = ()
 
     def __getattr__(self, name):
@@ -208,7 +205,11 @@ class FormData(object):
             if values is undefined:
                 return
             for key in values:
-                if key not in self.children:
+                if key in self.children:
+                    continue
+                elif key in self.child_names:
+                    self._add_child_data(key)
+                else:
                     raise ValueError('unknown key %r' % (key, ))
 
         # setting "errors=None" seems to be quite natural to me and hopefully
@@ -247,6 +248,11 @@ class FormData(object):
             child.update(
                 value=c_value, initial_value=c_initial, errors=c_errors, meta=c_meta,
             )
+
+    def _add_child_data(self, child_name):
+        assert (child_name not in self.children)
+        assert (child_name in self.child_names)
+        self.children[child_name] = FieldData()
 
     def update(self, value=undefined, initial_value=undefined, errors=undefined):
         self._set_values(value, initial_value, errors, undefined, clear_missing=False)

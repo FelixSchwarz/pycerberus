@@ -6,8 +6,8 @@ from pythonic_testcase import *
 
 from ..form_data import FieldData, FormData
 
-class FormDataTest(PythonicTestCase):
 
+class FormDataTest(PythonicTestCase):
     def setUp(self):
         self.context = FormData()
         self.context.children.update({
@@ -31,6 +31,15 @@ class FormDataTest(PythonicTestCase):
 
         assert_equals(set(['foo', 'bar']), set(copied_context.children))
         assert_equals(2, copied_context.bar.value)
+
+    def test_can_set_child_values_when_setting_only_child_names(self):
+        # FormData should not assume that it only has simple (FieldData) children
+        # but only when we absolutely need it.
+        context = FormData(child_names=('foo', 'bar'))
+
+        data = {'foo': 'FOO', 'bar': 'BAR'}
+        context.set(value=data)
+        assert_equals(data, context.value)
 
     # --- errors --------------------------------------------------------------
 
