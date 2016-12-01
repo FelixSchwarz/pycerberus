@@ -70,7 +70,11 @@ class ValidationTest(PythonicTestCase):
             initial_value = args[0]
             result = self._validator.new_result(initial_value)
             kwargs['context'] = {'result': result}
-        return self._validator.process(*args, **kwargs)
+        ensure_valid = kwargs.pop('ensure_valid', True)
+        result = self._validator.process(*args, **kwargs)
+        if ensure_valid and is_result(result):
+            assert_false(result.contains_errors())
+        return result
     
     def revert_conversion(self, *args, **kwargs):
         if len(args) == 1 and 'context' not in kwargs:
@@ -79,6 +83,7 @@ class ValidationTest(PythonicTestCase):
     
     def assert_error(self, value, *args, **kwargs):
         message = kwargs.pop('message', None)
+        kwargs['ensure_valid'] = False
         try:
             result = self.process(value, *args, **kwargs)
         except InvalidDataError as e:

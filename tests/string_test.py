@@ -28,7 +28,7 @@ class StringValidatorTest(ValidationTest):
     def test_can_reject_bad_types_with_error_result(self):
         self.init_validator(StringValidator(exception_if_invalid=False))
 
-        result = self.process([])
+        result = self.process([], ensure_valid=False)
         assert_true(result.contains_errors())
         assert_length(1, result.errors)
         error = result.errors[0]
@@ -69,7 +69,7 @@ class StringValidatorTest(ValidationTest):
         validator = StringValidator(min_length=2, max_length=3, exception_if_invalid=False)
         self.init_validator(validator)
 
-        result = self.process('f')
+        result = self.process('f', ensure_valid=False)
         assert_true(result.contains_errors())
         assert_length(1, result.errors)
         error = result.errors[0]

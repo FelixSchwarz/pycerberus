@@ -104,22 +104,22 @@ class IntegerValidatorTest(ValidationTest):
 
     def test_can_return_result_for_invalid_input(self):
         self.init_validator(IntegerValidator(exception_if_invalid=False))
-        result = self.process('invalid')
+        result = self.process('invalid', ensure_valid=False)
         assert_true(result.contains_errors())
         assert_equals('invalid', result.initial_value)
         assert_none(result.value)
 
     def test_can_return_result_from_validate(self):
         self.init_validator(IntegerValidator(min=10, max=20, exception_if_invalid=False))
-        result = self.process('5')
+        result = self.process('5', ensure_valid=False)
         assert_true(result.contains_errors())
 
-        result = self.process('40')
+        result = self.process('40', ensure_valid=False)
         assert_true(result.contains_errors())
 
     def test_can_skip_validate_if_convert_found_errors(self):
         self.init_validator(IntegerValidator(min=10, exception_if_invalid=False))
-        result = self.process('invalid')
+        result = self.process('invalid', ensure_valid=False)
         assert_true(result.contains_errors())
         assert_equals('invalid', result.initial_value)
         assert_none(result.value)
@@ -128,7 +128,7 @@ class IntegerValidatorTest(ValidationTest):
     def test_can_return_error_result_from_convert(self):
         self.init_validator(exception_if_invalid=False)
         with assert_not_raises():
-            result = self.process('invalid')
+            result = self.process('invalid', ensure_valid=False)
         assert_equals('invalid', result.initial_value)
         assert_equals(None, result.value)
 
@@ -141,7 +141,7 @@ class IntegerValidatorTest(ValidationTest):
     def test_can_return_error_result_from_validate(self):
         self.init_validator(max=10, exception_if_invalid=False)
         with assert_not_raises():
-            result = self.process(20)
+            result = self.process(20, ensure_valid=False)
         assert_equals(20, result.initial_value)
         assert_equals(None, result.value)
 
