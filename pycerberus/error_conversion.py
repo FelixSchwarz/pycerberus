@@ -105,7 +105,9 @@ def exception_from_error_list(errors):
         if (exc is not None) and (first_exc is None):
             first_exc = exc
         error_list.append(exc)
-    assert first_exc is not None, 'no error found?'
+
+    if first_exc is None:
+        return None
     first_error = error_from_exception(first_exc)
     return exception_from_error(first_error, error_list=tuple(error_list))
 

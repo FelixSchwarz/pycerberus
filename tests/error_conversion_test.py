@@ -7,6 +7,7 @@ from pythonic_testcase import *
 
 from pycerberus.errors import Error, InvalidDataError
 from pycerberus.error_conversion import exception_from_errors, exception_to_errors
+from pycerberus.lib.form_data import is_simple_error
 
 
 class ExceptionToErrorsTest(PythonicTestCase):
@@ -91,6 +92,22 @@ class ErrorsToExceptionTest(PythonicTestCase):
         assert_is_empty(id_error._error_list,
             message='should be a "leaf" error without error list/dict')
         assert_is_empty(id_error._error_dict)
+
+    def test_can_convert_empty_error_list(self):
+        id_error = self._error(key='foobar')
+        errors = {
+            'foo': ((), ()),
+            'bar': (id_error, ),
+        }
+        container_exc = exception_from_errors(errors)
+        assert_equals('foobar', container_exc.details().key())
+        error_dict = container_exc.error_dict()
+        assert_equals(None, error_dict['foo'])
+
+        bar_error = error_dict['bar']
+        assert_true(is_simple_error(bar_error))
+        bar_details = bar_error.details()
+        assert_equals(id_error.key, bar_details.key())
 
     def _error(self, key='foo', message='a message', value=42):
         return Error(key=key, msg=message, value=value, context=None, is_critical=True)

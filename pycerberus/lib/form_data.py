@@ -30,6 +30,9 @@ def is_simple_error(e):
     The module should work will all kind of "error" instances but we should
     have some kind of duck typing here.
     """
+    if hasattr(e, 'details') and callable(e.details):
+        # InvalidDataError
+        return True
     attr_names = ('key', 'message', 'value', 'context')
     for attr_name in attr_names:
         if not hasattr(e, attr_name):
