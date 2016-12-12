@@ -330,6 +330,8 @@ class Validator(BaseValidator):
                 result.set(value=converted_value)
             return result
 
+        if (errors is None) and not result.contains_errors():
+            return converted_value
         if errors is None:
             errors = result.errors
         if errors:

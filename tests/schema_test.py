@@ -292,6 +292,14 @@ class SchemaTest(ValidationTest):
         assert_length(1, foo_errors[0])
         assert_none(foo_errors[1])
 
+    def test_can_return_result_for_valid_schema_with_foreach_and_formvalidator(self):
+        schema = SchemaValidator()
+        schema.add('foo', ForEach(IntegerValidator()))
+        schema.add_formvalidator(Validator())
+
+        with assert_not_raises():
+            schema.process({'foo': [10]})
+
     # -------------------------------------------------------------------------
     # warn about additional parameters
     
