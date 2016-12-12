@@ -6,6 +6,7 @@
 from pythonic_testcase import *
 
 from pycerberus.api import Error, Validator
+from pycerberus.compat import OrderedDict
 from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 from pycerberus.lib import AttrDict
 from pycerberus.schema import SchemaValidator
@@ -179,7 +180,6 @@ class SchemaTest(ValidationTest):
         schema.add('first', IntegerValidator(required=True, exception_if_invalid=False))
         schema.add('second', IntegerValidator(required=False, exception_if_invalid=False))
 
-        from collections import OrderedDict
         input_ = OrderedDict((('first', ''), ('second', '')))
         result = schema.process(input_)
 

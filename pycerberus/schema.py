@@ -3,12 +3,12 @@
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
 
-from collections import OrderedDict
 import warnings
 
 import six
 
 from pycerberus.api import BaseValidator, EarlyBindForMethods, Validator
+from pycerberus.compat import OrderedDict
 from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
 from pycerberus.error_conversion import exception_from_errors, exception_to_errors
 from pycerberus.i18n import _

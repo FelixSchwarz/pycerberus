@@ -1,8 +1,9 @@
 # This file was part of GrumpyWidgets, copyright (c) 2012 Felix Schwarz
 # The source code contained in this file is licensed under the MIT license.
 
-from collections import OrderedDict
 from copy import deepcopy
+
+from pycerberus.compat import OrderedDict
 
 
 __all__ = ['is_result', 'FieldData', 'FormData']
