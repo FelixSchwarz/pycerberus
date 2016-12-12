@@ -36,6 +36,9 @@ def error_from_exception(e, is_critical=True):
 
 
 def exception_to_errors(e):
+    if e is None:
+        return None
+
     error_dict = None
     error_list = None
     if hasattr(e, '_error_dict') and e._error_dict:

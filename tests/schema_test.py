@@ -274,6 +274,24 @@ class SchemaTest(ValidationTest):
         assert_isinstance(int_error, Error)
         assert_equals('invalid_number', int_error.key)
 
+    def test_can_return_errors_from_raising_list_children(self):
+        schema = SchemaValidator(exception_if_invalid=False)
+        # exception_if_invalid=True is important here to trigger the bug in
+        # error conversion...
+        foo_list = ForEach(IntegerValidator(), exception_if_invalid=True)
+        schema.add('foo', foo_list)
+
+        # Test case: multiple items for the list child but only one contains an
+        # error
+        result = schema.process({'foo': ['bar', '1']})
+        assert_true(result.contains_errors())
+        assert_equals(('foo',), tuple(result.errors))
+        foo_errors = result.errors['foo']
+        assert_length(2, foo_errors)
+
+        assert_length(1, foo_errors[0])
+        assert_none(foo_errors[1])
+
     # -------------------------------------------------------------------------
     # warn about additional parameters
     
