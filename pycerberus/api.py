@@ -10,6 +10,7 @@ import warnings
 
 import six
 
+from pycerberus.error_conversion import exception_from_errors
 from pycerberus.errors import *
 from pycerberus.i18n import _, GettextTranslation
 from pycerberus.lib import SuperProxy
@@ -335,9 +336,7 @@ class Validator(BaseValidator):
         if errors is None:
             errors = result.errors
         if errors:
-            # the exception-based API only supports a single error per field
-            error = errors[0]
-            raise InvalidDataError(error.msg, error.value, error.key, context)
+            raise exception_from_errors(errors)
         else:
             return converted_value
 

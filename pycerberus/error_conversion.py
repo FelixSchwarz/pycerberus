@@ -63,6 +63,8 @@ def exception_to_errors(e):
 
 
 def exception_from_error(error, error_dict=None, error_list=()):
+    if isinstance(error, InvalidDataError):
+        return error
     return InvalidDataError(
         error.message, error.value, error.key, error.context,
         error_dict=error_dict,
@@ -115,7 +117,7 @@ def exception_from_error_list(errors):
     return exception_from_error(first_error, error_list=tuple(error_list))
 
 def exception_from_errors(errors):
-    if isinstance(errors, Error):
+    if is_simple_error(errors):
         return exception_from_error(errors)
     elif isinstance(errors, dict):
         return exception_from_error_dict(errors)
