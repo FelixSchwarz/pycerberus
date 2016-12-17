@@ -110,11 +110,19 @@ class RepeatingFieldData(object):
         self.items = []
         self.child_creator = child_creator
         self.count = 0
+        self.global_errors = ()
 
     def __repr__(self):
         return 'RepeatingFieldData<items=%r>' % (self.items)
 
+    def add_error(self, error):
+        _errors = list(self.global_errors)
+        _errors.append(error)
+        self.global_errors = tuple(_errors)
+
     def contains_errors(self):
+        if self.global_errors:
+            return True
         for item in self.items:
             if item.contains_errors():
                 return True
@@ -138,6 +146,9 @@ class RepeatingFieldData(object):
         elif value is not undefined:
             attr_name = 'value'
             values = value
+        if values is None:
+            return
+
         if len(self.items) == 0:
             if not is_iterable(values):
                 values = (values,)

@@ -7,7 +7,7 @@ from pythonic_testcase import *
 
 from pycerberus.errors import InvalidArgumentsError, InvalidDataError
 from pycerberus.schema import SchemaValidator
-from pycerberus.test_util import ValidationTest
+from pycerberus.test_util import error_keys, ValidationTest
 from pycerberus.validators import ForEach, IntegerValidator
 
 
@@ -156,3 +156,14 @@ class ForEachTest(ValidationTest):
         schema_error = result.errors[0]
         assert_equals(set(('foo',)), set(schema_error))
 
+    def test_can_return_result_for_empty_input_value(self):
+        validator = ForEach(
+            IntegerValidator(exception_if_invalid=False),
+            exception_if_invalid=False
+        )
+        result = validator.process(None)
+
+        assert_true(result.contains_errors())
+        assert_length(0, result.errors) # maybe 1 when we add global errors here?
+        assert_length(1, result.global_errors)
+        assert_equals(('empty', ), error_keys(result.global_errors))
