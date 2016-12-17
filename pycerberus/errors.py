@@ -110,7 +110,11 @@ class Error(object):
     def __getattr__(self, attr_name):
         if ('_custom_attrs' in self.__dict__) and (attr_name in self._custom_attrs):
             return self._custom_attrs[attr_name]
-        super(Error, self).__getattr__(attr_name)
+        # __getattr__ is the "line of last defense" (only called for "really
+        # custom" attributes) so we can assume that the attribute just does not
+        # exist at all.
+        klassname = self.__class__.__name__
+        raise AttributeError("type object '%s' has no attribute '%s'" % (klassname, attr_name))
 
     def __setattr__(self, attr_name, value):
         if ('_custom_attrs' in self.__dict__) and (attr_name in self._custom_attrs):
