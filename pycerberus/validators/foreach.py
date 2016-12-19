@@ -89,7 +89,7 @@ class ForEach(Validator):
             if not result.contains_errors():
                 result.set(value=converted_value)
             return result
-        for item_errors in errors:
+        for item_errors in (errors or ()):
             if (item_errors is None) or (len(item_errors) == 0):
                 continue
             error = item_errors[0]

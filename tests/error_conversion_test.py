@@ -93,6 +93,24 @@ class ErrorsToExceptionTest(PythonicTestCase):
             message='should be a "leaf" error without error list/dict')
         assert_is_empty(id_error._error_dict)
 
+    def test_can_convert_deeply_nested_dicts(self):
+        errors = {
+            'foo': {
+                'bar': {
+                    'baz': (Error(key='empty', msg=u'dummy', context=None, value=None),),
+                }
+            },
+        }
+        with assert_not_raises():
+            container_exc = exception_from_errors(errors)
+        assert_equals(('foo',), tuple(container_exc._error_dict))
+        foo_error = container_exc._error_dict['foo']
+        assert_equals(('bar',), tuple(foo_error._error_dict))
+        bar_error = foo_error._error_dict['bar']
+        assert_equals(('baz',), tuple(bar_error._error_dict))
+        baz_error = bar_error._error_dict['baz']
+        assert_equals('empty', baz_error.details().key())
+
     def test_can_convert_empty_error_list(self):
         id_error = self._error(key='foobar')
         errors = {
@@ -108,6 +126,31 @@ class ErrorsToExceptionTest(PythonicTestCase):
         assert_true(is_simple_error(bar_error))
         bar_details = bar_error.details()
         assert_equals(id_error.key, bar_details.key())
+
+    def test_does_not_add_superfluous_error_list_when_converting_error_dict_with_list(self):
+        errors = {'foobar': (
+            (Error(key='bad_value', msg=u'foo', value=22, context='[...]', is_critical=True),),
+        )}
+        schema_exc = exception_from_errors(errors)
+        assert_equals(('foobar', ), tuple(schema_exc._error_dict))
+
+        foobar_errors = schema_exc._error_dict['foobar']
+        assert_length(1, foobar_errors._error_list)
+
+        first_errors = foobar_errors.errors()
+        assert_length(1, first_errors)
+
+        first_error = first_errors[0]
+        assert_isinstance(first_error, InvalidDataError)
+        assert_falseish(first_error._error_dict)
+
+        # previously "._error_list" contained the original error instance (not
+        # converted to a InvalidDataError exception)
+        # ideally this should be just empty but the conversion code has a hard
+        # time to tell if this is just multiple errors for a single field or
+        # an actual error list so just be safe and always return it as list.
+        assert_length(1, first_error._error_list)
+        assert_isinstance(first_error._error_list[0], InvalidDataError)
 
     def _error(self, key='foo', message='a message', value=42):
         return Error(key=key, msg=message, value=value, context=None, is_critical=True)

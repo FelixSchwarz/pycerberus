@@ -12,7 +12,9 @@ exception-based API and there are validators which are not ported yet (but are
 included in result-aware schemas).
 """
 
-from .lib.form_data import is_simple_error
+import six
+
+from .lib.form_data import is_iterable, is_simple_error
 from .errors import Error, InvalidDataError
 
 
@@ -77,14 +79,17 @@ def exception_from_error_dict(error_dict):
     for field_name, field_errors in error_dict.items():
         if not field_errors:
             continue
-        first_error = field_errors[0]
-        # We need to differentiate between a list of errors referring
-        # to the same (simple) field and a list of errors referring to
-        # a list of fields. We can't deduct that from the container (tuple).
-        if is_simple_error(first_error):
-            exc = exception_from_errors(first_error)
+        if isinstance(field_errors, dict):
+            exc = exception_from_error_dict(field_errors)
         else:
-            exc = exception_from_errors(field_errors)
+            first_error = field_errors[0]
+            # We need to differentiate between a list of errors referring
+            # to the same (simple) field and a list of errors referring to
+            # a list of fields. We can't deduct that from the container (tuple).
+            if is_simple_error(first_error):
+                exc = exception_from_errors(first_error)
+            else:
+                exc = exception_from_errors(field_errors)
         if first_exc is None:
             first_exc = exc
         _error_dict[field_name] = exc
@@ -97,15 +102,22 @@ def exception_from_error_list(errors):
     first_exc = None
     error_list = []
     for item_errors in errors:
-        is_single_error = isinstance(item_errors, Error)
-        if is_single_error:
+        if is_simple_error(item_errors):
             exc = exception_from_error(item_errors)
         elif not item_errors: # None, (), {}
             exc = None
         elif isinstance(item_errors, dict):
             exc = exception_from_error_dict(item_errors)
         else:
-            exc = exception_from_error(item_errors[0], error_list=item_errors)
+            if is_simple_error(item_errors):
+                error = item_errors
+            elif is_iterable(item_errors) and not isinstance(item_errors, six.string_types):
+                error = item_errors[0]
+            else:
+                raise ValueError('should not reach this.')
+
+            errors_ = [exception_from_error(error)]
+            exc = exception_from_error(error, error_list=errors_)
 
         if (exc is not None) and (first_exc is None):
             first_exc = exc

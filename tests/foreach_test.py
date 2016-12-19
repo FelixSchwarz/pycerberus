@@ -164,6 +164,6 @@ class ForEachTest(ValidationTest):
         result = validator.process(None)
 
         assert_true(result.contains_errors())
-        assert_length(0, result.errors) # maybe 1 when we add global errors here?
-        assert_length(1, result.global_errors)
-        assert_equals(('empty', ), error_keys(result.global_errors))
+        assert_length(1, result.errors)
+        assert_length(1, result.global_errors) # seems to be duplicated?
+        assert_equals(('empty', ), error_keys(result.errors))

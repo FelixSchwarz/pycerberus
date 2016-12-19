@@ -130,9 +130,16 @@ class RepeatingFieldData(object):
 
     @property
     def errors(self):
+        if not self.contains_errors():
+            return None
         errors_ = []
         for context in self.items:
             errors_.append(context.errors or None)
+        has_field_errors = len(tuple(filter(None, errors_))) > 0
+        # this is one of the places where the "global errors" concept shows its
+        # ugly side.
+        if (not has_field_errors) and self.global_errors:
+            errors_ = self.global_errors
         return tuple(errors_)
 
     def update(self, value=undefined, initial_value=undefined, errors=undefined, meta=undefined):
@@ -255,7 +262,8 @@ class FormData(object):
             errors = {}
         is_dict_like = isinstance(errors, dict)
         if (not is_dict_like) and (errors is not undefined):
-            self._set_global_errors(errors)
+            if errors:
+                self._set_global_errors(errors)
             errors = {}
         ensure_all_keys_known(value)
         ensure_all_keys_known(errors)

@@ -73,7 +73,8 @@ class InvalidDataError(ValidationError):
         if self._error_dict:
             error_dict = {}
             for key, error in self._error_dict.items():
-                error_dict[key] = error.unpack_errors()
+                if error is not None:
+                    error_dict[key] = error.unpack_errors()
             return error_dict
         elif self._error_list:
             error_list = []
