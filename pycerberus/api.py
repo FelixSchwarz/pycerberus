@@ -290,7 +290,8 @@ class Validator(BaseValidator):
     def raise_error(self, key, value, context, errorclass=InvalidDataError, 
             error_dict=None, error_list=(), **values):
         if not self._exception_if_invalid:
-            warnings.warn('raise_error() called in validator which should not use exceptions (exception_if_invalid=False)')
+            klassname = self.__class__.__name__
+            warnings.warn('raise_error() called in validator "%s" which should not use exceptions (exception_if_invalid=False)' % klassname)
         raise self.exception(key, value, context, errorclass=errorclass, 
             error_dict=error_dict, error_list=error_list, **values)
     
