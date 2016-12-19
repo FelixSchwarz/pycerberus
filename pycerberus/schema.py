@@ -167,7 +167,9 @@ class SchemaValidator(Validator):
     
     def convert(self, fields, context):
         if fields is None:
-            return self.empty_value(context)
+            # This is helpful to produce the correct "empty" error for each
+            # field if this is a subschema.
+            fields = {}
         if not isinstance(fields, dict):
             self.new_error('invalid_type',
                 fields, context,

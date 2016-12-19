@@ -215,9 +215,10 @@ class SchemaTest(ValidationTest):
         schema.add('first', IntegerValidator(min=10, exception_if_invalid=True))
 
         result = schema.process(None)
-        assert_false(result.contains_errors())
+        assert_true(result.contains_errors())
         assert_equals({'first': None}, result.value)
         assert_equals({'first': None}, result.initial_value)
+        assert_equals(('empty',), error_keys(result.errors['first']))
 
     def test_can_return_error_for_invalid_input_types(self):
         schema = SchemaValidator(exception_if_invalid=False)
