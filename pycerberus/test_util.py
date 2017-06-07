@@ -80,7 +80,11 @@ class ValidationTest(PythonicTestCase):
         if len(args) == 1 and 'context' not in kwargs:
             kwargs['context'] = {}
         return self._validator.revert_conversion(*args, **kwargs)
-    
+
+    def assert_is_valid(self, *args, **kwargs):
+        kwargs['ensure_valid'] = True
+        return self.process(*args, **kwargs)
+
     def assert_error(self, value, *args, **kwargs):
         message = kwargs.pop('message', None)
         kwargs['ensure_valid'] = False
