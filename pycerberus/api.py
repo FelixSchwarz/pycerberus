@@ -242,7 +242,7 @@ class Validator(BaseValidator):
 
         class_has_static_value = (self._exception_if_invalid is not NoValueSet)
         user_specified_value = (exception_if_invalid is not NoValueSet)
-        if class_has_static_value and user_specified_value:
+        if class_has_static_value and user_specified_value and (self._exception_if_invalid != exception_if_invalid):
             msg = 'This validator does not accept "exception_if_invalid" as it is set on a class level'
             raise InvalidArgumentsError(msg)
 
