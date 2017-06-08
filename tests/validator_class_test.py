@@ -50,6 +50,25 @@ class ValidatorTest(ValidationTest):
         result = validator.process('invalid')
         assert_equals(42, result.value)
 
+    def test_process_does_not_modify_context_permanently_if_value_is_empty(self):
+        context = {}
+        validator = Validator(exception_if_invalid=False)
+        validator.process(None, context=context)
+        assert_equals({}, context)
+
+        validator = Validator(required=False, exception_if_invalid=False)
+        validator.process(None, context=context)
+        assert_equals({}, context)
+
+        validator = Validator(exception_if_invalid=True)
+        with assert_raises(EmptyError):
+            validator.process(None, context=context)
+        assert_equals({}, context)
+
+        validator = Validator(required=False, exception_if_invalid=True)
+        validator.process(None, context=context)
+        assert_equals({}, context)
+
 
 class DefaultAndRequiredValuesTest(ValidationTest):
     

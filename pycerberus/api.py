@@ -305,15 +305,18 @@ class Validator(BaseValidator):
         result = self.get_result(value, context)
         if self.is_empty(value, context) == True:
             result.set(initial_value=value)
+            if self.is_required() and not self._exception_if_invalid:
+                self.new_error('empty', value, context)
+            self._restore_old_result_in_context(context, old_result)
             if self.is_required() == False:
                 empty_value = self.empty_value(context)
                 if self._exception_if_invalid:
                     return empty_value
                 result.set(value=empty_value)
-            else:
-                if self._exception_if_invalid:
-                    self.raise_error('empty', value, context, errorclass=EmptyError)
-                self.new_error('empty', value, context)
+            elif self._exception_if_invalid:
+                self.raise_error('empty', value, context, errorclass=EmptyError)
+            # required new-style validator is handeled at the beginning
+            # This reduces the number of "context restores" in this branch
             return result
 
         context['result'] = result
