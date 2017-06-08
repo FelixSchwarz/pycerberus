@@ -321,10 +321,13 @@ class Validator(BaseValidator):
         converted_value = self.convert(value, context)
         if convert_errors == result.errors:
             self.validate(converted_value, context)
+        self._restore_old_result_in_context(context, old_result)
+        return self.handle_validator_result(converted_value, result, context)
+
+    def _restore_old_result_in_context(self, context, old_result):
         context.pop('result')
         if old_result is not NoValueSet:
             context['result'] = old_result
-        return self.handle_validator_result(converted_value, result, context)
 
     def handle_validator_result(self, converted_value, result, context, errors=None):
         if not self._exception_if_invalid:
