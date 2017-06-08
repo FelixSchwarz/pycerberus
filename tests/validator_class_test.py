@@ -13,10 +13,10 @@ from pycerberus.validators import IntegerValidator
 
 
 class ValidatorTest(ValidationTest):
-    
     def test_bail_out_if_unknown_parameters_are_passed_to_constructor(self):
-        assert_raises(Exception, lambda: Validator(invalid='fnord'))
-    
+        with assert_raises(Exception):
+            Validator(invalid='fnord')
+
     def test_revert_conversion(self):
         self.init_validator(Validator())
         assert_equals(u'ö', self.revert_conversion(u'ö'))
