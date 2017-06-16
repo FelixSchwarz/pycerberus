@@ -23,7 +23,7 @@ class DomainNameValidator(StringValidator):
         }
     
     def validate(self, value, context):
-        self.super()
+        super(DomainNameValidator, self).validate(value, context)
         if value.startswith('.'):
             self.raise_error('leading_dot', value, context, domain=repr(value))
         if value.endswith('.'):
