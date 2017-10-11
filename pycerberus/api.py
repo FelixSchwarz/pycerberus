@@ -337,12 +337,16 @@ class Validator(BaseValidator):
         return result
 
     def handle_validator_result(self, converted_value, result, context, errors=None):
+        if errors is not None:
+            is_input_valid = (not errors)
+        else:
+            is_input_valid = not result.contains_errors()
         if not self._exception_if_invalid:
-            if not result.contains_errors():
+            if is_input_valid:
                 result.set(value=converted_value)
             return result
 
-        if (errors is None) and not result.contains_errors():
+        if is_input_valid:
             return converted_value
         if errors is None:
             errors = result.errors

@@ -187,7 +187,8 @@ class SchemaValidator(Validator):
     # overriden from Validator
     def handle_validator_result(self, converted_value, result, context, errors=None):
         if errors is None:
-            errors = result.global_errors
+            # only pass (errors != None) if there are actual errors
+            errors = result.global_errors or None
         return super(SchemaValidator, self).handle_validator_result(converted_value, result, context, errors=errors)
 
     def new_error(self, key, value, context, msg_values=None, is_critical=True):
