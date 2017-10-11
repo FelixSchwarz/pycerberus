@@ -332,7 +332,7 @@ class Validator(BaseValidator):
             result.set(value=empty_value)
         elif self._exception_if_invalid:
             self.raise_error('empty', value, context, errorclass=EmptyError)
-        # required new-style validator is handeled at the beginning
+        # required new-style validator is handled at the beginning
         # This reduces the number of "context restores" in this branch
         return result
 
