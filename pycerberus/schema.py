@@ -277,14 +277,14 @@ class SchemaValidator(Validator):
         if result.contains_errors():
             return
         for formvalidator in self.formvalidators():
-            previous_errors = result.errors
+            nr_previous_errors = result.nr_errors()
             values = formvalidator.process(result.value, context=context)
             if not is_result(values):
                 if values is None:
                     warnings.warn('form validator %r returned None' % formvalidator)
                     continue
                 result.set(value=values)
-            if previous_errors != result.errors:
+            if result.nr_errors() > nr_previous_errors:
                 # do not execute additional form validators if one of them
                 # found an error
                 break
