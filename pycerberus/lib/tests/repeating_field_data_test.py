@@ -17,9 +17,11 @@ class RepeatingFieldDataTest(PythonicTestCase):
 
     def test_can_tell_if_child_contains_errors(self):
         assert_false(self.context.contains_errors())
+        assert_equals(0, self.context.nr_errors())
 
         self.context.items[1].errors = (self.error(),)
         assert_true(self.context.contains_errors())
+        assert_equals(1, self.context.nr_errors())
 
     # --- aggregate values ----------------------------------------------------
 

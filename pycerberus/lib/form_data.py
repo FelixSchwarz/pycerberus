@@ -65,8 +65,13 @@ class FieldData(object):
         tmpl = 'FieldData(value=%r, initial_value=%r, errors=%r, meta=%r)'
         return tmpl % (self.value, self.initial_value, self.errors, self.meta)
 
+    def nr_errors(self):
+        if self.errors is None:
+            return 0
+        return len(self.errors)
+
     def contains_errors(self):
-        return (self.errors is not None) and (len(self.errors) > 0)
+        return (self.nr_errors() > 0)
 
     def contains_critical_error(self):
         if not self.contains_errors():
@@ -121,12 +126,13 @@ class RepeatingFieldData(object):
         self.global_errors = tuple(_errors)
 
     def contains_errors(self):
-        if self.global_errors:
-            return True
+        return (self.nr_errors() > 0)
+
+    def nr_errors(self):
+        count = len(self.global_errors)
         for item in self.items:
-            if item.contains_errors():
-                return True
-        return False
+            count += item.nr_errors()
+        return count
 
     @property
     def errors(self):
@@ -209,12 +215,13 @@ class FormData(object):
         return 'FormData<children=%r>' % self.children
 
     def contains_errors(self):
-        if self.global_errors:
-            return True
+        return (self.nr_errors() > 0)
+
+    def nr_errors(self):
+        count = len(self.global_errors)
         for child in self.children.values():
-            if child.contains_errors():
-                return True
-        return False
+            count += child.nr_errors()
+        return count
 
     def contains_critical_error(self):
         if not self.contains_errors():

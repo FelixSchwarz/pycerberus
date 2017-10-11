@@ -41,12 +41,15 @@ class FieldDataTest(PythonicTestCase):
     def test_knows_if_context_contains_errors(self):
         self.context.errors = None
         assert_false(self.context.contains_errors())
+        assert_equals(0, self.context.nr_errors())
 
         self.context.errors = []
         assert_false(self.context.contains_errors())
+        assert_equals(0, self.context.nr_errors())
 
         self.context.errors = (self.error(),)
         assert_true(self.context.contains_errors())
+        assert_equals(1, self.context.nr_errors())
 
     def test_can_set_new_value(self):
         self.context.set(value='bar')

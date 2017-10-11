@@ -45,18 +45,23 @@ class FormDataTest(PythonicTestCase):
 
     def test_can_tell_if_child_contains_errors(self):
         assert_false(self.context.contains_errors())
+        assert_equals(0, self.context.nr_errors())
 
         self.context.foo.errors = (self.error(),)
         assert_true(self.context.contains_errors())
+        assert_equals(1, self.context.nr_errors())
 
     def test_can_tell_if_container_child_contains_errors(self):
         child_container = FormData()
         child_container.children = {'baz': FieldData(errors=(self.error(), ))}
         assert_true(child_container.contains_errors())
+        assert_equals(1, child_container.nr_errors())
 
         assert_false(self.context.contains_errors())
+        assert_equals(0, self.context.nr_errors())
         self.context.children['complex'] = child_container
         assert_true(self.context.contains_errors())
+        assert_equals(1, self.context.nr_errors())
 
     def test_can_set_global_errors(self):
         assert_false(self.context.contains_errors())
