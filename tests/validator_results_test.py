@@ -6,7 +6,7 @@
 from pythonic_testcase import *
 
 from pycerberus.api import Validator
-from pycerberus.errors import InvalidArgumentsError, InvalidDataError
+from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
 from pycerberus.lib.form_data import FieldData
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import StringValidator
@@ -78,6 +78,22 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_equals(1, result.value)
         assert_equals(1, result.initial_value)
         assert_equals({}, context, message='context should not be modified')
+
+    def test_can_return_converted_values_even_though_result_contained_errors(self):
+        # This test is not really useful on its own because it seems somewhat
+        # pathological to pass in a result in a simple FieldValidator.
+        # However this was the simplest test I was able to come up to ensure
+        # that Validator ignores pre-existing errors.
+        # That behavior will be required to run FormValidators properly which
+        # can be executed even though some (unrelated) fields are invalid. This
+        # functionality is currently only available out-of-tree.
+        result = self.validator().new_result(21)
+        result.errors = (Error(u'foo', u'some text', 21, {}, is_critical=False), )
+        assert_true(result.contains_errors())
+
+        context = {u'result': result}
+        result = self.process(1, context=context, ensure_valid=False)
+        assert_equals(1, result.value)
 
     def test_can_return_result_for_empty_error(self):
         validator = StringValidator(required=False, exception_if_invalid=False)

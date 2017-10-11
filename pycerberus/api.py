@@ -312,8 +312,9 @@ class Validator(BaseValidator):
         nr_errors_after_convert = result.nr_errors()
         if nr_errors_after_convert <= nr_initial_errors:
             self.validate(converted_value, context)
+        nr_new_errors = result.nr_errors() - nr_initial_errors
         self._restore_old_result_in_context(context, old_result)
-        return self.handle_validator_result(converted_value, result, context)
+        return self.handle_validator_result(converted_value, result, context, nr_new_errors=nr_new_errors)
 
     def _restore_old_result_in_context(self, context, old_result):
         context.pop('result')
@@ -337,8 +338,10 @@ class Validator(BaseValidator):
         # This reduces the number of "context restores" in this branch
         return result
 
-    def handle_validator_result(self, converted_value, result, context, errors=None):
-        if errors is not None:
+    def handle_validator_result(self, converted_value, result, context, errors=None, nr_new_errors=None):
+        if nr_new_errors is not None:
+            is_input_valid = (nr_new_errors <= 0)
+        elif errors is not None:
             is_input_valid = (not errors)
         else:
             is_input_valid = not result.contains_errors()

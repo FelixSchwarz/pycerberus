@@ -42,7 +42,7 @@ class ValidatorTest(ValidationTest):
         pycerberus should not break them accidentally without providing similar
         functionality via some API."""
         class CustomHandlingValidator(IntegerValidator):
-            def handle_validator_result(self, converted_value, result, context, errors=None):
+            def handle_validator_result(self, converted_value, result, context, **kwargs):
                 result.set(value=42)
                 return result
 

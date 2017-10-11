@@ -185,11 +185,11 @@ class SchemaValidator(Validator):
         return result.value
 
     # overriden from Validator
-    def handle_validator_result(self, converted_value, result, context, errors=None):
+    def handle_validator_result(self, converted_value, result, context, errors=None, nr_new_errors=None):
         if errors is None:
             # only pass (errors != None) if there are actual errors
             errors = result.global_errors or None
-        return super(SchemaValidator, self).handle_validator_result(converted_value, result, context, errors=errors)
+        return super(SchemaValidator, self).handle_validator_result(converted_value, result, context, errors=errors, nr_new_errors=nr_new_errors)
 
     def new_error(self, key, value, context, msg_values=None, is_critical=True):
         result = context['result']

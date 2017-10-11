@@ -80,13 +80,17 @@ class ForEach(Validator):
         return field_result
 
     # overriden from Validator
-    def handle_validator_result(self, converted_value, result, context, errors=None):
+    def handle_validator_result(self, converted_value, result, context, errors=None, nr_new_errors=None):
         # not calling super() as our errors are special
         if errors is None:
             errors = result.errors
+        if nr_new_errors is not None:
+            is_input_valid = (nr_new_errors <= 0)
+        else:
+            is_input_valid = not result.contains_errors()
 
         if not self._exception_if_invalid:
-            if not result.contains_errors():
+            if is_input_valid:
                 result.set(value=converted_value)
             return result
         for item_errors in (errors or ()):
