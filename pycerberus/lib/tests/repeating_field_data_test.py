@@ -47,6 +47,9 @@ class RepeatingFieldDataTest(PythonicTestCase):
         assert_equals((None, 'foo'), self.context.initial_value)
 
     # --- update values -------------------------------------------------------
+    def test_can_call_update_without_any_values(self):
+        with assert_not_raises():
+            self.context.update()
 
     def test_can_set_new_values(self):
         values = ('baz', 'qox')

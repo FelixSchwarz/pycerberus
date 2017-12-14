@@ -150,6 +150,7 @@ class RepeatingFieldData(object):
 
     def update(self, value=undefined, initial_value=undefined, errors=undefined, meta=undefined):
         # LATER: meta not implemented
+        values = None
         if initial_value is not undefined:
             attr_name = 'initial_value'
             values = initial_value
