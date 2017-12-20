@@ -27,16 +27,19 @@ class FieldDataTest(PythonicTestCase):
     def test_can_clone_itself(self):
         self.context.value = {}
         self.context.errors = []
+        self.context.meta = {'x': 42}
 
         clone = self.context.copy()
         clone.errors.append('new error')
         clone.value['new'] = 21
+        clone.meta['y'] = 21
 
         assert_equals({}, self.context.value)
         assert_equals([], self.context.errors)
+        assert_equals({'x': 42}, self.context.meta)
         assert_equals({'new': 21}, clone.value)
         assert_equals(['new error'], clone.errors)
-        assert_equals({}, clone.meta)
+        assert_equals({'x': 42, 'y': 21}, clone.meta)
 
     def test_knows_if_context_contains_errors(self):
         self.context.errors = None

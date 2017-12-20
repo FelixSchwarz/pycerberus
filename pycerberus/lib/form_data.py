@@ -57,6 +57,7 @@ class FieldData(object):
             value=deepcopy(self.value),
             errors=deepcopy(self.errors),
             initial_value=deepcopy(self.initial_value),
+            meta=deepcopy(self.meta),
         )
         return klass(**attributes)
     __deepcopy__ = copy
