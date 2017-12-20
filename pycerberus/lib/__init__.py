@@ -1,4 +1,4 @@
 
-from pycerberus.lib.attribute_dict import *
-from pycerberus.lib.simple_super import *
-
+from .attribute_dict import *
+from .form_data import *
+from .simple_super import *
