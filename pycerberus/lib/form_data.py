@@ -51,13 +51,17 @@ class FieldData(object):
         self.errors = errors
         self.meta = meta if (meta is not None) else {}
 
-    def copy(self):
+    def copy(self, memo=None):
         klass = self.__class__
+        value_ = deepcopy(self.value, memo=memo)
+        errors_ = deepcopy(self.errors, memo=memo)
+        initial_value_ = deepcopy(self.initial_value, memo=memo)
+        meta_ = deepcopy(self.meta, memo=memo)
         attributes = dict(
-            value=deepcopy(self.value),
-            errors=deepcopy(self.errors),
-            initial_value=deepcopy(self.initial_value),
-            meta=deepcopy(self.meta),
+            value=value_,
+            errors=errors_,
+            initial_value=initial_value_,
+            meta=meta_,
         )
         return klass(**attributes)
     __deepcopy__ = copy
