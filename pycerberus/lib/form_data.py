@@ -206,9 +206,16 @@ class RepeatingFieldData(object):
 
 
 class FormData(object):
-    def __init__(self, child_names=None):
-        self.child_names = child_names or ()
+    def __init__(self, child_names=None, children=None):
+        if child_names and children:
+            raise ValueError('You can not specify "children" and "child_names"')
+
         self.children = OrderedDict()
+        if children:
+            for name, child in children.items():
+                self.children[name] = child
+            child_names = tuple(self.children)
+        self.child_names = child_names or ()
         self.global_errors = ()
 
     def __getattr__(self, name):
