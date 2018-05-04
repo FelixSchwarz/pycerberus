@@ -21,8 +21,8 @@ class BooleanCheckbox(StringValidator):
         kwargs.setdefault('strip', True)
         self.trueish = kwargs.pop('trueish', self.__class__.trueish)
         self.falsish = kwargs.pop('falsish', self.__class__.falsish)
-        self.super.__init__(**kwargs)
-    
+        super(BooleanCheckbox, self).super(**kwargs)
+
     def messages(self):
         return {
             'unknown_bool': _(u'Value should be "%s" or "%s".') % (self.trueish[0], self.falsish[0])
@@ -37,7 +37,7 @@ class BooleanCheckbox(StringValidator):
 
         if isinstance(value, bool):
             return value
-        string_value = self.super().lower()
+        string_value = super(BooleanCheckbox, self).convert(value, context).lower()
         if string_value in self.trueish:
             return True
         elif string_value in self.falsish:
@@ -64,8 +64,8 @@ class BooleanCheckbox(StringValidator):
 class AgreeToConditionsCheckbox(BooleanCheckbox):
     def __init__(self, **kwargs):
         kwargs['required'] = True
-        self.super.__init__(**kwargs)
-    
+        super(AgreeToConditionsCheckbox, self).super(**kwargs)
+
     def messages(self):
         return {
             'must_agree': _(u'Please accept our Terms and Conditions.')
@@ -74,10 +74,10 @@ class AgreeToConditionsCheckbox(BooleanCheckbox):
     def convert(self, value, context):
         if value is None:
             return False
-        return self.super(value, context)
+        return super(AgreeToConditionsCheckbox, self).convert(value, context)
     
     def validate(self, value, context):
-        self.super()
+        super(AgreeToConditionsCheckbox, self).validate(value, context)
         if value == True:
             return
         self.raise_error('must_agree', value, context)
