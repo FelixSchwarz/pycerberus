@@ -67,7 +67,7 @@ if __name__ == '__main__':
     setuptools.setup(
         name = 'pycerberus',
         version = version,
-        description = 'Highly flexible, no magic input validation library',
+        description = 'Highly flexible input validation library',
         long_description=(read('description.txt') + read('Changelog.txt')),
         license = 'MIT',
         author = 'Felix Schwarz',

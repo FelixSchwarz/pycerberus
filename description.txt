@@ -5,8 +5,7 @@ your application from malicious (or just garbled) input data.
   can work with real Python types instead of strings - e.g. 42 instead of '42', 
   convert database IDs to model objects transparently.
 * Implement custom validation rules: Writing custom validators is 
-  straightforward, everything is well documented and pycerberus only uses very 
-  little Python magic.
+  straightforward and most things are well documented.
 * Focus on your value-adding application code: Save time by implementing every 
   input validation rule only once, but 100% right instead of implementing a 
   dozen different half-baked solutions.
