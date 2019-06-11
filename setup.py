@@ -72,8 +72,7 @@ if __name__ == '__main__':
         license = 'MIT',
         author = 'Felix Schwarz',
         author_email = 'felix.schwarz@oss.schwarz.eu',
-        url = 'http://www.schwarz.eu/opensource/projects/pycerberus',
-        download_url = 'http://www.schwarz.eu/opensource/projects/pycerberus/download/%(version)s/pycerberus-%(version)s.tar.gz' % dict(version=version),
+        url = 'https://github.com/FelixSchwarz/pycerberus',
 
         tests_require=requires_from_file('dev_requirements.txt'),
         install_requires=requires_from_file('requirements.txt'),
