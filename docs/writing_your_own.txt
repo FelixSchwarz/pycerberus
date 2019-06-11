@@ -29,8 +29,8 @@ Validator
 Miscellaneous
 ----------------------------------
 
-pycerberus uses `simple_super <http://www.häcker.net/trac/browser/open-source/python-simple-super/trunk/simple_super.py>`_
-so you can just say 'self.super()' in your custom validator classes. This will
+pycerberus uses a deprecated library called `simple_super` so you can just say
+`self.super()` in your custom validator classes. This will
 call the super implementation with just the same parameters as your method was
 called.
 

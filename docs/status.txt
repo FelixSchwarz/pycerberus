@@ -1,11 +1,16 @@
 Development Status
 ==================================
 
-Currently (December 2011, version 0.5) pycerberus is at a very basic stage - 
-though with very solid foundations. The API for single validators is basically
-complete, i18n support is built in and there is decent documentation covering
-all important aspects. You can check multiple values (e.g. a web form) easily
-using a validation Schema ("compound validator").
+I'm using pycerberus currently (June 2019, version 0.6.99) in several projects
+and the basic API (based on "rich results") seems to be fine. One problem is
+that I have a lot of code on top of the open source version which should
+probably be open sourced as well (e.g. dependencies for formvalidators).
+
+The code is a bit simple, does not have many validators but is pretty solid.
+The API for single validators is basically complete, i18n support is built in
+and there is decent documentation covering all important aspects. You can check
+multiple values (e.g. a web form) easily using a validation Schema
+("compound validator").
 
 In the future 'll try to increase the number of *built-in validators for
 specific domains* (e.g. localized numbers). Another interesting topic will be 
