@@ -68,7 +68,7 @@ if __name__ == '__main__':
         name = 'pycerberus',
         version = version,
         description = 'Highly flexible input validation library',
-        long_description=(read('description.txt') + read('Changelog.txt')),
+        long_description=(read('README.md') + read('Changelog.txt')),
         license = 'MIT',
         author = 'Felix Schwarz',
         author_email = 'felix.schwarz@oss.schwarz.eu',
