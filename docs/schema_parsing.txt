@@ -13,7 +13,7 @@ transform ``"foo, 42"`` into ``dict(name="foo", value=42)``.
 .. autoclass:: pycerberus.schemas.PositionalArgumentsParsingSchema
    :members:
 
-This schema is used for example in `pymta <http://www.schwarz.eu/opensource/projects/pymta>`_.
+This schema is used for example in `pymta <https://github.com/FelixSchwarz/pymta>`_.
 to parse the SMTP command strings. Also I used it in my 
 `OhlohWidgetsMacro <http://www.schwarz.eu/opensource/projects/ohloh_widgets_macro>`_:
 Trac macros can get parameters but these are passed as a single string so the 

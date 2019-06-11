@@ -15,7 +15,7 @@ specific domains* (e.g. localized numbers). Another interesting topic will be
 However I have to say that I'm pretty satisfied with the current status so 
 adding more features to pycerberus won't be my #1 priority in the next months.
 The current API and functionality was well-suited even when 
-`validating input parameters of a SMTP server <http://www.schwarz.eu/opensource/projects/pymta>`_
+`validating input parameters of a SMTP server <https://github.com/FelixSchwarz/pymta>`_
 so I think most use cases should be actually covered.
 
 
