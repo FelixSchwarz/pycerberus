@@ -2,6 +2,7 @@
 # This file is a part of pycerberus.
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
+# SPDX-License-Identifier: MIT
 """
 Helper functions to convert between pycerberus.Error and InvalidDataError
 instances (also recursively). The conversion is lossy but the important parts

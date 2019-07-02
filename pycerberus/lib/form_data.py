@@ -1,5 +1,6 @@
 # This file was part of GrumpyWidgets, copyright (c) 2012 Felix Schwarz
 # The source code contained in this file is licensed under the MIT license.
+# SPDX-License-Identifier: MIT
 
 from __future__ import absolute_import, print_function, unicode_literals
 
