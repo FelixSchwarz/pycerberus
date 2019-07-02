@@ -1,6 +1,8 @@
 # This file was part of GrumpyWidgets, copyright (c) 2012 Felix Schwarz
 # The source code contained in this file is licensed under the MIT license.
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 from copy import deepcopy
 
 from pycerberus.compat import OrderedDict

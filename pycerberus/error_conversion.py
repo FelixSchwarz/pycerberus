@@ -12,6 +12,8 @@ exception-based API and there are validators which are not ported yet (but are
 included in result-aware schemas).
 """
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import six
 
 from .lib.form_data import is_iterable, is_simple_error

@@ -3,6 +3,10 @@
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
 
+from __future__ import absolute_import, print_function, unicode_literals
+
+import re
+
 from pythonic_testcase import *
 
 from pycerberus.errors import Error, InvalidArgumentsError, InvalidDataError
@@ -48,6 +52,11 @@ class InvalidDataErrorTest(PythonicTestCase):
         assert_equals({'foobar': [foo_error, None]}, wrapping_error.unpack_errors())
 
 
+# repr() returns u'...' for "unicode" strings in Python 2. We are using
+# "unicode_literals" from __future__ so all strings are treated as unicode.
+# As we also test "repr()" outputs let's strip the u'...' for assertions.
+_u_repr = lambda s: re.sub("([\=\{])u'", r"\1'", repr(s))
+
 class ErrorTest(PythonicTestCase):
     def test_can_store_attributes(self):
         context = {'quox': 21}
@@ -61,18 +70,18 @@ class ErrorTest(PythonicTestCase):
         expected_repr = "Error(key='foo', msg='bar', value='baz', context={'quox': 21}, is_critical=False)"
         if "context='[...]'" in repr(error):
             self.skipTest('context stubbed out')
-        assert_equals(expected_repr, repr(error))
+        assert_equals(expected_repr, _u_repr(error))
 
     def test_can_store_custom_attributes(self):
         error = Error(key='foo', msg='bar', value='baz', context={}, quox=42, foobar=21)
         repr_tmpl = "Error(key='foo', msg='bar', value='baz', context={}, is_critical=True, foobar=21, quox=%d)"
         if "context='[...]'" in repr(error):
             self.skipTest('context stubbed out')
-        assert_equals(repr_tmpl % 42, repr(error))
+        assert_equals(repr_tmpl % 42, _u_repr(error))
 
         assert_equals(42, error.quox)
         assert_equals(21, error.foobar)
 
         error.quox = 12
         assert_equals(12, error.quox)
-        assert_equals(repr_tmpl % 12, repr(error))
+        assert_equals(repr_tmpl % 12, _u_repr(error))

@@ -3,6 +3,8 @@
 # The source code contained in this file is licensed under the MIT license.
 # See LICENSE.txt in the main project directory, for more information.
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import re
 
 from pycerberus.i18n import _
@@ -37,8 +39,8 @@ class EmailAddressValidator(DomainNameValidator):
     def messages(self):
         return {
             'single_at': _(u"An email address must contain a single '@'."),
-            'invalid_email_character': _(u'Invalid character %(invalid_character)s in email address %(emailaddress)s.'),
-            'missing_domain': _(u"Missing domain in email address '%(emailaddress)s'."),
+            'invalid_email_character': _(u'Invalid character "%(invalid_character)s" in email address "%(emailaddress)s".'),
+            'missing_domain': _(u'Missing domain in email address "%(emailaddress)s".'),
         }
     
     def validate(self, emailaddress, context):
@@ -56,7 +58,7 @@ class EmailAddressValidator(DomainNameValidator):
     def _validate_localpart(self, localpart, emailaddress, context):
         match = re.search('([^a-zA-Z0-9\.\_\-\+])', localpart)
         if match is not None:
-            values = dict(invalid_character=repr(match.group(1)), emailaddress=repr(emailaddress))
+            values = dict(invalid_character=str(match.group(1)), emailaddress=str(emailaddress))
             self.raise_error('invalid_email_character', localpart, context, **values)
 
     def _validate_domain(self, domain, emailaddress, context):
