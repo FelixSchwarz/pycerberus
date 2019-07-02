@@ -19,9 +19,9 @@ class StringValidatorTest(ValidationTest):
     validator_class = StringValidator
     
     def test_accept_string_and_unicode(self):
-        self.assert_equals('foo', self.process('foo'))
-        self.assert_equals(u'bär', self.process(u'bär'))
-    
+        assert_equals('foo', self.process('foo'))
+        assert_equals(u'bär', self.process(u'bär'))
+
     def test_reject_bad_types(self):
         self.assert_error([])
         self.assert_error({})
@@ -41,16 +41,16 @@ class StringValidatorTest(ValidationTest):
 
     def test_show_class_name_in_error_message(self):
         e = self.assert_error([])
-        self.assert_contains(u'(expected string, got "list")', e.details().msg())
-    
+        assert_contains(u'(expected string, got "list")', e.details().msg())
+
     def test_empty_string_is_also_empty(self):
         self.assert_error(None)
         self.assert_error('')
         
         self.init_validator(default='foo', required=False)
-        self.assert_equals('foo', self.process(None))
-        self.assert_equals('foo', self.process(''))
-    
+        assert_equals('foo', self.process(None))
+        assert_equals('foo', self.process(''))
+
     def test_can_specify_min_length(self):
         self.init_validator(StringValidator(min_length=3))
         self.process('foo')

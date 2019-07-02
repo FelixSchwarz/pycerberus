@@ -6,6 +6,8 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from pythonic_testcase import *
+
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import IntegerValidator
 
@@ -72,37 +74,37 @@ class CustomizedI18NBehaviorTest(ValidationTest):
         return gettext_args.get('domain')
     
     def test_validator_can_define_more_translations_while_keeping_existing_ones(self):
-        self.assert_equals('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
-        self.assert_equals('A message from an application validator.', self.message_for_key('foo'))
-    
+        assert_equals('Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
+        assert_equals('A message from an application validator.', self.message_for_key('foo'))
+
     def test_validator_can_define_custom_parameters_for_translation_mechanism(self):
-        self.assert_equals('pycerberus', self.domain_for_key('empty'))
-        self.assert_equals('fnord', self.domain_for_key('foo'))
-    
+        assert_equals('pycerberus', self.domain_for_key('empty'))
+        assert_equals('fnord', self.domain_for_key('foo'))
+
     def test_parameters_for_translation_are_inherited_from_super_class(self):
-        self.assert_equals('fnord', self.domain_for_key('foo'))
+        assert_equals('fnord', self.domain_for_key('foo'))
         self.init_validator(SimpleDerivedValidator())
-        self.assert_equals('fnord', self.domain_for_key('foo'))
-    
+        assert_equals('fnord', self.domain_for_key('foo'))
+
     def test_use_parameters_for_translation_from_class_where_key_is_defined(self):
         self.init_validator(SimpleDerivedValidator())
-        self.assert_equals('framework', self.domain_for_key('invalid_type'))
-        self.assert_equals('fnord', self.domain_for_key('foo'))
-    
+        assert_equals('framework', self.domain_for_key('invalid_type'))
+        assert_equals('fnord', self.domain_for_key('foo'))
+
     def test_validators_can_use_their_own_translations_for_existing_keys(self):
-        self.assert_equals(u'Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
+        assert_equals(u'Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
         self.init_validator(ValidatorRedefiningKeys())
-        self.assert_equals('fnord', self.message_for_key('empty'))
-    
+        assert_equals('fnord', self.message_for_key('empty'))
+
     def test_validators_can_use_other_translation_systems_than_gettext(self):
         self.init_validator(ValidatorWithNonGettextTranslation())
-        self.assert_equals('db translation', self.message_for_key('inactive', locale='en'))
-        self.assert_equals(u'db Übersetzung', self.message_for_key('inactive', locale='de'))
-    
+        assert_equals('db translation', self.message_for_key('inactive', locale='en'))
+        assert_equals(u'db Übersetzung', self.message_for_key('inactive', locale='de'))
+
     def test_different_translation_system_is_only_applied_to_messages_declared_in_that_class(self):
         self.init_validator(ValidatorWithNonGettextTranslation())
         # This translation is present in the included mo files but not returned
         # by the custom translation method.
-        self.assert_equals(u'Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
+        assert_equals(u'Bitte geben Sie einen Wert ein.', self.message_for_key('empty'))
 
 

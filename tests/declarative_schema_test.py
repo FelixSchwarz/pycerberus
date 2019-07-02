@@ -35,21 +35,21 @@ class DeclarativeSchemaTest(ValidationTest):
     # setup / introspection
     
     def test_knows_its_fieldvalidators(self):
-        self.assert_contains('id', self.schema().fieldvalidators().keys())
-    
+        assert_contains('id', self.schema().fieldvalidators().keys())
+
     def test_also_can_use_validator_classes(self):
-        self.assert_contains('amount', self.schema().fieldvalidators().keys())
-        self.assert_equals(set(['id', 'amount']), set(self.schema().fieldvalidators().keys()))
-    
+        assert_contains('amount', self.schema().fieldvalidators().keys())
+        assert_equals(set(['id', 'amount']), set(self.schema().fieldvalidators().keys()))
+
     def test_instance_uses_instances_of_validators_declared_as_class(self):
         first = self.schema().validator_for('amount')
         second = self.schema().validator_for('amount')
-        self.assert_not_equals(first, second)
-    
+        assert_not_equals(first, second)
+
     def test_declared_validators_are_no_class_attributes_after_initialization(self):
         for fieldname in self.schema().fieldvalidators():
-            self.assert_false(hasattr(self.schema(), fieldname))
-    
+            assert_false(hasattr(self.schema(), fieldname))
+
     def test_can_have_formvalidators(self):
         assert_callable(self.schema().formvalidators)
         assert_length(1, self.schema().formvalidators())
@@ -59,8 +59,8 @@ class DeclarativeSchemaTest(ValidationTest):
     
     def test_can_bail_out_if_additional_items_are_detected(self):
         e = self.assert_raises(InvalidDataError, lambda: self.schema().process(dict(id=42, amount=21, extra='foo')))
-        self.assert_equals('Undeclared field detected: "extra".', e.msg())
-    
+        assert_equals('Undeclared field detected: "extra".', e.msg())
+
     def test_can_override_additional_items_parameter_on_class_instantiation(self):
         schema = self.schema(allow_additional_parameters=True)
         schema.process(dict(id=42, amount=21, extra='foo'))
@@ -69,8 +69,9 @@ class DeclarativeSchemaTest(ValidationTest):
         class DerivedSchema(self.DeclarativeSchema):
             pass
         schema = DerivedSchema()
-        self.assert_raises(InvalidDataError, lambda: schema.process(dict(id=42, amount=21, extra='foo')))
-    
+        with assert_raises(InvalidDataError):
+            schema.process(dict(id=42, amount=21, extra='foo'))
+
     # -------------------------------------------------------------------------
     # pass unvalidated parameters
     

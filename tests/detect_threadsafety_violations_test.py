@@ -21,14 +21,15 @@ class DetectThreadSafetyViolationInValidatorTest(ValidationTest):
     validator_class = NonThreadSafeValidator
     
     def test_can_detect_threadsafety_violations(self):
-        assert_raises(ThreadSafetyError, lambda: self.process(42))
-    
+        with assert_raises(ThreadSafetyError):
+            self.process(42)
+
     def test_can_disable_threadsafety_detection(self):
         class ValidatorWrittenByExpert(self.validator_class):
             def __init__(self, *args, **kwargs):
                 self._is_internal_state_frozen = False
                 self.super()
         self.init_validator(ValidatorWrittenByExpert())
-        self.assert_equals(42, self.process(42))
+        assert_equals(42, self.process(42))
 
 

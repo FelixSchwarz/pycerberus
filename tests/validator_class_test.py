@@ -24,8 +24,8 @@ class ValidatorTest(ValidationTest):
         self.init_validator(Validator())
         assert_equals(u'ö', self.revert_conversion(u'ö'))
         assert_equals('1', self.revert_conversion(1))
-        assert_equals(None, self.revert_conversion(None))
-    
+        assert_none(self.revert_conversion(None))
+
     def test_can_copy_itself(self):
         # This is the same test as in BaseValidator - however Validator has
         # thread-safety built-in so we need extra code
@@ -93,15 +93,15 @@ class DefaultAndRequiredValuesTest(ValidationTest):
         raise NotImplementedError()
     
     def test_have_special_value_for_no_value_set(self):
-        self.assert_equals(NoValueSet, NoValueSet)
-        self.assert_trueish(NoValueSet)
-    
+        assert_equals(NoValueSet, NoValueSet)
+        assert_trueish(NoValueSet)
+
     def test_can_detect_empty_values_and_return_special_value_before_validation(self):
         self.validator().convert = self.not_implemented
         self.init_validator(required=False)
-        self.assert_equals(42, self.process('empty'))
+        assert_equals(42, self.process('empty'))
         # special check to ensure that other tests are not affected by this
-        self.assert_not_equals(self.not_implemented, self.validator().convert)
+        assert_not_equals(self.not_implemented, self.validator().convert)
 
     def test_validator_provides_almost_empty_dict_if_no_context_was_given(self):
         # we need a "result" in our context so validators can properly report
@@ -114,25 +114,27 @@ class DefaultAndRequiredValuesTest(ValidationTest):
             return 21
         self.init_validator(required=False)
         self.validator().empty_value = store_empty
-        self.assert_equals(21, self.process('empty'))
+        assert_equals(21, self.process('empty'))
 
         assert_not_none(dummy.given_context)
         result = dummy.given_context.pop('result', None)
         assert_true(is_result(result),
             message='context must contain a result instance to return errors without using exceptions')
-        self.assert_equals({}, dummy.given_context)
+        assert_equals({}, dummy.given_context)
         # check that we did not change the real class used in other test cases
-        self.assert_not_equals(store_empty, self.init_validator().empty_value)
-    
+        assert_not_equals(store_empty, self.init_validator().empty_value)
+
     def test_can_set_default_value_for_empty_values(self):
-        self.assert_equals(23, Validator(default=23, required=False).process(None))
-    
+        assert_equals(23, Validator(default=23, required=False).process(None))
+
     def test_raise_exception_if_required_value_is_missing(self):
-        self.assert_equals(42,  Validator(required=True).process(42))
-        self.assert_none(Validator(required=False).process(None))
-        assert_raises(EmptyError, lambda: Validator(required=True).process(None))
-        assert_raises(EmptyError, lambda: Validator().process(None))
-    
+        assert_equals(42,  Validator(required=True).process(42))
+        assert_none(Validator(required=False).process(None))
+        with assert_raises(EmptyError):
+            Validator(required=True).process(None)
+        with assert_raises(EmptyError):
+            Validator().process(None)
+
     def test_raise_exception_if_value_is_required_but_default_is_set_to_prevent_errors(self):
         assert_raises(InvalidArgumentsError, lambda: Validator(required=True, default=12))
 
@@ -143,14 +145,14 @@ class StripValueTest(ValidationTest):
     
     def test_can_strip_input(self):
         self.init_validator(strip=True)
-        self.assert_equals('foo', self.validator().process(' foo '))
-        
+        assert_equals('foo', self.validator().process(' foo '))
+
         self.init_validator(strip=False)
-        self.assert_equals(' foo ', self.validator().process(' foo '))
-    
+        assert_equals(' foo ', self.validator().process(' foo '))
+
     def test_do_not_strip_input_by_default(self):
-        self.assert_equals(' foo ', self.validator().process(' foo '))
-    
+        assert_equals(' foo ', self.validator().process(' foo '))
+
     def test_only_strip_if_value_has_strip_method(self):
         self.init_validator(strip=True)
         self.assert_error(None)

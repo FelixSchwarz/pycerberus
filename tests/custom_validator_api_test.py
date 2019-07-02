@@ -6,6 +6,8 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from pythonic_testcase import *
+
 from pycerberus.api import Validator
 from pycerberus.test_util import ValidationTest
 
@@ -42,38 +44,38 @@ class CustomValidatorAPITest(ValidationTest):
     
     def test_validators_can_use_custom_lookup_mechanism_for_messages(self):
         self.init_validator(ValidatorWithCustomMessageForKey())
-        self.assert_equals('message from custom lookup', self.message_for_key('inactive'))
-    
+        assert_equals('message from custom lookup', self.message_for_key('inactive'))
+
     def test_can_specify_additional_messages_during_instantiation(self):
         validator = AdditionalMessagesValidator(messages={
             'deleted': 'Your account was deleted.'
         })
         self.init_validator(validator)
-        
-        self.assert_equals({
+
+        assert_equals({
             'disabled': 'account disabled',
             'deleted': 'Your account was deleted.',
         }, validator.messages())
-        self.assert_equals('account disabled', validator.message_for_key('disabled', {}))
-        self.assert_equals('Your account was deleted.', validator.message_for_key('deleted', {}))
-        self.assert_equals(set(['disabled', 'deleted']), set(validator.keys()))
-        
-        self.assert_equals('account disabled', self.message_for_key('disabled'))
-        self.assert_equals('Your account was deleted.', self.message_for_key('deleted'))
-        self.assert_equals('Value must not be empty.', self.message_for_key('empty', locale='en'))
-    
+        assert_equals('account disabled', validator.message_for_key('disabled', {}))
+        assert_equals('Your account was deleted.', validator.message_for_key('deleted', {}))
+        assert_equals(set(['disabled', 'deleted']), set(validator.keys()))
+
+        assert_equals('account disabled', self.message_for_key('disabled'))
+        assert_equals('Your account was deleted.', self.message_for_key('deleted'))
+        assert_equals('Value must not be empty.', self.message_for_key('empty', locale='en'))
+
     def test_can_replace_builtin_messages_during_instantion(self):
         validator_messages = AdditionalMessagesValidator().messages()
-        self.assert_not_contains('empty', validator_messages,
+        assert_not_contains('empty', validator_messages,
             message='the bug only occurred when the validator class did not override the key itself.')
         new_msg = 'Please select any value.'
         validator = AdditionalMessagesValidator(messages={
             'empty': new_msg,
         })
         self.init_validator(validator)
-        
-        self.assert_equals(new_msg, self.message_for_key('empty'))
-        self.assert_equals('account deleted', self.message_for_key('deleted'),
+
+        assert_equals(new_msg, self.message_for_key('empty'))
+        assert_equals('account deleted', self.message_for_key('deleted'),
             message='class-level message definitions should still work')
 
 
@@ -89,6 +91,6 @@ class CanDeclareMessagesInClassDictTest(ValidationTest):
     validator_class = CanDeclareMessagesInClassDictValidator
     
     def test_can_declare_messages_in_classdict(self):
-        self.assert_equals('Message from class-level.', self.message_for_key('classlevel'))
+        assert_equals('Message from class-level.', self.message_for_key('classlevel'))
 
 
