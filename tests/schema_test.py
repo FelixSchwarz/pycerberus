@@ -492,18 +492,25 @@ class SchemaTest(ValidationTest):
         assert_length(1, result.children['key'].errors)
         assert_equals('key', result.children['key'].errors[0].key)
 
+    def test_can_handle_mismatched_value_for_subschema(self):
+        schema = self._schema_with_user_subschema(exception_if_invalid=False)
+        result = schema.process({'user': 1})
+
+        assert_true(result.contains_errors())
+        assert_true(result.user.contains_errors())
+
     # -------------------------------------------------------------------------
     # sub-schemas
     
-    def _user_schema(self):
-        user_schema = self._schema(fields=())
+    def _user_schema(self, **schema_kwargs):
+        user_schema = self._schema(fields=(), **schema_kwargs)
         user_schema.add('first_name', StringValidator)
         user_schema.add('last_name', StringValidator)
         return user_schema
     
-    def _schema_with_user_subschema(self):
-        schema = self._schema(fields=())
-        schema.add('user', self._user_schema())
+    def _schema_with_user_subschema(self, **schema_kwargs):
+        schema = self._schema(fields=(), **schema_kwargs)
+        schema.add('user', self._user_schema(**schema_kwargs))
         return schema
     
     def test_can_declare_schema_with_subschema(self):

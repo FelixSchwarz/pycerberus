@@ -157,6 +157,13 @@ class FormDataTest(PythonicTestCase):
         assert_equals('baz', self.context.foo.initial_value)
         assert_equals(set(['foo', 'bar']), set(self.context.children))
 
+    def test_ignores_mismatched_types_when_setting_initial_values(self):
+        field = FieldData()
+        schema = FormData(children={'name': field})
+        schema.set(initial_value=1)
+
+        assert_none(field.initial_value, message='should ignore mismatched input')
+
     def test_can_set_errors(self):
         values = {'foo': ('too big', ), 'bar': None}
         self.context.set(errors=values)

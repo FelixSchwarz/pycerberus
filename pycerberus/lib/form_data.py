@@ -266,7 +266,11 @@ class FormData(object):
         def value_for(child_name, values, default_value=None):
             if values is undefined:
                 return undefined
-            return values.get(child_name, default_value)
+            if hasattr(values, 'get'):
+                return values.get(child_name, default_value)
+            # If the caller does not pass a dict-like object just ignore the
+            # input to avoid exceptions later.
+            return default_value
 
         def ensure_all_keys_known(values):
             if values is undefined:
