@@ -16,7 +16,7 @@ __all__ = ['OneOf']
 class OneOf(Validator):
     def __init__(self, allowed_values, **kwargs):
         self._allowed_values = allowed_values
-        self.super.__init__(**kwargs)
+        super(OneOf, self).__init__(**kwargs)
     
     def messages(self):
         return {

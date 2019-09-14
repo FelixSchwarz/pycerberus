@@ -110,8 +110,8 @@ class SchemaValidator(Validator):
         if filter_unvalidated_parameters is not None:
             self.filter_unvalidated_parameters = filter_unvalidated_parameters
         self._check_consistency_additional_and_filtered_parameters()
-        
-        self.super(*args, **kwargs)
+
+        super(SchemaValidator, self).__init__(*args, **kwargs)
         self._setup_fieldvalidators()
         self._setup_formvalidators()
     

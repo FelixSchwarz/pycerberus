@@ -80,8 +80,8 @@ class DefaultAndRequiredValuesTest(ValidationTest):
         
         def __init__(self, default=42, *args, **kwargs):
             self._is_internal_state_frozen = False
-            self.super()
-        
+            super(self.__class__, self).__init__(default=42, *args, **kwargs)
+
         def is_empty(self, value, context):
             return value == self._empty_value
     

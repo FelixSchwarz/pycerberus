@@ -16,7 +16,6 @@ import six
 from pycerberus.error_conversion import exception_from_errors
 from pycerberus.errors import *
 from pycerberus.i18n import _, GettextTranslation
-from pycerberus.lib import SuperProxy
 from pycerberus.lib.form_data import FieldData
 
 
@@ -28,9 +27,6 @@ class NoValueSet(object):
 
 
 class EarlyBindForMethods(type):
-    
-    super = SuperProxy()
-    
     def __new__(cls, classname, direct_superclasses, class_attributes_dict):
         validator_class = type.__new__(cls, classname, direct_superclasses, class_attributes_dict)
         cls._simulate_early_binding_for_message_methods(validator_class)
@@ -74,9 +70,6 @@ class BaseValidator(object):
     You can pass ``messages`` a dict of messages during instantiation to 
     overwrite messages specified in the validator without the need to create 
     a subclass."""
-    
-    super = SuperProxy()
-    
     def __init__(self, messages=None):
         if not messages:
             return
@@ -222,7 +215,7 @@ class Validator(BaseValidator):
     
     def __init__(self, default=NoValueSet, required=NoValueSet,
                  exception_if_invalid=NoValueSet, strip=False, messages=None):
-        self.super(messages=messages)
+        super(Validator, self).__init__(messages=messages)
         self._default = default
         self._required = required
         self._exception_if_invalid = getattr(self, 'exception_if_invalid', NoValueSet)

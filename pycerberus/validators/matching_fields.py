@@ -17,8 +17,8 @@ class MatchingFields(Validator):
     def __init__(self, first_field, second_field, *args, **kwargs):
         self.first_field = first_field
         self.second_field = second_field
-        self.super.__init__(*args, **kwargs)
-    
+        super(MatchingFields, self).__init__(*args, **kwargs)
+
     def messages(self):
         return dict(mismatch=_(u'Fields do not match'))
     

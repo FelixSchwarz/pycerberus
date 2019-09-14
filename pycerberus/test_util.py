@@ -12,7 +12,6 @@ from pythonic_testcase import *
 
 from pycerberus import InvalidDataError
 from pycerberus.lib.form_data import is_result
-from pycerberus.lib.simple_super import SuperProxy
 
 
 __all__ = [
@@ -35,8 +34,6 @@ def assert_no_critical_errors(errors):
 
 
 class ValidationTest(PythonicTestCase):
-    
-    super = SuperProxy()
     # don't initialize '_validator' attribute in 'setUp()' so that subclasses
     # can initialize the validator themself before calling this 'setUp()'.
     # This is important if the validator to be tested requires mandatory 
@@ -44,7 +41,7 @@ class ValidationTest(PythonicTestCase):
     _validator = None
     
     def setUp(self):
-        self.super()
+        super(ValidationTest, self).setUp()
         if hasattr(self, 'validator_class'):
             # this will set up the validator with the correct arguments 
             # specified in the testcase

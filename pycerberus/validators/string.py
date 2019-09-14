@@ -22,8 +22,8 @@ class StringValidator(Validator):
         self._min_length = min_length
         self._max_length = max_length
         self._check_min_max_length_consistency()
-        self.super.__init__(**kwargs)
-    
+        super(StringValidator, self).__init__(**kwargs)
+
     def _check_min_max_length_consistency(self):
         if (self._min_length != NoValueSet) and (self._max_length != NoValueSet):
             if self._min_length > self._max_length:

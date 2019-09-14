@@ -29,8 +29,8 @@ class ForEach(Validator):
                 message = 'min_length must be smaller or equal to max_length (%s > %s)' % values
                 raise InvalidArgumentsError(message)
         kwargs.setdefault('default', ())
-        self.super.__init__(**kwargs)
-    
+        super(ForEach, self).__init__(**kwargs)
+
     def messages(self):
         return {
             'invalid_type': _(u'Validator got unexpected input (expected string, got "%(classname)s").'),

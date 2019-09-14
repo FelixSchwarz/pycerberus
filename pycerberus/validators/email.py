@@ -49,7 +49,7 @@ class EmailAddressValidator(DomainNameValidator):
         if len(parts) != 2:
             self.raise_error('single_at', emailaddress, context)
         localpart, domain = parts
-        self.super(domain, context)
+        super(EmailAddressValidator, self).validate(domain, context)
         self._validate_localpart(localpart, emailaddress, context)
         self._validate_domain(domain, emailaddress, context)
 

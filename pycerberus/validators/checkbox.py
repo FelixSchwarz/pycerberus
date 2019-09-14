@@ -24,7 +24,7 @@ class BooleanCheckbox(StringValidator):
         kwargs.setdefault('strip', True)
         self.trueish = kwargs.pop('trueish', self.__class__.trueish)
         self.falsish = kwargs.pop('falsish', self.__class__.falsish)
-        super(BooleanCheckbox, self).super(**kwargs)
+        super(BooleanCheckbox, self).__init__(**kwargs)
 
     def messages(self):
         return {
@@ -67,7 +67,7 @@ class BooleanCheckbox(StringValidator):
 class AgreeToConditionsCheckbox(BooleanCheckbox):
     def __init__(self, **kwargs):
         kwargs['required'] = True
-        super(AgreeToConditionsCheckbox, self).super(**kwargs)
+        super(AgreeToConditionsCheckbox, self).__init__(**kwargs)
 
     def messages(self):
         return {

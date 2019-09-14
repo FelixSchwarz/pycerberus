@@ -23,8 +23,8 @@ class IntegerValidator(Validator):
         if (self.min is not None) and (self.max is not None) and (self.min > self.max):
             message = 'min must be smaller or equal to max (%s > %s)' % (repr(self.min), repr(self.max))
             raise InvalidArgumentsError(message)
-        self.super(*args, **kwargs)
-    
+        super(IntegerValidator, self).__init__(*args, **kwargs)
+
     def messages(self):
         return {
                 'invalid_type': _(u'Validator got unexpected input (expected string, got "%(classname)s").'),

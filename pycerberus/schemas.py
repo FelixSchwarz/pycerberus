@@ -34,7 +34,7 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
     """
     
     def __init__(self, *args, **kwargs):
-        self.super()
+        super(PositionalArgumentsParsingSchema, self).__init__(*args, **kwargs)
         self.set_internal_state_freeze(False)
         self.set_allow_additional_parameters(False)
         self.set_parameter_order(getattr(self.__class__, 'parameter_order', ()))
@@ -80,7 +80,7 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         if value is None:
             value = {}
         fields = self._map_arguments_to_named_fields(value, context or {})
-        return self.super(fields, context=context)
+        return super(PositionalArgumentsParsingSchema, self).process(fields, context=context)
 
     def _raise_exception(self, result, context):
         if '_extra' in result.children:
@@ -93,5 +93,5 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
                 is_critical=False,
             )
             extra_child.set(errors=(new_error,))
-        self.super()
+        super(PositionalArgumentsParsingSchema, self)._raise_exception(result, context)
 
