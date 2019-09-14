@@ -62,42 +62,14 @@ def i18n_aware_commands():
 
 
 if __name__ == '__main__':
-    version = '0.6.99.20190702'
     extra_commands = i18n_aware_commands()
     setuptools.setup(
-        name = 'pycerberus',
-        version = version,
-        description = 'Highly flexible input validation library',
         long_description=(read('README.md') + read('Changelog.txt')),
-        license = 'MIT',
-        author = 'Felix Schwarz',
-        author_email = 'felix.schwarz@oss.schwarz.eu',
-        url = 'https://github.com/FelixSchwarz/pycerberus',
 
         tests_require=requires_from_file('dev_requirements.txt'),
         install_requires=requires_from_file('requirements.txt'),
         test_suite = 'nose.collector',
         
-        # simple_super is not zip_safe, neither is the current gettext 
-        # implementation
-        zip_safe=False,
-        packages=setuptools.find_packages(exclude=['tests']),
-        # setuptools bug when using Python 2 + unicode literals
-        # It only accepts plain strings (not unicode) for package_data so we
-        # need to convert these explicitely.
-        # http://stackoverflow.com/a/23175194/138526
-        package_data = {
-            str('pycerberus'): [str('locales/*/LC_MESSAGES/pycerberus.mo')],
-        },
-        classifiers = (
-            'Development Status :: 4 - Beta',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: MIT License',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 3',
-            'Topic :: Software Development :: Libraries :: Python Modules',
-        ),
         cmdclass=extra_commands,
     )
 
