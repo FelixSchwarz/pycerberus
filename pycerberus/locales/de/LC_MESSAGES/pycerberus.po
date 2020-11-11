@@ -115,7 +115,7 @@ msgstr ""
 #: pycerberus/validators/email.py:44
 #, python-format
 msgid "Missing domain in email address \"%(emailaddress)s\"."
-msgstr ""
+msgstr "Fehlende Domain in E-Mail-Adresse \"%(emailaddress)s\"."
 
 #: pycerberus/validators/foreach.py:37
 #, python-format
