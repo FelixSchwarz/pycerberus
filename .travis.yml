@@ -10,6 +10,7 @@ python:
 
 install:
   - pip install -e .[testing]
+  - pybabel compile --domain=pycerberus --directory=pycerberus/locales
 
 script:
   - nosetests
