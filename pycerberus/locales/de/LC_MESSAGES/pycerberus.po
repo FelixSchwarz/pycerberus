@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.4\n"
 "Report-Msgid-Bugs-To: felix.schwarz@oss.schwarz.eu\n"
-"POT-Creation-Date: 2020-11-11 12:33+0100\n"
+"POT-Creation-Date: 2020-11-11 12:51+0100\n"
 "PO-Revision-Date: 2013-04-23 14:02+0200\n"
 "Last-Translator: Felix Schwarz <felix.schwarz@oss.schwarz.eu>\n"
 "Language: de\n"
@@ -134,6 +134,11 @@ msgstr "Die Felder stimmen nicht überein."
 #: pycerberus/validators/oneof.py:23
 msgid "This value is not allowed."
 msgstr "Dieser Wert ist nicht erlaubt."
+
+#: pycerberus/validators/regex.py:34
+#, python-format
+msgid "Input \"%(input_)s\" does not match the expected pattern."
+msgstr "Die Eingabe \"%(input_)s\" entspricht nicht dem erwarteten Muster."
 
 #: pycerberus/validators/string.py:37
 #, python-format

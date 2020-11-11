@@ -22,6 +22,7 @@ and version 1.0 will use result instances by default.
 - BaseValidator: removed deprecated ".error()" and ".to_string()" methods
 - stop using "SuperProxy" - using "self.super(…)" is not supported in validator
   classes/tests anymore.
+- added `RegexValidator` implementation
 
 
 0.6 (24.11.2014)

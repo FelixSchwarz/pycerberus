@@ -99,6 +99,24 @@ class ValidationTest(PythonicTestCase):
             raise AssertionError(default_message + ' ' + message)
         return result
 
+    def assert_error_with_key(self, error_key, *args, **kwargs):
+        message = kwargs.get('message', None)
+        result_or_exc = self.assert_error(*args, **kwargs)
+
+        if is_result(result_or_exc):
+            errors = result_or_exc.errors
+            _exc_keys = error_keys(errors)
+        else:
+            exc = result_or_exc
+            _exc_keys = (exc.details().key(),)
+
+        if error_key in _exc_keys:
+            return
+        fail_msg = 'No error with key %s (found %s)' % (error_key, ', '.join(_exc_keys))
+        if message:
+            fail_msg += ': ' + message
+        self.fail(fail_msg)
+
     def assert_error_with_locale(self, value, locale='en', *args, **kwargs):
         """Process the given value and assert that this raises a validation
         exception - return that exception."""
