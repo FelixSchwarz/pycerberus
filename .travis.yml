@@ -9,7 +9,7 @@ python:
   - "pypy3"
 
 install:
-  - pip install -e .[testing]
+  - pip install -e .[i18n,testing]
   - pybabel compile --domain=pycerberus --directory=pycerberus/locales
 
 script:
