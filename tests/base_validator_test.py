@@ -23,3 +23,14 @@ class BaseValidatorTest(PythonicTestCase):
         
         assert_contains(4, a.acceptable_values)
         assert_not_contains(4, b.acceptable_values)
+
+    def test_can_set_validator_id_via_constructor(self):
+        validator = BaseValidator(id='foo')
+        assert_equals('foo', validator.id)
+
+    def test_can_generate_validator_id(self):
+        class FooBarValidator(BaseValidator):
+            pass
+        validator = FooBarValidator()
+        assert_equals('foo-bar-validator', validator.id)
+

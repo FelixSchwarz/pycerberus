@@ -6,6 +6,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import six
 from pythonic_testcase import *
 
 from pycerberus.api import Validator
@@ -47,8 +48,17 @@ class DeclarativeSchemaTest(ValidationTest):
         assert_not_equals(first, second)
 
     def test_declared_validators_are_no_class_attributes_after_initialization(self):
-        for fieldname in self.schema().fieldvalidators():
-            assert_false(hasattr(self.schema(), fieldname))
+        schema = self.schema()
+        for fieldname in schema.fieldvalidators():
+            if not hasattr(schema, fieldname):
+                continue
+            if fieldname == 'id':
+                # "id" is valid attribute for Validators but might also used
+                # for a field validator so let's check this is just a simple
+                # string.
+                assert (schema.id is None) or isinstance(schema.id, six.string_types)
+            else:
+                raise AssertionError('schema has unexpected attribute "%s"' % fieldname)
 
     def test_can_have_formvalidators(self):
         assert_callable(self.schema().formvalidators)

@@ -8,6 +8,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
 import inspect
+import re
 import types
 import warnings
 
@@ -60,6 +61,11 @@ class EarlyBindForMethods(type):
     _simulate_early_binding_for_message_methods = classmethod(_simulate_early_binding_for_message_methods)
 
 
+def _class_name_to_validator_id(class_name):
+    matches = re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', class_name)
+    return '-'.join(map(lambda s: s.lower(), matches))
+
+
 @six.add_metaclass(EarlyBindForMethods)
 class BaseValidator(object):
     """The BaseValidator implements only the minimally required methods. 
@@ -70,7 +76,8 @@ class BaseValidator(object):
     You can pass ``messages`` a dict of messages during instantiation to 
     overwrite messages specified in the validator without the need to create 
     a subclass."""
-    def __init__(self, messages=None):
+    def __init__(self, messages=None, id=None):
+        self.id = id if id else _class_name_to_validator_id(self.__class__.__name__)
         if not messages:
             return
         
@@ -212,10 +219,10 @@ class Validator(BaseValidator):
     In order to prevent programmer errors, an exception will be raised if 
     you set ``required`` to True but provide a default value as well.
     """
-    
-    def __init__(self, default=NoValueSet, required=NoValueSet,
+
+    def __init__(self, default=NoValueSet, required=NoValueSet, id=None,
                  exception_if_invalid=NoValueSet, strip=False, messages=None):
-        super(Validator, self).__init__(messages=messages)
+        super(Validator, self).__init__(messages=messages, id=id)
         self._default = default
         self._required = required
         self._exception_if_invalid = getattr(self, 'exception_if_invalid', NoValueSet)

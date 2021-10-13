@@ -20,6 +20,10 @@ class ValidatorTest(ValidationTest):
         with assert_raises(Exception):
             Validator(invalid='fnord')
 
+    def test_can_set_validator_id_via_constructor(self):
+        validator = Validator(id='foo')
+        assert_equals('foo', validator.id)
+
     def test_revert_conversion(self):
         self.init_validator(Validator())
         assert_equals(u'ö', self.revert_conversion(u'ö'))
