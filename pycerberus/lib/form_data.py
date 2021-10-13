@@ -238,6 +238,7 @@ class FormData(object):
                 self.children[name] = child
             child_names = tuple(self.children)
         self.child_names = child_names or ()
+        self._schema_meta = {}
         self.global_errors = ()
 
     def __getattr__(self, name):
@@ -354,16 +355,21 @@ class FormData(object):
         assert (child_name in self.child_names)
         self.children[child_name] = FieldData()
 
-    def update(self, value=undefined, initial_value=undefined, errors=undefined):
+    def update(self, value=undefined, initial_value=undefined, errors=undefined, schema_meta=undefined):
         self._set_values(value, initial_value, errors, undefined, clear_missing=False)
+        if schema_meta is not undefined:
+            self._schema_meta = schema_meta
 
-    def set(self, value=undefined, initial_value=undefined, errors=undefined, meta=undefined):
+    def set(self, value=undefined, initial_value=undefined, errors=undefined, meta=undefined, schema_meta=undefined):
         self._set_values(value, initial_value, errors, meta, clear_missing=True)
+        if schema_meta is not undefined:
+            self._schema_meta = schema_meta
 
     def copy(self):
         context = self.__class__()
         for name, child in self.children.items():
             context.children[name] = child.copy()
+        context._schema_meta = deepcopy(self._schema_meta)
         return context
     __deepcopy__ = copy
 
@@ -377,7 +383,15 @@ class FormData(object):
 
     @property
     def meta(self):
-        return self._collect_attribute_values('meta')
+        _meta = self._collect_attribute_values('meta')
+        if self.schema_meta:
+            assert '_schema_meta' not in _meta
+            _meta['_schema_meta'] = self._schema_meta
+        return _meta
+
+    @property
+    def schema_meta(self):
+        return self._schema_meta
 
     def _collect_attribute_values(self, attribute_name):
         values = {}

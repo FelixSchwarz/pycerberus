@@ -140,6 +140,14 @@ class FormDataTest(PythonicTestCase):
         assert_equals('baz', self.context.foo.meta)
         assert_equals(42, self.context.bar.meta)
 
+    def test_can_set_schema_meta(self):
+        values = {'foo': 'baz', 'bar': 42}
+        self.context.set(meta=values, schema_meta={'quox': 21})
+
+        assert_equals({'quox': 21}, self.context.schema_meta)
+        expected_meta = {'foo': 'baz', 'bar': 42, '_schema_meta': {'quox': 21}}
+        assert_equals(expected_meta, self.context.meta)
+
     def test_does_not_touch_unrelated_values_during_set(self):
         values = {'foo': 'baz', 'bar': 42}
         self.context.set(value=values)
@@ -215,6 +223,12 @@ class FormDataTest(PythonicTestCase):
         self.context.update(value={'bar': 42})
 
         assert_equals({'foo': 'foo', 'bar': 42}, self.context.value)
+
+    def test_can_update_schema_meta(self):
+        self.context.update(schema_meta={'quox': 21})
+        assert_equals({'quox': 21}, self.context.schema_meta)
+        expected_meta = {'foo': {}, 'bar': {'quox': 'baz'}, '_schema_meta': {'quox': 21}}
+        assert_equals(expected_meta, self.context.meta)
 
     # --- helpers -------------------------------------------------------------
 
