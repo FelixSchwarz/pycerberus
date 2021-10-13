@@ -303,12 +303,12 @@ class Validator(BaseValidator):
             return self.handle_empty_input(value, context, old_result)
 
         context['result'] = result
-        nr_initial_errors = result.nr_errors()
+        nr_initial_errors = result.error_count
         converted_value = self.convert(value, context)
-        nr_errors_after_convert = result.nr_errors()
+        nr_errors_after_convert = result.error_count
         if nr_errors_after_convert <= nr_initial_errors:
             self.validate(converted_value, context)
-        nr_new_errors = result.nr_errors() - nr_initial_errors
+        nr_new_errors = result.error_count - nr_initial_errors
         self._restore_old_result_in_context(context, old_result)
         return self.handle_validator_result(converted_value, result, context, nr_new_errors=nr_new_errors)
 

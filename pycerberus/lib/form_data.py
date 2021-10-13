@@ -5,6 +5,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from copy import deepcopy
+import warnings
 
 from pycerberus.compat import OrderedDict
 
@@ -73,13 +74,18 @@ class FieldData(object):
         tmpl = 'FieldData(value=%r, initial_value=%r, errors=%r, meta=%r)'
         return tmpl % (self.value, self.initial_value, self.errors, self.meta)
 
-    def nr_errors(self):
+    @property
+    def error_count(self):
         if self.errors is None:
             return 0
         return len(self.errors)
 
+    def nr_errors(self):
+        warnings.warn('"nr_errors()" is deprecated, use "error_count" instead')
+        return self.error_count
+
     def contains_errors(self):
-        return (self.nr_errors() > 0)
+        return (self.error_count > 0)
 
     def contains_critical_error(self):
         if not self.contains_errors():
@@ -134,13 +140,18 @@ class RepeatingFieldData(object):
         self.global_errors = tuple(_errors)
 
     def contains_errors(self):
-        return (self.nr_errors() > 0)
+        return (self.error_count > 0)
 
-    def nr_errors(self):
+    @property
+    def error_count(self):
         count = len(self.global_errors)
         for item in self.items:
-            count += item.nr_errors()
+            count += item.error_count
         return count
+
+    def nr_errors(self):
+        warnings.warn('"nr_errors()" is deprecated, use "error_count" instead')
+        return self.error_count
 
     @property
     def errors(self):
@@ -231,13 +242,18 @@ class FormData(object):
         return 'FormData<children=%r>' % self.children
 
     def contains_errors(self):
-        return (self.nr_errors() > 0)
+        return (self.error_count > 0)
 
-    def nr_errors(self):
+    @property
+    def error_count(self):
         count = len(self.global_errors)
         for child in self.children.values():
-            count += child.nr_errors()
+            count += child.error_count
         return count
+
+    def nr_errors(self):
+        warnings.warn('"nr_errors()" is deprecated, use "error_count" instead')
+        return self.error_count
 
     def contains_critical_error(self):
         if not self.contains_errors():
