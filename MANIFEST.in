@@ -3,7 +3,6 @@ include i18n-*.sh
 include Changelog.txt
 include LICENSE.txt
 include README.md
-include README.python3.txt
 include VERSION.txt
 include tests/*.py
 include docs/*

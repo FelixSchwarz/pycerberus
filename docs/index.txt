@@ -42,7 +42,6 @@ Documentation
     schemas
     schema_inheritance
     schema_parsing
-    python3
 
 
 
