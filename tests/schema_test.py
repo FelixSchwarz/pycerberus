@@ -158,7 +158,7 @@ class SchemaTest(ValidationTest):
         result = schema.process(input_)
         assert_equals(input_, result.initial_value)
         assert_equals({'id': 1, 'key': 'foo'}, result.value)
-        assert_false(result.contains_errors())
+        assert_false(result.contains_error())
         assert_falseish(result.errors.get('id'))
         assert_falseish(result.errors.get('key'))
 
@@ -170,7 +170,7 @@ class SchemaTest(ValidationTest):
         input_ = {'first': '5', 'second': '20'}
         result = schema.process(input_)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         first_errors = result.errors['first']
         assert_length(1, first_errors)
         assert_equals('too_low', first_errors[0].key)
@@ -186,13 +186,13 @@ class SchemaTest(ValidationTest):
         input_ = OrderedDict((('first', ''), ('second', '')))
         result = schema.process(input_)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         first = result.children['first']
-        assert_true(first.contains_errors(),
+        assert_true(first.contains_error(),
             message='"first" is required and got an empty string as input')
         assert_equals(('empty',), error_keys(first.errors))
         second = result.children['second']
-        assert_false(second.contains_errors())
+        assert_false(second.contains_error())
 
     def test_can_gather_return_values_and_exceptions(self):
         schema = SchemaValidator(exception_if_invalid=False)
@@ -202,7 +202,7 @@ class SchemaTest(ValidationTest):
         input_ = {'first': '5', 'second': '20'}
         result = schema.process(input_)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_is_not_empty(result.errors)
         first_errors = result.errors['first']
         assert_length(1, first_errors)
@@ -218,7 +218,7 @@ class SchemaTest(ValidationTest):
         schema.add('first', IntegerValidator(min=10, exception_if_invalid=True))
 
         result = schema.process(None)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals({'first': None}, result.value)
         assert_equals({'first': None}, result.initial_value)
         assert_equals(('empty',), error_keys(result.errors['first']))
@@ -228,7 +228,7 @@ class SchemaTest(ValidationTest):
         schema.add('first', IntegerValidator(min=10, exception_if_invalid=True))
 
         result = schema.process([])
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(0, result.errors.get('first', ()))
         assert_length(1, result.global_errors)
         error = result.global_errors[0]
@@ -241,7 +241,7 @@ class SchemaTest(ValidationTest):
         schema.add('foo', subschema)
 
         result = schema.process({'id': '10', 'foo': {'id': '20'}})
-        assert_false(result.contains_errors())
+        assert_false(result.contains_error())
 
     def test_can_return_error_results_from_subschemas(self):
         subschema = self._schema(fields=('id',), exception_if_invalid=False)
@@ -249,14 +249,14 @@ class SchemaTest(ValidationTest):
         schema.add('foo', subschema)
 
         result = schema.process({'id': '10', 'foo': {'id': 'invalid'}})
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         id_result = result.children['id']
-        assert_false(id_result.contains_errors())
+        assert_false(id_result.contains_error())
         foo_container = result.children['foo']
-        assert_true(foo_container.contains_errors())
+        assert_true(foo_container.contains_error())
 
         foo_id = foo_container.children['id']
-        assert_true(foo_id.contains_errors())
+        assert_true(foo_id.contains_error())
         assert_length(1, foo_id.errors)
         error = foo_id.errors[0]
         assert_equals('invalid_number', error.key)
@@ -267,7 +267,7 @@ class SchemaTest(ValidationTest):
         schema.add('foo', foo_list)
 
         result = schema.process({'foo': ['abc']})
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals(('foo',), tuple(result.errors))
         foo_errors = result.errors['foo']
 
@@ -288,7 +288,7 @@ class SchemaTest(ValidationTest):
         # Test case: multiple items for the list child but only one contains an
         # error
         result = schema.process({'foo': ['bar', '1']})
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals(('foo',), tuple(result.errors))
         foo_errors = result.errors['foo']
         assert_length(2, foo_errors)
@@ -323,7 +323,7 @@ class SchemaTest(ValidationTest):
         )
         result = schema.process(dict(foo=42))
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(0, result.global_errors)
         assert_contains('foo', result.children)
         foo_errors = result.children['foo'].errors
@@ -381,8 +381,8 @@ class SchemaTest(ValidationTest):
             exception_if_invalid=False
         )
         result = schema.process({'id': '42'})
-        assert_true(result.contains_errors())
-        assert_false(result.children['id'].contains_errors())
+        assert_true(result.contains_error())
+        assert_false(result.children['id'].contains_error())
         assert_length(1, result.global_errors)
         assert_equals('key', result.global_errors[0].key)
 
@@ -395,13 +395,13 @@ class SchemaTest(ValidationTest):
             exception_if_invalid=False
         )
         result = schema.process({'id': '42', 'key': 'foo'})
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(0, result.global_errors)
 
-        assert_true(result.children['id'].contains_errors())
+        assert_true(result.children['id'].contains_error())
         assert_length(1, result.children['id'].errors)
         assert_equals('key', result.children['id'].errors[0].key)
-        assert_true(result.children['key'].contains_errors())
+        assert_true(result.children['key'].contains_error())
         assert_length(1, result.children['key'].errors)
         assert_equals('key', result.children['key'].errors[0].key)
 
@@ -425,7 +425,7 @@ class SchemaTest(ValidationTest):
             exception_if_invalid=False
         )
         result = schema.process({'id': 'invalid'})
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.children['id'].errors)
         id_error = result.children['id'].errors[0]
         assert_equals('invalid_number', id_error.key)
@@ -482,13 +482,13 @@ class SchemaTest(ValidationTest):
             exception_if_invalid=False
         )
         result = schema.process({'id': '42', 'key': 'foo'})
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(0, result.global_errors)
 
-        assert_true(result.children['id'].contains_errors())
+        assert_true(result.children['id'].contains_error())
         assert_length(1, result.children['id'].errors)
         assert_equals('key', result.children['id'].errors[0].key)
-        assert_true(result.children['key'].contains_errors())
+        assert_true(result.children['key'].contains_error())
         assert_length(1, result.children['key'].errors)
         assert_equals('key', result.children['key'].errors[0].key)
 
@@ -496,8 +496,8 @@ class SchemaTest(ValidationTest):
         schema = self._schema_with_user_subschema(exception_if_invalid=False)
         result = schema.process({'user': 1})
 
-        assert_true(result.contains_errors())
-        assert_true(result.user.contains_errors())
+        assert_true(result.contains_error())
+        assert_true(result.user.contains_error())
 
     # -------------------------------------------------------------------------
     # sub-schemas

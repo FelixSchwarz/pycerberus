@@ -101,29 +101,29 @@ class IntegerValidatorTest(ValidationTest):
     def test_can_return_result_for_valid_input(self):
         self.init_validator(IntegerValidator(exception_if_invalid=False))
         result = self.process('6')
-        assert_false(result.contains_errors())
+        assert_false(result.contains_error())
         assert_equals('6', result.initial_value)
         assert_equals(6, result.value)
 
     def test_can_return_result_for_invalid_input(self):
         self.init_validator(IntegerValidator(exception_if_invalid=False))
         result = self.process('invalid', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals('invalid', result.initial_value)
         assert_none(result.value)
 
     def test_can_return_result_from_validate(self):
         self.init_validator(IntegerValidator(min=10, max=20, exception_if_invalid=False))
         result = self.process('5', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
 
         result = self.process('40', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
 
     def test_can_skip_validate_if_convert_found_errors(self):
         self.init_validator(IntegerValidator(min=10, exception_if_invalid=False))
         result = self.process('invalid', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals('invalid', result.initial_value)
         assert_none(result.value)
         assert_length(1, result.errors)
@@ -135,7 +135,7 @@ class IntegerValidatorTest(ValidationTest):
         assert_equals('invalid', result.initial_value)
         assert_equals(None, result.value)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('invalid_number', error.key)
@@ -148,7 +148,7 @@ class IntegerValidatorTest(ValidationTest):
         assert_equals(20, result.initial_value)
         assert_equals(None, result.value)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('too_big', error.key)

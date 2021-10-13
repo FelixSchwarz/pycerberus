@@ -77,7 +77,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         context = {}
         result = self.process(1, context=context)
         assert_not_equals(1, result, message='should return FieldData instance')
-        assert_false(result.contains_errors())
+        assert_false(result.contains_error())
         assert_equals(1, result.value)
         assert_equals(1, result.initial_value)
         assert_equals({}, context, message='context should not be modified')
@@ -92,7 +92,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         # functionality is currently only available out-of-tree.
         result = self.validator().new_result(21)
         result.errors = (Error(u'foo', u'some text', 21, {}, is_critical=False), )
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
 
         context = {u'result': result}
         result = self.process(1, context=context, ensure_valid=False)
@@ -103,7 +103,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         context = {'result': validator.new_result(None)}
         result = validator.process('', context=context)
         assert_not_none(result)
-        assert_false(result.contains_errors())
+        assert_false(result.contains_error())
         assert_equals('', result.initial_value)
         assert_equals(None, result.value)
 
@@ -113,7 +113,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
 
         assert_equals(2, result.initial_value)
         assert_none(result.value)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
 
         assert_length(1, result.errors)
         error = result.errors[0]
@@ -127,7 +127,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
 
         assert_equals(-1, result.initial_value)
         assert_none(result.value)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('small', error.key)
@@ -142,7 +142,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_equals(10, result.initial_value)
         assert_none(result.value)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(2, result.errors)
         error1, error2 = result.errors
         assert_equals('div2', error1.key)
@@ -153,7 +153,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_equals(-2, result.initial_value)
         assert_none(result.value)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('div2', error.key, message='validate would add "small" key')
@@ -163,7 +163,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_equals(None, result.initial_value)
         assert_none(result.value)
 
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('empty', error.key)

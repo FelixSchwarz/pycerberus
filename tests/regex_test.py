@@ -33,7 +33,7 @@ class RegexTest(ValidationTest):
             use_match_for_conversion=True
         )
         result = self.process('invalid', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals(('bad_pattern',), error_keys(result.errors))
         # error in convert should be treated as critical as the input for
         # .validate() is different
@@ -49,7 +49,7 @@ class RegexTest(ValidationTest):
             use_match_for_conversion=True
         )
         result = self.process([], ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals(('invalid_type',), error_keys(result.errors))
         # error in convert should be treated as critical as the input for
         # .validate() is different
@@ -62,7 +62,7 @@ class RegexTest(ValidationTest):
             use_match_for_conversion=False
         )
         result = self.process('invalid', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals(('bad_pattern',), error_keys(result.errors))
         assert_false(result.errors[0].is_critical)
 
@@ -77,7 +77,7 @@ class RegexTest(ValidationTest):
             exception_if_invalid=False,
         )
         result = self.process('abcd', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals(('too_short', 'bad_pattern'), error_keys(result.errors))
         assert_no_critical_errors(result.errors)
 
@@ -91,7 +91,7 @@ class RegexTest(ValidationTest):
         # message from super class (Validator)
         context = {'locale': 'de'}
         result = self.process('invalid', context=context, ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_equals(
             'Die Eingabe "invalid" entspricht nicht dem erwarteten Muster.',
             result.errors[0].message

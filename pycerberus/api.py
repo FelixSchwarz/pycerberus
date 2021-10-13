@@ -340,7 +340,7 @@ class Validator(BaseValidator):
         elif errors is not None:
             is_input_valid = (not errors)
         else:
-            is_input_valid = not result.contains_errors()
+            is_input_valid = not result.contains_error()
         if not self._exception_if_invalid:
             if is_input_valid:
                 result.set(value=converted_value)

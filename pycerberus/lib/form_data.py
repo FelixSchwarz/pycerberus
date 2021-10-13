@@ -84,11 +84,15 @@ class FieldData(object):
         warnings.warn('"nr_errors()" is deprecated, use "error_count" instead')
         return self.error_count
 
-    def contains_errors(self):
+    def contains_error(self):
         return (self.error_count > 0)
 
+    def contains_errors(self):
+        # will be deprecated after the next major release
+        return self.contains_error()
+
     def contains_critical_error(self):
-        if not self.contains_errors():
+        if not self.contains_error():
             return False
         for error in self.errors:
             if error.is_critical:
@@ -139,8 +143,12 @@ class RepeatingFieldData(object):
         _errors.append(error)
         self.global_errors = tuple(_errors)
 
-    def contains_errors(self):
+    def contains_error(self):
         return (self.error_count > 0)
+
+    def contains_errors(self):
+        # will be deprecated after the next major release
+        return self.contains_error()
 
     @property
     def error_count(self):
@@ -155,7 +163,7 @@ class RepeatingFieldData(object):
 
     @property
     def errors(self):
-        if not self.contains_errors():
+        if not self.contains_error():
             return None
         errors_ = []
         for context in self.items:
@@ -241,8 +249,12 @@ class FormData(object):
     def __repr__(self):
         return 'FormData<children=%r>' % self.children
 
-    def contains_errors(self):
+    def contains_error(self):
         return (self.error_count > 0)
+
+    def contains_errors(self):
+        # will be deprecated after the next major release
+        return self.contains_error()
 
     @property
     def error_count(self):
@@ -256,7 +268,7 @@ class FormData(object):
         return self.error_count
 
     def contains_critical_error(self):
-        if not self.contains_errors():
+        if not self.contains_error():
             return False
         for error in (self.global_errors or ()):
             if error.is_critical:

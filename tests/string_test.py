@@ -32,7 +32,7 @@ class StringValidatorTest(ValidationTest):
         self.init_validator(StringValidator(exception_if_invalid=False))
 
         result = self.process([], ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('invalid_type', error.key)
@@ -73,7 +73,7 @@ class StringValidatorTest(ValidationTest):
         self.init_validator(validator)
 
         result = self.process('f', ensure_valid=False)
-        assert_true(result.contains_errors())
+        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('too_short', error.key)
