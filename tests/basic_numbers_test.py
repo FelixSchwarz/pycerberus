@@ -8,7 +8,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from pythonic_testcase import *
 
-from pycerberus import InvalidDataError
 from pycerberus.errors import InvalidArgumentsError
 from pycerberus.lib.form_data import FieldData
 from pycerberus.test_util import ValidationTest
@@ -28,47 +27,37 @@ class IntegerValidatorTest(ValidationTest):
         self.assert_is_valid('4', expected=4)
 
     def test_fail_for_non_digit_strings(self):
-        with assert_raises(InvalidDataError):
-            self.process('invalid_number')
+        self.assert_error_with_key('invalid_number', 'invalid')
 
     def test_validator_rejects_bad_types(self):
-        with assert_raises(InvalidDataError):
-            self.process([])
-        with assert_raises(InvalidDataError):
-            self.process({})
-        with assert_raises(InvalidDataError):
-            self.process(object)
-        with assert_raises(InvalidDataError):
-            self.process(int)
+        for _input in ([], {}, object, int):
+            self.assert_error_with_key('invalid_type', _input)
 
     def test_validator_rejects_none_if_value_is_required(self):
         # Actually this functionality seems to be pretty basic and is 
         # implemented in the Validator class - however it was broken because of
         # a bug in simple_super ("self.super()" vs. "self.super(*args, **kwargs)")
-        with assert_raises(InvalidDataError):
-            self.process(None)
+        self.assert_error_with_key('empty', None)
 
     def test_can_specify_minimum_value(self):
         self.init_validator(min=20)
         self.assert_is_valid(20)
         self.assert_is_valid(40)
-        e = assert_raises(InvalidDataError, lambda: self.process(4))
-        assert_equals('Number must be 20 or greater.', e.msg())
+        error = self.assert_error_with_key('too_low', 4, _return_error=True)
+        assert_equals('Number must be 20 or greater.', error.msg())
 
     def test_can_specify_maximum_value(self):
         self.init_validator(max=12)
         self.assert_is_valid(12)
         self.assert_is_valid(-5)
-        e = assert_raises(InvalidDataError, lambda: self.process(13))
-        assert_equals('Number must be 12 or smaller.', e.msg())
+        error = self.assert_error_with_key('too_big', 13, _return_error=True)
+        assert_equals('Number must be 12 or smaller.', error.msg())
 
     def test_can_use_min_and_max_together(self):
         self.init_validator(min=3, max=12)
         self.assert_is_valid(5)
-        with assert_raises(InvalidDataError):
-            self.process(2)
-        with assert_raises(InvalidDataError):
-            self.process(13)
+        self.assert_error_with_key('too_low', 2)
+        self.assert_error_with_key('too_big', 13)
 
     def test_minium_value_must_be_smaller_or_equal_to_maximum(self):
         e = assert_raises(InvalidArgumentsError, lambda: self.init_validator(min=13, max=12))
@@ -105,8 +94,7 @@ class IntegerValidatorTest(ValidationTest):
 
     def test_can_return_result_for_invalid_input(self):
         self.init_validator(IntegerValidator(exception_if_invalid=False))
-        result = self.process('invalid', ensure_valid=False)
-        assert_true(result.contains_error())
+        result = self.assert_error_with_key('invalid_number', 'invalid')
         assert_equals('invalid', result.initial_value)
         assert_none(result.value)
 
@@ -120,8 +108,7 @@ class IntegerValidatorTest(ValidationTest):
 
     def test_can_skip_validate_if_convert_found_errors(self):
         self.init_validator(IntegerValidator(min=10, exception_if_invalid=False))
-        result = self.process('invalid', ensure_valid=False)
-        assert_true(result.contains_error())
+        result = self.assert_error_with_key('invalid_number', 'invalid')
         assert_equals('invalid', result.initial_value)
         assert_none(result.value)
         assert_length(1, result.errors)

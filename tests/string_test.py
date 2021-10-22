@@ -30,12 +30,7 @@ class StringValidatorTest(ValidationTest):
 
     def test_can_reject_bad_types_with_error_result(self):
         self.init_validator(StringValidator(exception_if_invalid=False))
-
-        result = self.process([], ensure_valid=False)
-        assert_true(result.contains_error())
-        assert_length(1, result.errors)
-        error = result.errors[0]
-        assert_equals('invalid_type', error.key)
+        error = self.assert_error_with_key('invalid_type', [], _return_error=True)
         assert_true(error.is_critical)
 
 
@@ -72,11 +67,7 @@ class StringValidatorTest(ValidationTest):
         validator = StringValidator(min_length=2, max_length=3, exception_if_invalid=False)
         self.init_validator(validator)
 
-        result = self.process('f', ensure_valid=False)
-        assert_true(result.contains_error())
-        assert_length(1, result.errors)
-        error = result.errors[0]
-        assert_equals('too_short', error.key)
+        error = self.assert_error_with_key('too_short', 'f', _return_error=True)
         assert_false(error.is_critical)
 
     def test_min_length_must_be_smaller_or_equal_max_length(self):

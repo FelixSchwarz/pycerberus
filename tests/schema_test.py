@@ -99,11 +99,11 @@ class SchemaTest(ValidationTest):
     # -------------------------------------------------------------------------
     # processing / validation
     
-    def test_non_dict_inputs_raise_invaliddataerror(self):
+    def test_returns_error_for_non_dict_inputs(self):
         with assert_raises(InvalidDataError):
             SchemaValidator().process('foo')
-        exception = assert_raises(InvalidDataError, lambda: SchemaValidator().process([]))
-        assert_equals('invalid_type', exception.details().key())
+        self.init_validator(SchemaValidator())
+        self.assert_error_with_key('invalid_type', [])
 
     def test_can_process_single_value(self):
         self.init_validator()
@@ -116,10 +116,10 @@ class SchemaTest(ValidationTest):
                       schema.process({'id': '42', 'amount': '21'}))
 
     def test_can_retrieve_information_about_error(self):
-        schema = self._schema()
-        error = assert_raises(InvalidDataError, lambda: schema.process({'id': 'invalid'})).details()
+        self.init_validator()
+        exc = self.assert_error_with_key('invalid_number', {'id': 'invalid'}, _return_error=True)
+        error = exc.details()
         assert_equals('invalid', error.value())
-        assert_equals('invalid_number', error.key())
         assert_equals('Please enter a number.', error.msg())
     
     def test_use_empty_value_from_validator_for_missing_fields(self):

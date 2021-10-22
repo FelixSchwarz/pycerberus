@@ -12,7 +12,8 @@ from pythonic_testcase import *
 
 from pycerberus import InvalidDataError
 from pycerberus.api import NoValueSet
-from pycerberus.lib.form_data import is_result
+from pycerberus.errors import Error
+from pycerberus.lib import is_result
 
 
 __all__ = [
@@ -97,25 +98,37 @@ class ValidationTest(PythonicTestCase):
             assert_equals(expected, result.value, message=message)
         return result
 
-    def assert_error(self, value, *args, **kwargs):
+    def assert_error(self, value, _return_error=False, **kwargs):
         message = kwargs.pop('message', None)
         kwargs['ensure_valid'] = False
         try:
             result = self.process(value, **kwargs)
         except InvalidDataError as e:
             return e
-        if (not is_result(result)) or (not result.contains_errors()):
-            default_message = 'InvalidDataError not raised!'
-            if message is None:
-                raise AssertionError(default_message)
-            raise AssertionError(default_message + ' ' + message)
-        return result
+
+        if is_result(result) and result.contains_error():
+            if _return_error:
+                is_error_dict = not isinstance(result.errors, (tuple, list))
+                if is_error_dict:
+                    assert_length(1, result.errors)
+                    _errors, = result.errors.values()
+                else:
+                    _errors = result.errors
+                assert_length(1, result.errors)
+                return _errors[0]
+            return result
+        default_message = 'InvalidDataError not raised!'
+        if message is None:
+            raise AssertionError(default_message)
+        raise AssertionError(default_message + ' ' + message)
 
     def assert_error_with_key(self, error_key, *args, **kwargs):
         message = kwargs.get('message', None)
         result_or_exc = self.assert_error(*args, **kwargs)
 
-        if is_result(result_or_exc):
+        if isinstance(result_or_exc, Error):
+            _exc_keys = (result_or_exc.key,)
+        elif is_result(result_or_exc):
             errors = result_or_exc.errors
             _exc_keys = error_keys(errors)
         else:
@@ -123,7 +136,7 @@ class ValidationTest(PythonicTestCase):
             _exc_keys = (exc.details().key(),)
 
         if error_key in _exc_keys:
-            return
+            return result_or_exc
         fail_msg = 'No error with key %s (found %s)' % (error_key, ', '.join(_exc_keys))
         if message:
             fail_msg += ': ' + message

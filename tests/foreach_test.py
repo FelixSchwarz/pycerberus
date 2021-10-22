@@ -59,35 +59,32 @@ class ForEachTest(ValidationTest):
         self.init_validator(ForEach(IntegerValidator()))
         self.assert_is_valid((42,))
 
-    def assert_raises_error_with_key(self, value, error_key):
-        assert_equals(error_key, self.assert_error(value).details().key())
-    
     def test_rejects_missing_field(self):
-        self.assert_raises_error_with_key(None, 'empty')
+        self.assert_error_with_key('empty', None)
     
     def test_rejects_non_iteratible_types(self):
-        self.assert_raises_error_with_key(object(), 'invalid_type')
-        self.assert_raises_error_with_key(42, 'invalid_type')
+        self.assert_error_with_key('invalid_type', object())
+        self.assert_error_with_key('invalid_type', 42)
     
     def test_can_specify_min_amount_of_items(self):
         self.init_validator(ForEach(IntegerValidator, min_length=2))
         self.assert_is_valid((21, 42))
 
-        self.assert_raises_error_with_key((), 'too_short')
-        self.assert_raises_error_with_key((21,), 'too_short')
+        self.assert_error_with_key('too_short', ())
+        self.assert_error_with_key('too_short', (21,))
     
     def test_can_specify_max_amount_of_items(self):
         self.init_validator(ForEach(IntegerValidator, max_length=2))
         self.assert_is_valid((21, 42))
 
-        self.assert_raises_error_with_key((21, 42, 63), 'too_long')
-    
+        self.assert_error_with_key('too_long', (21, 42, 63))
+
     def test_can_specify_min_length_and_max_lenght(self):
         self.init_validator(ForEach(IntegerValidator, min_length=1, max_length=1))
         self.assert_is_valid((21,))
-        self.assert_raises_error_with_key((), 'too_short')
-        self.assert_raises_error_with_key((21, 42), 'too_long')
-    
+        self.assert_error_with_key('too_short', ())
+        self.assert_error_with_key('too_long', (21, 42,))
+
     def test_min_length_must_be_smaller_or_equal_max_length(self):
         with assert_raises(InvalidArgumentsError):
             ForEach(IntegerValidator, min_length=2, max_length=1)

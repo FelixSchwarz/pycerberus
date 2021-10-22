@@ -21,5 +21,4 @@ class AgreeToConditionsCheckboxTest(ValidationTest):
 
     def test_rejects_unchecked_checkbox(self):
         for input_ in (False, None, ''):
-            e = self.assert_error(input_)
-            assert_equals('must_agree', e.details().key())
+            self.assert_error_with_key('must_agree', input_)

@@ -61,9 +61,8 @@ class BooleanCheckboxTest(ValidationTest):
         self.assert_is_valid('FaLsE', expected=False)
 
     def test_rejects_values_which_are_neither_true_nor_false(self):
-        e = self.assert_error('maybe')
-        assert_equals('unknown_bool', e.details().key())
-    
+        self.assert_error_with_key('unknown_bool', 'maybe')
+
     def test_treat_missing_value_in_schema_as_false(self):
         # regression test!
         class CheckboxSchema(SchemaValidator):
