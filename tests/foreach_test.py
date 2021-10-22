@@ -24,14 +24,14 @@ class ForEachTest(ValidationTest):
         return IntegerValidator().message('invalid_number', {})
     
     def test_passes_for_empty_lists(self):
-        self.process([])
-    
+        self.assert_is_valid([])
+
     def test_passes_if_every_single_item_passes(self):
-        self.process((21, 42,))
-    
+        self.assert_is_valid((21, 42,))
+
     def test_applied_validator_can_convert_items(self):
-        assert_equals((21, 42), self.process(('21', '42')))
-    
+        assert_equals((21, 42), self.assert_is_valid(('21', '42')))
+
     def test_applies_validator_to_first_item(self):
         errors = self.assert_error(['bar']).errors()
         
@@ -57,8 +57,8 @@ class ForEachTest(ValidationTest):
         # This is important if validators need some configuration in the 
         # constructor
         self.init_validator(ForEach(IntegerValidator()))
-        self.process((42,))
-    
+        self.assert_is_valid((42,))
+
     def assert_raises_error_with_key(self, value, error_key):
         assert_equals(error_key, self.assert_error(value).details().key())
     
@@ -71,20 +71,20 @@ class ForEachTest(ValidationTest):
     
     def test_can_specify_min_amount_of_items(self):
         self.init_validator(ForEach(IntegerValidator, min_length=2))
-        self.process((21, 42))
-        
+        self.assert_is_valid((21, 42))
+
         self.assert_raises_error_with_key((), 'too_short')
         self.assert_raises_error_with_key((21,), 'too_short')
     
     def test_can_specify_max_amount_of_items(self):
         self.init_validator(ForEach(IntegerValidator, max_length=2))
-        self.process((21, 42))
-        
+        self.assert_is_valid((21, 42))
+
         self.assert_raises_error_with_key((21, 42, 63), 'too_long')
     
     def test_can_specify_min_length_and_max_lenght(self):
         self.init_validator(ForEach(IntegerValidator, min_length=1, max_length=1))
-        self.process((21,))
+        self.assert_is_valid((21,))
         self.assert_raises_error_with_key((), 'too_short')
         self.assert_raises_error_with_key((21, 42), 'too_long')
     

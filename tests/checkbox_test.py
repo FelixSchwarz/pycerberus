@@ -18,21 +18,19 @@ class BooleanCheckboxTest(ValidationTest):
     validator_class = BooleanCheckbox
     
     def test_false_values(self):
-        assert_false(self.process('off'))
-        assert_false(self.process('false'))
-        assert_false(self.process(False))
-        assert_false(self.process(None))
-        assert_false(self.process(''))
-    
+        for input_value in ('off', 'false', False, None, ''):
+            valid_value = self.assert_is_valid(input_value)
+            assert_false(valid_value)
+
     def test_true_values(self):
-        assert_true(self.process('on'))
-        assert_true(self.process('true'))
-        assert_true(self.process(True))
+        for input_value in ('on', 'true', True):
+            valid_value = self.assert_is_valid(input_value)
+            assert_true(valid_value)
 
     def test_can_set_trueish_and_falsish_values(self):
         self.init_validator(trueish=('a',), falsish=('b',))
-        assert_true(self.process('a'))
-        assert_false(self.process('b'))
+        assert_true(self.assert_is_valid('a'))
+        assert_false(self.assert_is_valid('b'))
         self.assert_error('0')
         self.assert_error('1')
 
@@ -40,7 +38,7 @@ class BooleanCheckboxTest(ValidationTest):
         trueish = (42, 'fnord', 'on', 'true')
         self.init_validator(trueish=trueish)
         for value in trueish:
-            assert_true(self.process(value),
+            assert_true(self.assert_is_valid(value),
                 message='should treat %r as True' % (value,))
 
     def test_can_handle_trueish_zero_and_falsish_one(self):
@@ -51,18 +49,18 @@ class BooleanCheckboxTest(ValidationTest):
         # (while at the same time True should still be trueish/False should be
         # falsish)
         self.init_validator(trueish=(0,), falsish=(1,))
-        assert_true(self.process(0))
-        assert_false(self.process(1))
+        assert_equals(True, self.assert_is_valid(0))
+        assert_equals(False, self.assert_is_valid(1))
 
     def test_strips_by_default(self):
-        assert_true(self.process('  true  '))
+        assert_equals(True, self.assert_is_valid('  true  '))
     
     def test_ignores_case(self):
-        assert_true(self.process('ON'))
-        assert_true(self.process('TrUe'))
-        assert_false(self.process('oFf'))
-        assert_false(self.process('FaLsE'))
-    
+        assert_equals(True, self.assert_is_valid('ON'))
+        assert_equals(True, self.assert_is_valid('TrUe'))
+        assert_equals(False, self.assert_is_valid('oFf'))
+        assert_equals(False, self.assert_is_valid('FaLsE'))
+
     def test_rejects_values_which_are_neither_true_nor_false(self):
         e = self.assert_error('maybe')
         assert_equals('unknown_bool', e.details().key())

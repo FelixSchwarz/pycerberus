@@ -17,7 +17,7 @@ class EmailAddressValidatorTest(ValidationTest):
     validator_class = EmailAddressValidator
     
     def _assert_valid_email(self, address_string):
-        assert_equals(address_string, self.process(address_string))
+        assert_equals(address_string, self.assert_is_valid(address_string))
 
     def test_accepts_simple_email_address(self):
         self._assert_valid_email('foo@example.com')

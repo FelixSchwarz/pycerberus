@@ -35,7 +35,6 @@ class ValidatorWithErrorResults(Validator):
     def validate(self, value, context):
         if value < 0:
             self.new_error('small', value, context)
-        return value + 1
 
 
 class RaisingValidator(Validator):
@@ -75,9 +74,9 @@ class ValidatorWithErrorResultsTest(ValidationTest):
     # --- validation returns results ------------------------------------------
     def test_can_return_result_for_valid_input(self):
         context = {}
-        result = self.process(1, context=context)
+        result = self.assert_is_valid(1, context=context, _return_result=True)
+
         assert_not_equals(1, result, message='should return FieldData instance')
-        assert_false(result.contains_error())
         assert_equals(1, result.value)
         assert_equals(1, result.initial_value)
         assert_equals({}, context, message='context should not be modified')

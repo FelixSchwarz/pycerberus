@@ -81,15 +81,22 @@ class ValidationTest(PythonicTestCase):
             kwargs['context'] = {}
         return self._validator.revert_conversion(*args, **kwargs)
 
-    def assert_is_valid(self, *args, **kwargs):
+    def assert_is_valid(self, value, _return_result=None, **kwargs):
         kwargs['ensure_valid'] = True
-        return self.process(*args, **kwargs)
+        result = self.process(value, **kwargs)
+        if not is_result(result):
+            return result
+
+        assert_false(result.contains_errors())
+        if not _return_result:
+            return result.value
+        return result
 
     def assert_error(self, value, *args, **kwargs):
         message = kwargs.pop('message', None)
         kwargs['ensure_valid'] = False
         try:
-            result = self.process(value, *args, **kwargs)
+            result = self.process(value, **kwargs)
         except InvalidDataError as e:
             return e
         if (not is_result(result)) or (not result.contains_errors()):

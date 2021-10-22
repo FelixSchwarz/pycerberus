@@ -16,11 +16,10 @@ class AgreeToConditionsCheckboxTest(ValidationTest):
     validator_class = AgreeToConditionsCheckbox
     
     def test_accepts_true(self):
-        assert_true(self.process('true'))
-        assert_true(self.process(True))
-        assert_true(self.process('1'))
-        assert_true(self.process('on'))
-    
+        for _input in ('true', True, '1', 'on'):
+            result = self.assert_is_valid(_input)
+            assert_equals(True, result)
+
     def test_rejects_unchecked_checkbox(self):
         for input_ in (False, None, ''):
             e = self.assert_error(input_)

@@ -19,8 +19,8 @@ class StringValidatorTest(ValidationTest):
     validator_class = StringValidator
     
     def test_accept_string_and_unicode(self):
-        assert_equals('foo', self.process('foo'))
-        assert_equals(u'bär', self.process(u'bär'))
+        assert_equals('foo', self.assert_is_valid('foo'))
+        assert_equals(u'bär', self.assert_is_valid(u'bär'))
 
     def test_reject_bad_types(self):
         self.assert_error([])
@@ -41,31 +41,31 @@ class StringValidatorTest(ValidationTest):
 
     def test_show_class_name_in_error_message(self):
         e = self.assert_error([])
-        assert_contains(u'(expected string, got "list")', e.details().msg())
+        assert_contains(u'(expected string, got "list")', e.msg())
 
     def test_empty_string_is_also_empty(self):
         self.assert_error(None)
         self.assert_error('')
         
         self.init_validator(default='foo', required=False)
-        assert_equals('foo', self.process(None))
-        assert_equals('foo', self.process(''))
+        assert_equals('foo', self.assert_is_valid(None))
+        assert_equals('foo', self.assert_is_valid(''))
 
     def test_can_specify_min_length(self):
         self.init_validator(StringValidator(min_length=3))
-        self.process('foo')
+        self.assert_is_valid('foo')
         self.assert_error('fo')
     
     def test_can_specify_max_length(self):
         self.init_validator(StringValidator(max_length=3))
-        self.process('foo')
+        self.assert_is_valid('foo')
         self.assert_error('foobar')
     
     def test_can_specify_min_and_max_length_together(self):
         self.init_validator(StringValidator(min_length=2, max_length=3))
         self.assert_error('f')
-        self.process('fo')
-        self.process('foo')
+        self.assert_is_valid('fo')
+        self.assert_is_valid('foo')
         self.assert_error('foobar')
 
     def test_can_return_error_results_from_validate(self):
@@ -92,8 +92,8 @@ class ValidatorsDerivedFromStringTest(ValidationTest):
     validator_class = TrueValidator
     
     def test_only_test_for_length_if_explicitely_set(self):
-        self.process('5')
-        
+        self.assert_is_valid('5')
+
         self.init_validator(self.validator_class(min_length=0))
         with assert_raises(TypeError):
             self.process('5')
