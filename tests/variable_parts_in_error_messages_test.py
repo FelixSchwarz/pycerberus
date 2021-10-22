@@ -17,12 +17,13 @@ class VariablePartsInErrorMessages(ValidationTest):
     validator_class = IntegerValidator
     
     def test_error_messages_can_contain_variable_parts(self):
-        assert_contains('got "list"', self.get_error([]).details().msg())
+        error = self.assert_error_with_locale([], locale='en', _return_error=True)
+        assert_contains('got "list"', error.msg())
 
     def test_variable_parts_are_added_after_translation(self):
         expected_part = '(String erwartet, "list" erhalten)'
-        translated_message = self.get_error([], locale='de').details().msg()
-        assert_contains(expected_part, translated_message)
+        error = self.assert_error_with_locale([], locale='de', _return_error=True)
+        assert_contains(expected_part, error.msg())
 
 
 

@@ -17,15 +17,18 @@ class MessagesFromBuiltInValidatorsAreTranslatedTest(ValidationTest):
     validator_class = IntegerValidator
     
     def test_error_messages_are_translated(self):
-        assert_equals('Please enter a number.', self.get_error('foo', locale='en').details().msg())
-        assert_equals('Bitte geben Sie eine Zahl ein.', self.get_error('foo', locale='de').details().msg())
+        error_en = self.assert_error_with_locale('foo', locale='en', _return_error=True)
+        assert_equals('Please enter a number.', error_en.msg())
+        error_de = self.assert_error_with_locale('foo', locale='de', _return_error=True)
+        assert_equals('Bitte geben Sie eine Zahl ein.', error_de.msg())
 
     def test_variable_parts_are_added_after_translation(self):
         expected_message = u'(String erwartet, "list" erhalten)'
-        translated_message = self.get_error([], locale='de').details().msg()
-        assert_contains(expected_message, translated_message)
+        error_de = self.assert_error_with_locale([], locale='de', _return_error=True)
+        assert_contains(expected_message, error_de.msg())
 
     def test_fallback_to_english_translation_for_unknown_locales(self):
-        assert_equals('Please enter a number.', self.get_error('foo', locale='unknown').details().msg())
+        error_en = self.assert_error_with_locale('foo', locale='unknown', _return_error=True)
+        assert_equals('Please enter a number.', error_en.msg())
 
 
