@@ -15,18 +15,16 @@ from pycerberus.validators import EmailAddressValidator
 class EmailAddressValidatorTest(ValidationTest):
     
     validator_class = EmailAddressValidator
-    
-    def _assert_valid_email(self, address_string):
-        assert_equals(address_string, self.assert_is_valid(address_string))
 
     def test_accepts_simple_email_address(self):
-        self._assert_valid_email('foo@example.com')
-        self._assert_valid_email('foo.bar@example.com')
-        self._assert_valid_email('foo_bar@example.com')
-        self._assert_valid_email('foo@bar-baz.example')
-        self._assert_valid_email('foo+bar@example.com')
-        self._assert_valid_email('foo-bar@example.com')
-    
+        _assert_valid_email = lambda s: self.assert_is_valid(s, expected=s)
+        _assert_valid_email('foo@example.com')
+        _assert_valid_email('foo.bar@example.com')
+        _assert_valid_email('foo_bar@example.com')
+        _assert_valid_email('foo@bar-baz.example')
+        _assert_valid_email('foo+bar@example.com')
+        _assert_valid_email('foo-bar@example.com')
+
     def test_reject_email_address_without_at(self):
         e = self.get_error('example.com')
         assert_equals("An email address must contain a single '@'.", e.msg())
