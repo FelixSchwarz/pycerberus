@@ -72,8 +72,8 @@ class DeclarativeSchemaTest(ValidationTest):
         assert_equals('Undeclared field detected: "extra".', e.msg())
 
     def test_can_override_additional_items_parameter_on_class_instantiation(self):
-        schema = self.schema(allow_additional_parameters=True)
-        schema.process(dict(id=42, amount=21, extra='foo'))
+        self.init_validator(self.schema(allow_additional_parameters=True))
+        self.assert_is_valid({'id': 42, 'amount': 21, 'extra': 'foo'})
     
     def test_additional_items_parameter_is_inherited_for_schema_subclasses(self):
         class DerivedSchema(self.DeclarativeSchema):
@@ -91,19 +91,21 @@ class DeclarativeSchemaTest(ValidationTest):
     
     def test_passes_unvalidated_parameters_if_specified(self):
         self.init_validator(self.PassValuesSchema())
-        assert_equals({'id': 42, 'foo': 'bar'}, self.process({'id': '42', 'foo': 'bar'}))
-    
-    def test_filter_unvalidated_parameter_is_inherited_for_schema_subclasses(self):        
+        _expected = {'id': 42, 'foo': 'bar'}
+        self.assert_is_valid({'id': '42', 'foo': 'bar'}, expected=_expected)
+
+    def test_filter_unvalidated_parameter_is_inherited_for_schema_subclasses(self):
         class DerivedSchema(self.PassValuesSchema):
             pass
         
         self.init_validator(DerivedSchema())
-        assert_equals({'id': 42, 'foo': 'bar'}, self.process({'id': '42', 'foo': 'bar'}))
-    
+        _expected = {'id': 42, 'foo': 'bar'}
+        self.assert_is_valid({'id': '42', 'foo': 'bar'}, expected=_expected)
+
     def test_can_override_filter_unvalidated_parameter_on_class_instantiation(self):
         self.init_validator(self.PassValuesSchema(filter_unvalidated_parameters=True))
-        assert_equals({'id': 42}, self.process({'id': '42', 'foo': 'bar'}))
-    
+        self.assert_is_valid({'id': '42', 'foo': 'bar'}, expected={'id': 42})
+
     # -------------------------------------------------------------------------
     # sub-schemas
     
@@ -115,9 +117,7 @@ class DeclarativeSchemaTest(ValidationTest):
         class UserSchema(SchemaValidator):
             user = PersonSchema
         self.init_validator(UserSchema())
-        
-        user_input = {'user': {'first_name': 'Foo', 'last_name': 'Bar'}}
-        assert_equals(user_input, self.process(user_input))
-    
 
+        _input = {'user': {'first_name': 'Foo', 'last_name': 'Bar'}}
+        self.assert_is_valid(_input, expected=_input)
 

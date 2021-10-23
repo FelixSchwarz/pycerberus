@@ -63,7 +63,12 @@ class SchemaTest(ValidationTest):
         for formvalidator in formvalidators:
             schema.add_formvalidator(formvalidator)
         return schema
-    
+
+    def init_validator(self, validator=None, *args, **kwargs):
+        if validator is None:
+            validator = self._schema()
+        return super(SchemaTest, self).init_validator(validator=validator, *args, **kwargs)
+
     # -------------------------------------------------------------------------
     # setup / introspection
     
@@ -71,8 +76,9 @@ class SchemaTest(ValidationTest):
         assert_equals({}, SchemaValidator().fieldvalidators())
 
     def test_process_smoke(self):
-        assert_equals({},SchemaValidator().process(None))
-        assert_equals({}, SchemaValidator().process({}))
+        self.init_validator(SchemaValidator())
+        self.assert_is_valid(None, expected={})
+        self.assert_is_valid({}, expected={})
 
     def test_can_add_validators(self):
         schema = SchemaValidator()
@@ -100,8 +106,8 @@ class SchemaTest(ValidationTest):
         assert_equals('invalid_type', exception.details().key())
 
     def test_can_process_single_value(self):
-        schema = self._schema()
-        assert_equals({'id': 42}, schema.process({'id': '42'}))
+        self.init_validator()
+        self.assert_is_valid({'id': '42'}, expected={'id': 42})
 
     def test_can_process_multiple_values(self):
         schema = self._schema()
@@ -127,8 +133,8 @@ class SchemaTest(ValidationTest):
             schema.process({})
 
     def test_converted_dict_contains_only_validated_fields(self):
-        schema = self._schema()
-        assert_equals({'id': 42}, schema.process({'id': '42', 'foo': 'bar'}))
+        self.init_validator()
+        self.assert_is_valid({'id': '42', 'foo': 'bar'}, expected={'id': 42})
 
     def test_can_get_all_errors_at_once(self):
         schema = self._schema(('id', 'key'))
@@ -309,7 +315,8 @@ class SchemaTest(ValidationTest):
     
     def test_schema_can_bail_out_if_additional_items_are_detected(self):
         schema = self._schema(fields=())
-        assert_equals({}, schema.process(dict(foo=42)))
+        self.init_validator(schema)
+        self.assert_is_valid({'foo': 42}, expected={})
         schema.set_internal_state_freeze(False)
         schema.set_allow_additional_parameters(False)
         with assert_raises(InvalidDataError):
@@ -344,15 +351,16 @@ class SchemaTest(ValidationTest):
     def test_filters_unvalidated_parameters_by_default(self):
         schema = self._schema(filter_unvalidated_parameters=True)
         self.init_validator(schema)
-        
-        assert_equals({'id': 42}, self.process({'id': '42', 'foo': 'bar'}))
-    
+        self.assert_is_valid({'id': '42', 'foo': 'bar'}, expected={'id': 42})
+
     def test_passes_unvalidated_parameters_if_specified(self):
         schema = self._schema(filter_unvalidated_parameters=False)
         self.init_validator(schema)
 
-        assert_equals({'id': 42, 'foo': 'bar'}, self.process({'id': '42', 'foo': 'bar'}))
-    
+        _input = {'id': '42', 'foo': 'bar'}
+        _expected = {'id': 42, 'foo': 'bar'}
+        self.assert_is_valid(_input, expected=_expected)
+
     def test_prevents_schema_instantiation_with_exception_for_additional_items_and_passing_unvalidated(self):
         with assert_raises(InvalidArgumentsError):
             self._schema(allow_additional_parameters=False, filter_unvalidated_parameters=False)
@@ -517,5 +525,5 @@ class SchemaTest(ValidationTest):
         self.init_validator(self._schema_with_user_subschema())
         
         user_input = {'user': {'first_name': 'Foo', 'last_name': 'Bar'}}
-        assert_equals(user_input, self.process(user_input))
+        self.assert_is_valid(user_input, expected=user_input)
 

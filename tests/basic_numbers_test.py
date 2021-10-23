@@ -20,12 +20,12 @@ class IntegerValidatorTest(ValidationTest):
     validator_class = IntegerValidator
     
     def test_can_convert_string_to_int(self):
-        assert_equals(42, self.assert_is_valid('42'))
-        assert_equals(42, self.assert_is_valid(u'42'))
-        assert_equals(-5, self.assert_is_valid('-5'))
+        self.assert_is_valid('42', expected=42)
+        self.assert_is_valid(u'42', expected=42)
+        self.assert_is_valid('-5', expected=-5)
 
     def test_validator_accepts_integer(self):
-        assert_equals(4, self.assert_is_valid(4))
+        self.assert_is_valid('4', expected=4)
 
     def test_fail_for_non_digit_strings(self):
         with assert_raises(InvalidDataError):
@@ -76,7 +76,7 @@ class IntegerValidatorTest(ValidationTest):
 
     def test_treats_empty_string_as_empty_value(self):
         self.init_validator(required=False)
-        assert_equals(None, self.assert_is_valid(''))
+        self.assert_is_valid('', expected=None)
 
     # --- revert_conversion() -------------------------------------------------
     def test_revert_conversion(self):
@@ -100,10 +100,8 @@ class IntegerValidatorTest(ValidationTest):
     # --- results instead of exceptions ---------------------------------------
     def test_can_return_result_for_valid_input(self):
         self.init_validator(IntegerValidator(exception_if_invalid=False))
-        result = self.assert_is_valid('6', _return_result=True)
-        assert_false(result.contains_error())
+        result = self.assert_is_valid('6', expected=6)
         assert_equals('6', result.initial_value)
-        assert_equals(6, result.value)
 
     def test_can_return_result_for_invalid_input(self):
         self.init_validator(IntegerValidator(exception_if_invalid=False))

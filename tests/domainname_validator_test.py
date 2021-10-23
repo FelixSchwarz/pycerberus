@@ -17,8 +17,8 @@ class DomainNameValidatorTest(ValidationTest):
     validator_class = DomainNameValidator
     
     def test_accepts_simple_domain_names(self):
-        assert_equals('example.com', self.assert_is_valid('example.com'))
-        assert_equals('bar-baz.example', self.assert_is_valid('bar-baz.example'))
+        self.assert_is_valid('example.com', expected='example.com')
+        self.assert_is_valid('bar-baz.example', expected='bar-baz.example')
 
     def test_reject_domain_with_leading_dot(self):
         msg = self.assert_error('.example.com').msg()

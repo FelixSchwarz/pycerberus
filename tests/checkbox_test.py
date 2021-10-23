@@ -19,18 +19,16 @@ class BooleanCheckboxTest(ValidationTest):
     
     def test_false_values(self):
         for input_value in ('off', 'false', False, None, ''):
-            valid_value = self.assert_is_valid(input_value)
-            assert_false(valid_value)
+            self.assert_is_valid(input_value, expected=False)
 
     def test_true_values(self):
         for input_value in ('on', 'true', True):
-            valid_value = self.assert_is_valid(input_value)
-            assert_true(valid_value)
+            self.assert_is_valid(input_value, expected=True)
 
     def test_can_set_trueish_and_falsish_values(self):
         self.init_validator(trueish=('a',), falsish=('b',))
-        assert_true(self.assert_is_valid('a'))
-        assert_false(self.assert_is_valid('b'))
+        self.assert_is_valid('a', expected=True)
+        self.assert_is_valid('b', expected=False)
         self.assert_error('0')
         self.assert_error('1')
 
@@ -38,7 +36,7 @@ class BooleanCheckboxTest(ValidationTest):
         trueish = (42, 'fnord', 'on', 'true')
         self.init_validator(trueish=trueish)
         for value in trueish:
-            assert_true(self.assert_is_valid(value),
+            self.assert_is_valid(value, expected=True,
                 message='should treat %r as True' % (value,))
 
     def test_can_handle_trueish_zero_and_falsish_one(self):
@@ -49,17 +47,18 @@ class BooleanCheckboxTest(ValidationTest):
         # (while at the same time True should still be trueish/False should be
         # falsish)
         self.init_validator(trueish=(0,), falsish=(1,))
-        assert_equals(True, self.assert_is_valid(0))
-        assert_equals(False, self.assert_is_valid(1))
+        self.assert_is_valid(0, expected=True)
+        self.assert_is_valid(1, expected=False)
 
     def test_strips_by_default(self):
-        assert_equals(True, self.assert_is_valid('  true  '))
-    
+        self.assert_is_valid('  true  ', expected=True)
+
     def test_ignores_case(self):
-        assert_equals(True, self.assert_is_valid('ON'))
-        assert_equals(True, self.assert_is_valid('TrUe'))
-        assert_equals(False, self.assert_is_valid('oFf'))
-        assert_equals(False, self.assert_is_valid('FaLsE'))
+        self.assert_is_valid('ON', expected=True)
+        self.assert_is_valid('TrUe', expected=True)
+
+        self.assert_is_valid('oFf', expected=False)
+        self.assert_is_valid('FaLsE', expected=False)
 
     def test_rejects_values_which_are_neither_true_nor_false(self):
         e = self.assert_error('maybe')
@@ -70,9 +69,11 @@ class BooleanCheckboxTest(ValidationTest):
         class CheckboxSchema(SchemaValidator):
             allow_additional_parameters = True
             decision = BooleanCheckbox()
-        assert_equals({'decision': False}, CheckboxSchema().process({}))
-        assert_equals({'decision': False}, CheckboxSchema().process({'foo': 'bar'}))
-    
+
+        self.init_validator(CheckboxSchema())
+        self.assert_is_valid({}, expected={'decision': False})
+        self.assert_is_valid({'foo': 'bar'}, expected={'decision': False})
+
     def test_can_revert_conversion_for_falsish_values(self):
         assert_false(self.revert_conversion(False))
         assert_false(self.revert_conversion('false'))

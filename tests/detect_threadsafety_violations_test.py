@@ -30,6 +30,6 @@ class DetectThreadSafetyViolationInValidatorTest(ValidationTest):
                 self._is_internal_state_frozen = False
                 super(ValidatorWrittenByExpert, self).__init__(*args, **kwargs)
         self.init_validator(ValidatorWrittenByExpert())
-        assert_equals(42, self.process(42))
+        self.assert_is_valid(42, expected=42)
 
 

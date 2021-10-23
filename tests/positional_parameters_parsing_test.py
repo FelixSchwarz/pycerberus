@@ -18,8 +18,9 @@ class TestPositionalArgumentsWithoutData(ValidationTest):
     validator_class = PositionalArgumentsParsingSchema
     
     def test_accept_input_without_parameters(self):
-        assert_equals({}, self.schema().process(''))
-        assert_equals({}, self.schema().process(None))
+        self.init_validator(self.schema())
+        self.assert_is_valid('', expected={})
+        self.assert_is_valid(None, expected={})
 
     def test_bails_out_if_additional_parameters_are_passed(self):
         e = self.assert_error('foo bar')
@@ -42,7 +43,8 @@ class TestPositionalArgumentsWithSingleParameter(ValidationTest):
         assert_equals(u'Unknown parameter "bar, baz"', e.msg())
 
     def test_accepts_one_parameter(self):
-        assert_equals({'foo': 'fnord'}, self.schema().process('fnord'))
+        self.init_validator(self.schema())
+        self.assert_is_valid('fnord', expected={'foo': 'fnord'})
 
 
 class TestPositionalArgumentsWithMultipleParameters(ValidationTest):
@@ -57,7 +59,8 @@ class TestPositionalArgumentsWithMultipleParameters(ValidationTest):
         self.assert_error('fnord')
     
     def test_accepts_two_parameter(self):
-        assert_equals({'foo': 'fnord', 'bar': 42}, self.schema().process('fnord, 42'))
+        self.init_validator(self.schema())
+        self.assert_is_valid('fnord, 42', expected={'foo': 'fnord', 'bar': 42})
 
 
 
@@ -72,7 +75,7 @@ class TestProgrammaticSchemaConstructionForPositionalArguments(ValidationTest):
         self._validator = schema
         
     def test_can_instantiate_schema_programmatically(self):
-        assert_equals({'id': 42}, self.schema().process('42'))
+        self.assert_is_valid('42', expected={'id': 42})
         self.assert_error('foo')
         self.assert_error('foo, bar')
         

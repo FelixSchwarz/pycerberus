@@ -74,7 +74,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
     # --- validation returns results ------------------------------------------
     def test_can_return_result_for_valid_input(self):
         context = {}
-        result = self.assert_is_valid(1, context=context, _return_result=True)
+        result = self.assert_is_valid(1, context=context)
 
         assert_not_equals(1, result, message='should return FieldData instance')
         assert_equals(1, result.value)
@@ -97,14 +97,12 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         result = self.process(1, context=context, ensure_valid=False)
         assert_equals(1, result.value)
 
-    def test_can_return_result_for_empty_error(self):
+    def test_can_return_result_for_empty_input(self):
         validator = StringValidator(required=False, exception_if_invalid=False)
+        self.init_validator(validator)
         context = {'result': validator.new_result(None)}
-        result = validator.process('', context=context)
-        assert_not_none(result)
-        assert_false(result.contains_error())
+        result = self.assert_is_valid('', expected=None, context=context)
         assert_equals('', result.initial_value)
-        assert_equals(None, result.value)
 
     def test_can_return_error_from_convert(self):
         context = {}

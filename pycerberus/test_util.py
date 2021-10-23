@@ -11,6 +11,7 @@ import operator
 from pythonic_testcase import *
 
 from pycerberus import InvalidDataError
+from pycerberus.api import NoValueSet
 from pycerberus.lib.form_data import is_result
 
 
@@ -81,15 +82,19 @@ class ValidationTest(PythonicTestCase):
             kwargs['context'] = {}
         return self._validator.revert_conversion(*args, **kwargs)
 
-    def assert_is_valid(self, value, _return_result=None, **kwargs):
+    def assert_is_valid(self, value, expected=NoValueSet, **kwargs):
+        message = kwargs.pop('message', None)
         kwargs['ensure_valid'] = True
         result = self.process(value, **kwargs)
         if not is_result(result):
-            return result
+            actual_value = result
+            if expected is not NoValueSet:
+                assert_equals(expected, actual_value, message=message)
+            return actual_value
 
-        assert_false(result.contains_errors())
-        if not _return_result:
-            return result.value
+        assert_false(result.contains_errors(), message=message)
+        if expected is not NoValueSet:
+            assert_equals(expected, result.value, message=message)
         return result
 
     def assert_error(self, value, *args, **kwargs):

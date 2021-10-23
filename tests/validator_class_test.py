@@ -103,7 +103,7 @@ class DefaultAndRequiredValuesTest(ValidationTest):
     def test_can_detect_empty_values_and_return_special_value_before_validation(self):
         self.validator().convert = self.not_implemented
         self.init_validator(required=False)
-        assert_equals(42, self.process('empty'))
+        self.assert_is_valid('empty', expected=42)
         # special check to ensure that other tests are not affected by this
         assert_not_equals(self.not_implemented, self.validator().convert)
 
@@ -118,7 +118,7 @@ class DefaultAndRequiredValuesTest(ValidationTest):
             return 21
         self.init_validator(required=False)
         self.validator().empty_value = store_empty
-        assert_equals(21, self.process('empty'))
+        self.assert_is_valid('empty', expected=21)
 
         assert_not_none(dummy.given_context)
         result = dummy.given_context.pop('result', None)
@@ -129,7 +129,9 @@ class DefaultAndRequiredValuesTest(ValidationTest):
         assert_not_equals(store_empty, self.init_validator().empty_value)
 
     def test_can_set_default_value_for_empty_values(self):
-        assert_equals(23, Validator(default=23, required=False).process(None))
+        validator = Validator(default=23, required=False, exception_if_invalid=False)
+        self.init_validator(Validator(default=23, required=False))
+        self.assert_is_valid(None, expected=23)
 
     def test_raise_exception_if_required_value_is_missing(self):
         assert_equals(42,  Validator(required=True).process(42))
@@ -149,13 +151,13 @@ class StripValueTest(ValidationTest):
     
     def test_can_strip_input(self):
         self.init_validator(strip=True)
-        assert_equals('foo', self.validator().process(' foo '))
+        self.assert_is_valid(' foo ', expected='foo')
 
         self.init_validator(strip=False)
-        assert_equals(' foo ', self.validator().process(' foo '))
+        self.assert_is_valid(' foo ', expected=' foo ')
 
     def test_do_not_strip_input_by_default(self):
-        assert_equals(' foo ', self.validator().process(' foo '))
+        self.assert_is_valid(' foo ', expected=' foo ')
 
     def test_only_strip_if_value_has_strip_method(self):
         self.init_validator(strip=True)

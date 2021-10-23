@@ -30,7 +30,7 @@ class ForEachTest(ValidationTest):
         self.assert_is_valid((21, 42,))
 
     def test_applied_validator_can_convert_items(self):
-        assert_equals((21, 42), self.assert_is_valid(('21', '42')))
+        self.assert_is_valid(('21', '42'), expected=(21, 42))
 
     def test_applies_validator_to_first_item(self):
         errors = self.assert_error(['bar']).errors()
@@ -98,7 +98,7 @@ class ForEachTest(ValidationTest):
     
     def test_can_set_validator_arguments_for_constructor(self):
         self.init_validator(ForEach(IntegerValidator, default=[], required=False))
-        assert_equals([], self.process(None))
+        self.assert_is_valid(None, expected=[])
 
     def test_can_return_results_from_subvalidators(self):
         validator = ForEach(

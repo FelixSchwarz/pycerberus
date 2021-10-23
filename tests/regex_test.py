@@ -21,7 +21,7 @@ class RegexTest(ValidationTest):
         super(RegexTest, self).setUp()
 
     def test_accepts_input_matching_the_pattern(self):
-        assert_equals('42', self.process('42').value)
+        self.assert_is_valid('42', expected='42')
 
     def test_rejects_input_not_matching_the_pattern(self):
         self.assert_error_with_key('bad_pattern', 'invalid')
