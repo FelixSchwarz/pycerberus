@@ -100,9 +100,8 @@ class SchemaTest(ValidationTest):
     # processing / validation
     
     def test_returns_error_for_non_dict_inputs(self):
-        with assert_raises(InvalidDataError):
-            SchemaValidator().process('foo')
         self.init_validator(SchemaValidator())
+        self.assert_error('foo')
         self.assert_error_with_key('invalid_type', [])
 
     def test_can_process_single_value(self):
@@ -128,19 +127,21 @@ class SchemaTest(ValidationTest):
         assert_equals({'id': None}, schema.process({}))
     
     def test_missing_fields_are_validated_as_well(self):
-        schema = self._schema()
-        with assert_raises(InvalidDataError):
-            schema.process({})
+        self.init_validator()
+        result = self.assert_error({})
+        errors = result.error_dict()
+        assert_equals({'id'}, set(errors))
+        id_error, = errors.values()
+        assert_equals('empty', id_error.details().key())
 
     def test_converted_dict_contains_only_validated_fields(self):
         self.init_validator()
         self.assert_is_valid({'id': '42', 'foo': 'bar'}, expected={'id': 42})
 
     def test_can_get_all_errors_at_once(self):
-        schema = self._schema(('id', 'key'))
-        exception = assert_raises(InvalidDataError, 
-            lambda: schema.process({'id': 'invalid', 'key': None}))
-        assert_length(2, exception.error_dict())
+        self.init_validator(self._schema(('id', 'key'), exception_if_invalid=False))
+        result = self.assert_error({'id': 'invalid', 'key': None})
+        assert_length(2, result.errors)
 
     def test_exception_contains_information_about_all_errrors(self):
         schema = self._schema(('id', 'key'))
@@ -319,8 +320,7 @@ class SchemaTest(ValidationTest):
         self.assert_is_valid({'foo': 42}, expected={})
         schema.set_internal_state_freeze(False)
         schema.set_allow_additional_parameters(False)
-        with assert_raises(InvalidDataError):
-            schema.process(dict(foo=42))
+        self.assert_error({'foo': 42})
 
     def test_can_return_error_if_additional_items_present(self):
         schema = self._schema(
@@ -339,11 +339,9 @@ class SchemaTest(ValidationTest):
         assert_false(foo_errors[0].is_critical)
 
     def test_exception_contains_information_about_invalid_and_extra_fields(self):
-        schema = self._schema(allow_additional_parameters=False)
-
-        exception = assert_raises(InvalidDataError,
-            lambda: schema.process({'id': 'invalid', 'foo':'heh'}))
-        assert_equals(2, len(exception.error_dict().items()))
+        self.init_validator(self._schema(allow_additional_parameters=False))
+        exc = self.assert_error({'id': 'invalid', 'foo':'heh'})
+        assert_length(2, exc.error_dict())
 
     # -------------------------------------------------------------------------
     # pass unvalidated parameters
@@ -422,10 +420,10 @@ class SchemaTest(ValidationTest):
 
     def test_formvalidators_are_not_executed_if_field_validator_failed(self):
         schema = self._schema(formvalidators=(exploding_validator(), ))
-        with assert_raises(InvalidDataError) as result:
-            schema.process({'id': 'invalid'})
-        error = result.caught_exception
-        assert_equals(('id',), tuple(error.error_dict().keys()))
+        self.init_validator(schema)
+        result = self.assert_error_with_key('invalid_number', {'id': 'invalid'})
+        errors = result.error_dict()
+        assert_equals({'id'}, set(errors))
 
     def test_formvalidators_with_result_values_are_not_executed_if_field_validator_failed(self):
         schema = self._schema(

@@ -10,7 +10,6 @@ import six
 from pythonic_testcase import *
 
 from pycerberus.api import Validator
-from pycerberus.errors import InvalidDataError
 from pycerberus.schema import SchemaValidator
 from pycerberus.test_util import ValidationTest
 from pycerberus.validators import IntegerValidator, StringValidator
@@ -68,7 +67,7 @@ class DeclarativeSchemaTest(ValidationTest):
     # warn about additional parameters
     
     def test_can_bail_out_if_additional_items_are_detected(self):
-        e = self.assert_raises(InvalidDataError, lambda: self.schema().process(dict(id=42, amount=21, extra='foo')))
+        e = self.assert_error({'id': 42, 'amount': 21, 'extra': 'foo'})
         assert_equals('Undeclared field detected: "extra".', e.msg())
 
     def test_can_override_additional_items_parameter_on_class_instantiation(self):
@@ -78,9 +77,8 @@ class DeclarativeSchemaTest(ValidationTest):
     def test_additional_items_parameter_is_inherited_for_schema_subclasses(self):
         class DerivedSchema(self.DeclarativeSchema):
             pass
-        schema = DerivedSchema()
-        with assert_raises(InvalidDataError):
-            schema.process(dict(id=42, amount=21, extra='foo'))
+        self.init_validator(DerivedSchema())
+        self.assert_error({'id': 42, 'amount': 21, 'extra': 'foo'})
 
     # -------------------------------------------------------------------------
     # pass unvalidated parameters

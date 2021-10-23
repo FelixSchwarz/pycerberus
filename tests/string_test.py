@@ -35,7 +35,7 @@ class StringValidatorTest(ValidationTest):
 
 
     def test_show_class_name_in_error_message(self):
-        e = self.assert_error([])
+        e = self.assert_error([], _return_error=True)
         assert_contains(u'(expected string, got "list")', e.msg())
 
     def test_empty_string_is_also_empty(self):

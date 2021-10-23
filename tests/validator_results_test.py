@@ -94,7 +94,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_true(result.contains_error())
 
         context = {u'result': result}
-        result = self.process(1, context=context, ensure_valid=False)
+        result = self.assert_error(1, context=context)
         assert_equals(1, result.value)
 
     def test_can_return_result_for_empty_input(self):
@@ -106,11 +106,10 @@ class ValidatorWithErrorResultsTest(ValidationTest):
 
     def test_can_return_error_from_convert(self):
         context = {}
-        result = self.process(2, context=context, ensure_valid=False)
+        result = self.assert_error(2, context=context)
 
         assert_equals(2, result.initial_value)
         assert_none(result.value)
-        assert_true(result.contains_error())
 
         assert_length(1, result.errors)
         error = result.errors[0]
@@ -120,22 +119,23 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_equals({}, context, message='context should not be modified')
 
     def test_can_return_error_from_validate(self):
-        result = self.process(-1, ensure_valid=False)
+        result = self.assert_error(-1)
 
         assert_equals(-1, result.initial_value)
         assert_none(result.value)
-        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('small', error.key)
 
     def test_can_use_error_from_validate_as_exception(self):
         self.init_validator(RaisingValidator())
-        e = assert_raises(InvalidDataError, lambda: self.process('foo'))
+        e = self.assert_error('foo', _return_error=True)
+        # the validator did return an InvalidDataError otherwise the result
+        # instance has no ".details()" method
         assert_equals('foo', e.details().key())
 
     def test_can_return_multiple_errors_in_process(self):
-        result = self.process(10, ensure_valid=False)
+        result = self.assert_error(10)
         assert_equals(10, result.initial_value)
         assert_none(result.value)
 
@@ -146,7 +146,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_equals('div5', error2.key)
 
     def test_can_skip_validate_if_convert_detected_errors(self):
-        result = self.process(-2, ensure_valid=False)
+        result = self.assert_error(-2)
         assert_equals(-2, result.initial_value)
         assert_none(result.value)
 
@@ -156,11 +156,10 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_equals('div2', error.key, message='validate would add "small" key')
 
     def test_can_return_error_for_empty_values_in_required_validator(self):
-        result = self.process(None, ensure_valid=False)
+        result = self.assert_error(None)
         assert_equals(None, result.initial_value)
         assert_none(result.value)
 
-        assert_true(result.contains_error())
         assert_length(1, result.errors)
         error = result.errors[0]
         assert_equals('empty', error.key)
@@ -168,7 +167,7 @@ class ValidatorWithErrorResultsTest(ValidationTest):
     def test_can_return_context_without_permanent_modifications(self):
         source_context = {'foo': [1, 2, 3]}
         context = source_context.copy()
-        result = self.process(-2, context=context, ensure_valid=False)
+        result = self.assert_error(-2, context=context)
         assert_equals(-2, result.initial_value)
         assert_equals(source_context, context)
 

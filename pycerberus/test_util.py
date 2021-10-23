@@ -68,12 +68,13 @@ class ValidationTest(PythonicTestCase):
     schema = validator
     
     def process(self, *args, **kwargs):
+        validator = kwargs.pop('_validator', self._validator)
         if len(args) == 1 and 'context' not in kwargs:
             initial_value = args[0]
-            result = self._validator.new_result(initial_value)
+            result = validator.new_result(initial_value)
             kwargs['context'] = {'result': result}
         ensure_valid = kwargs.pop('ensure_valid', True)
-        result = self._validator.process(*args, **kwargs)
+        result = validator.process(*args, **kwargs)
         if ensure_valid and is_result(result):
             assert_false(result.contains_errors())
         return result

@@ -70,8 +70,7 @@ class RegexTest(ValidationTest):
             # otherwise we can have only a single error
             exception_if_invalid=False,
         )
-        result = self.process('abcd', ensure_valid=False)
-        assert_true(result.contains_error())
+        result = self.assert_error('abcd')
         assert_equals(('too_short', 'bad_pattern'), error_keys(result.errors))
         assert_no_critical_errors(result.errors)
 
@@ -84,10 +83,9 @@ class RegexTest(ValidationTest):
 
         # message from super class (Validator)
         context = {'locale': 'de'}
-        result = self.process('invalid', context=context, ensure_valid=False)
-        assert_true(result.contains_error())
+        error = self.assert_error('invalid', _return_error=True, context=context)
         assert_equals(
             'Die Eingabe "invalid" entspricht nicht dem erwarteten Muster.',
-            result.errors[0].message
+            error.message
         )
 

@@ -100,10 +100,10 @@ class IntegerValidatorTest(ValidationTest):
 
     def test_can_return_result_from_validate(self):
         self.init_validator(IntegerValidator(min=10, max=20, exception_if_invalid=False))
-        result = self.process('5', ensure_valid=False)
+        result = self.assert_error('5')
         assert_true(result.contains_error())
 
-        result = self.process('40', ensure_valid=False)
+        result = self.assert_error('40')
         assert_true(result.contains_error())
 
     def test_can_skip_validate_if_convert_found_errors(self):

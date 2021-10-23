@@ -54,7 +54,7 @@ class ValidatorTest(ValidationTest):
                 return result
 
         validator = CustomHandlingValidator(exception_if_invalid=False)
-        result = validator.process('invalid')
+        result = self.assert_error('invalid', _validator=validator)
         assert_equals(42, result.value)
 
     def test_process_does_not_modify_context_permanently_if_value_is_empty(self):
