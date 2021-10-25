@@ -23,6 +23,8 @@ class IntegerValidator(Validator):
         if (self.min is not None) and (self.max is not None) and (self.min > self.max):
             message = 'min must be smaller or equal to max (%s > %s)' % (repr(self.min), repr(self.max))
             raise InvalidArgumentsError(message)
+        if not hasattr(self, 'exception_if_invalid'):
+            kwargs.setdefault('exception_if_invalid', True)
         super(IntegerValidator, self).__init__(*args, **kwargs)
 
     def messages(self):

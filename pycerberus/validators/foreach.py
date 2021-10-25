@@ -29,6 +29,8 @@ class ForEach(Validator):
                 message = 'min_length must be smaller or equal to max_length (%s > %s)' % values
                 raise InvalidArgumentsError(message)
         kwargs.setdefault('default', ())
+        if not hasattr(self, 'exception_if_invalid'):
+            kwargs.setdefault('exception_if_invalid', True)
         super(ForEach, self).__init__(**kwargs)
 
     def messages(self):

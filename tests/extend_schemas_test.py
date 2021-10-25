@@ -16,8 +16,8 @@ from pycerberus.validators import StringValidator
 class ExtendSchemaTest(PythonicTestCase):
     
     class BasicSchema(SchemaValidator):
-        id = Validator()
-        formvalidators = (Validator(), )
+        id = Validator(exception_if_invalid=False)
+        formvalidators = (Validator(exception_if_invalid=False),)
     
     def schema_class(self):
         return self.__class__.BasicSchema

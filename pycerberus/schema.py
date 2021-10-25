@@ -102,7 +102,9 @@ class SchemaValidator(Validator):
             filter_unvalidated_parameters=None, *args, **kwargs):
         self._fields = OrderedDict()
         self._formvalidators = []
-        
+        if not hasattr(self, 'exception_if_invalid'):
+            kwargs.setdefault('exception_if_invalid', True)
+
         if allow_additional_parameters is not None:
             self.allow_additional_parameters = allow_additional_parameters
         if getattr(self, 'allow_additional_parameters', None) is None:

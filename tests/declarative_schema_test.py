@@ -23,7 +23,7 @@ class DeclarativeSchemaTest(ValidationTest):
         
         id = IntegerValidator()
         amount = IntegerValidator
-        formvalidators = (Validator(), )
+        formvalidators = (Validator(exception_if_invalid=False),)
     validator_class = DeclarativeSchema
     
     def schema(self, schema_class=None, **kwargs):

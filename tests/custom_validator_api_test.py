@@ -13,7 +13,8 @@ from pycerberus.test_util import ValidationTest
 
 
 class ValidatorWithCustomMessageForKey(Validator):
-    
+    exception_if_invalid = True
+
     def validate(self, value, context):
         self.raise_error('inactive', value, context)
     
@@ -26,6 +27,8 @@ class ValidatorWithCustomMessageForKey(Validator):
 
 
 class AdditionalMessagesValidator(Validator):
+    exception_if_invalid = True
+
     def messages(self):
         # need to have multiple messages, therefore 'ValidatorWithCustomMessageForKey'
         # is not suitable
@@ -80,6 +83,7 @@ class CustomValidatorAPITest(ValidationTest):
 
 
 class CanDeclareMessagesInClassDictValidator(Validator):
+    exception_if_invalid = True
     messages = {'classlevel': 'Message from class-level.'}
     
     def validate(self, value, context):

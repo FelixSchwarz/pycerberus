@@ -51,8 +51,12 @@ class ValidationTest(PythonicTestCase):
     
     def init_validator(self, validator=None, *args, **kwargs):
         if (validator is None) and hasattr(self, 'validator_class'):
+            _kwargs = {}
+            if hasattr(self, 'validator_kwargs'):
+                _kwargs.update(self.validator_kwargs)
+            _kwargs.update(kwargs)
             # FIXME: This won't work as args filled means that validator != None
-            validator = self.validator_class(*args, **kwargs)
+            validator = self.validator_class(*args, **_kwargs)
         self._validator = validator
         return self._validator
     

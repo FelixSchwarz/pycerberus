@@ -18,14 +18,14 @@ from pycerberus.validators import IntegerValidator
 class ValidatorTest(ValidationTest):
     def test_bail_out_if_unknown_parameters_are_passed_to_constructor(self):
         with assert_raises(Exception):
-            Validator(invalid='fnord')
+            Validator(invalid='fnord', exception_if_invalid=False)
 
     def test_can_set_validator_id_via_constructor(self):
-        validator = Validator(id='foo')
+        validator = Validator(id='foo', exception_if_invalid=False)
         assert_equals('foo', validator.id)
 
     def test_revert_conversion(self):
-        self.init_validator(Validator())
+        self.init_validator(Validator(exception_if_invalid=False))
         assert_equals(u'ö', self.revert_conversion(u'ö'))
         assert_equals('1', self.revert_conversion(1))
         assert_none(self.revert_conversion(None))
@@ -34,6 +34,7 @@ class ValidatorTest(ValidationTest):
         # This is the same test as in BaseValidator - however Validator has
         # thread-safety built-in so we need extra code
         class MutableValidator(Validator):
+            exception_if_invalid = False
             acceptable_values = [1, 2, 3]
         validator = MutableValidator()
         
@@ -81,7 +82,8 @@ class DefaultAndRequiredValuesTest(ValidationTest):
     
     class DummyValidator(Validator):
         _empty_value = 'empty'
-        
+        exception_if_invalid = False
+
         def __init__(self, default=42, *args, **kwargs):
             self._is_internal_state_frozen = False
             super(self.__class__, self).__init__(default=default, *args, **kwargs)
@@ -130,29 +132,31 @@ class DefaultAndRequiredValuesTest(ValidationTest):
 
     def test_can_set_default_value_for_empty_values(self):
         validator = Validator(default=23, required=False, exception_if_invalid=False)
-        self.init_validator(Validator(default=23, required=False))
+        self.init_validator(validator)
         self.assert_is_valid(None, expected=23)
 
     def test_creates_error_if_required_value_is_missing(self):
-        self.init_validator(Validator(required=False))
+        self.init_validator(Validator(required=False, exception_if_invalid=False))
         self.assert_is_valid(None)
 
-        self.init_validator(Validator(required=True))
+        self.init_validator(Validator(required=True, exception_if_invalid=False))
         self.assert_is_valid(42)
         self.assert_error_with_key('empty', None)
 
         # validators are required by default
-        self.init_validator(Validator())
+        self.init_validator(Validator(exception_if_invalid=False))
         self.assert_error_with_key('empty', None)
 
     def test_raise_exception_if_value_is_required_but_default_is_set_to_prevent_errors(self):
-        assert_raises(InvalidArgumentsError, lambda: Validator(required=True, default=12))
+        with assert_raises(InvalidArgumentsError):
+            Validator(required=True, default=12, exception_if_invalid=False)
 
 
 class StripValueTest(ValidationTest):
     
     validator_class = Validator
-    
+    validator_kwargs = {'exception_if_invalid': False}
+
     def test_can_strip_input(self):
         self.init_validator(strip=True)
         self.assert_is_valid(' foo ', expected='foo')

@@ -22,6 +22,8 @@ class StringValidator(Validator):
         self._min_length = min_length
         self._max_length = max_length
         self._check_min_max_length_consistency()
+        if not hasattr(self, 'exception_if_invalid'):
+            kwargs.setdefault('exception_if_invalid', True)
         super(StringValidator, self).__init__(**kwargs)
 
     def _check_min_max_length_consistency(self):

@@ -14,6 +14,8 @@ __all__ = ['OneOf']
 
 
 class OneOf(Validator):
+    exception_if_invalid = True
+
     def __init__(self, allowed_values, **kwargs):
         self._allowed_values = allowed_values
         super(OneOf, self).__init__(**kwargs)

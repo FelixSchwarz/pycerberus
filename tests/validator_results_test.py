@@ -6,6 +6,8 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import warnings
+
 from pythonic_testcase import *
 
 from pycerberus.api import Validator
@@ -54,7 +56,9 @@ class ValidatorWithErrorResultsTest(ValidationTest):
 
     # --- initialization -------------------------------------------------------
     def test_vanilla_validators_default_to_use_exceptions(self):
-        validator = Validator()
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            validator = Validator()
         assert_true(validator._exception_if_invalid)
 
         validator = Validator(exception_if_invalid=False)
@@ -185,6 +189,6 @@ class ValidatorWithErrorResultsTest(ValidationTest):
     # --- revert_conversion() -------------------------------------------------
 
     def test_can_use_field_data_to_revert_conversion(self):
-        validator = Validator()
+        validator = Validator(exception_if_invalid=False)
         data = FieldData('foo', initial_value='bar')
         assert_equals('bar', validator.revert_conversion(data))

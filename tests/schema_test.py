@@ -309,7 +309,7 @@ class SchemaTest(ValidationTest):
     def test_can_return_result_for_valid_schema_with_foreach_and_formvalidator(self):
         schema = SchemaValidator()
         schema.add('foo', ForEach(IntegerValidator()))
-        schema.add_formvalidator(Validator())
+        schema.add_formvalidator(Validator(exception_if_invalid=False))
 
         with assert_not_raises():
             schema.process({'foo': [10]})
@@ -370,10 +370,10 @@ class SchemaTest(ValidationTest):
     # form validators
     
     def test_can_add_form_validators(self):
-        self._schema().add_formvalidator(Validator())
+        self._schema().add_formvalidator(Validator(exception_if_invalid=False))
     
     def test_can_retrieve_form_validators(self):
-        formvalidator = Validator()
+        formvalidator = Validator(exception_if_invalid=False)
         schema = self._schema()
         schema.add_formvalidator(formvalidator)
         assert_length(1, schema.formvalidators())
@@ -416,6 +416,7 @@ class SchemaTest(ValidationTest):
 
     def test_formvalidators_can_modify_fields(self):
         class FormValidator(Validator):
+            exception_if_invalid = False
             def convert(self, fields, context):
                 return {'id': True, }
         schema = self._schema(formvalidators=(FormValidator(),))

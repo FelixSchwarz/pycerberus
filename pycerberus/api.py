@@ -245,9 +245,13 @@ class Validator(BaseValidator):
 
         class_has_static_value = (self._exception_if_invalid is not NoValueSet)
         user_specified_value = (exception_if_invalid is not NoValueSet)
+        
         if class_has_static_value and user_specified_value and (self._exception_if_invalid != exception_if_invalid):
             msg = 'This validator does not accept "exception_if_invalid" as it is set on a class level'
             raise InvalidArgumentsError(msg)
+        elif (not class_has_static_value) and (not user_specified_value):
+            msg = 'Please specify "exception_if_invalid" explicitly, default will be changed to "do not raise exceptions" in the future (%s).' % (self.__class__.__name__,)
+            warnings.warn(msg, DeprecationWarning)
 
     def _has_default_value_set(self):
         return (self._default is not NoValueSet)

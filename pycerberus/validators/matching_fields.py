@@ -13,7 +13,8 @@ from pycerberus.i18n import _
 __all__ = ['MatchingFields']
 
 class MatchingFields(Validator):
-    
+    exception_if_invalid = True
+
     def __init__(self, first_field, second_field, *args, **kwargs):
         self.first_field = first_field
         self.second_field = second_field

@@ -15,6 +15,8 @@ from pycerberus.test_util import ValidationTest
 
 class DetectThreadSafetyViolationInValidatorTest(ValidationTest):
     class NonThreadSafeValidator(Validator):
+        exception_if_invalid = False
+
         def validate(self, value, context):
             self.fnord = 42
     
