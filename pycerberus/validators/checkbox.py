@@ -8,6 +8,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from pycerberus.errors import InvalidDataError
 from pycerberus.i18n import _
+from pycerberus.lib import FieldData
 from pycerberus.validators.string import StringValidator
 
 
@@ -15,10 +16,11 @@ __all__ = ['AgreeToConditionsCheckbox', 'BooleanCheckbox']
 
 
 class BooleanCheckbox(StringValidator):
-    
     trueish = ('true', 't', 'on', '1')
     falsish = ('false', 'f', 'off', '0', '')
-    
+
+    _exception_if_invalid = False
+
     def __init__(self, **kwargs):
         kwargs.setdefault('required', False)
         kwargs.setdefault('strip', True)
@@ -40,12 +42,14 @@ class BooleanCheckbox(StringValidator):
 
         if isinstance(value, bool):
             return value
-        string_value = super(BooleanCheckbox, self).convert(value, context).lower()
-        if string_value in self.trueish:
-            return True
-        elif string_value in self.falsish:
+        string_value = super(BooleanCheckbox, self).convert(value, context)
+        if string_value is None:
             return False
-        self.raise_error('unknown_bool', value, context)
+        if string_value.lower() in self.trueish:
+            return True
+        elif string_value.lower() in self.falsish:
+            return False
+        self.new_error('unknown_bool', value, context)
 
     def _contains(self, value, values):
         for v in values:
@@ -58,10 +62,21 @@ class BooleanCheckbox(StringValidator):
     
     def revert_conversion(self, value, context=None):
         "Returns True for all trueish values, otherwise False."
+        old_result = None
+        if context and ('result' in context):
+            old_result = context['result']
+        if not context:
+            context = {}
+        context['result'] = FieldData()
+
         try:
-            return self.convert(value, context or dict())
+            _valid_value = self.convert(value, context=context)
         except InvalidDataError:
-            return False
+            _valid_value = False
+        _result = context.pop('result')
+        if old_result:
+            context['result'] = old_result
+        return _valid_value if not _result.contains_error() else False
 
 
 class AgreeToConditionsCheckbox(BooleanCheckbox):
@@ -83,8 +98,8 @@ class AgreeToConditionsCheckbox(BooleanCheckbox):
         super(AgreeToConditionsCheckbox, self).validate(value, context)
         if value == True:
             return
-        self.raise_error('must_agree', value, context)
-    
+        self.new_error('must_agree', value, context)
+
     def is_empty(self, value, context):
         return False
 
