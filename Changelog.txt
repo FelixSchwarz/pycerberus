@@ -23,6 +23,7 @@ and version 1.0 will use result instances by default.
 - stop using "SuperProxy" - using "self.super(…)" is not supported in validator
   classes/tests anymore.
 - added `RegexValidator` implementation
+- ForEach: default to use rich results
 
 
 0.6 (24.11.2014)

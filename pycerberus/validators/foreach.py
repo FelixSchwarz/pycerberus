@@ -30,7 +30,7 @@ class ForEach(Validator):
                 raise InvalidArgumentsError(message)
         kwargs.setdefault('default', ())
         if not hasattr(self, 'exception_if_invalid'):
-            kwargs.setdefault('exception_if_invalid', True)
+            kwargs.setdefault('exception_if_invalid', False)
         super(ForEach, self).__init__(**kwargs)
 
     def messages(self):
@@ -51,9 +51,10 @@ class ForEach(Validator):
             )
             return
         if self._min_length and len(values) < self._min_length:
-            self.raise_error('too_short', values, context, min=self._min_length)
+            self.new_error('too_short', values, context, msg_values={'min': self._min_length})
         if self._max_length != NoValueSet and len(values) > self._max_length:
-            self.raise_error('too_long', values, context, max=self._max_length)
+            self.new_error('too_long', values, context, msg_values={'max': self._max_length})
+            values = values[:self._max_length]
 
         field_results = []
         for i, value in enumerate(values):
@@ -84,7 +85,7 @@ class ForEach(Validator):
         context['result'] = list_result
         return field_result
 
-    # overriden from Validator
+    # overridden from Validator
     def handle_validator_result(self, converted_value, result, context, errors=None, nr_new_errors=None):
         # not calling super() as our errors are special
         if errors is None:
@@ -105,7 +106,7 @@ class ForEach(Validator):
             raise InvalidDataError(error.msg, error.value, error.key, context)
         return result.value
 
-    # overriden from Validator
+    # overridden from Validator
     def new_result(self, initial_value):
         return RepeatingFieldData(child_creator=lambda: FieldData())
 

@@ -19,7 +19,7 @@ class ForEachTest(ValidationTest):
     
     validator_class = ForEach
     validator_args = (IntegerValidator, )
-    
+
     def _invalid_message(self):
         return IntegerValidator().message('invalid_number', {})
     
@@ -33,26 +33,28 @@ class ForEachTest(ValidationTest):
         self.assert_is_valid(('21', '42'), expected=(21, 42))
 
     def test_applies_validator_to_first_item(self):
-        errors = self.assert_error(['bar']).errors()
-        
+        errors = self.assert_error(['bar'], _return_error=True)
+
         assert_length(1, errors)
-        assert_isinstance(errors[0], InvalidDataError)
-        assert_equals(self._invalid_message(), errors[0].msg())
+        assert_equals(self._invalid_message(), errors[0].msg)
     
     def test_applies_validator_to_every_item(self):
-        errors = self.assert_error(['bar', 'baz']).errors()
-        
-        assert_length(2, errors)
-        assert_equals(self._invalid_message(), errors[0].msg())
-        assert_equals(self._invalid_message(), errors[1].msg())
-    
+        result = self.assert_error(['bar', 'baz'])
+
+        assert_length(2, result.errors)
+        f1_errors, f2_errors = result.errors
+        f1_error, = f1_errors
+        assert_equals(self._invalid_message(), f1_error.msg)
+        f2_error, = f2_errors
+        assert_equals(self._invalid_message(), f2_error.msg)
+
     def test_returns_sparse_error_list(self):
-        errors = self.assert_error(['bar', '42']).errors()
-        
-        assert_length(2, errors)
-        assert_equals(self._invalid_message(), errors[0].msg())
-        assert_equals(None, errors[1])
-    
+        result = self.assert_error(['bar', '42'])
+
+        errors_bar, errors_42 = result.errors
+        assert_equals(self._invalid_message(), errors_bar[0].msg)
+        assert_equals(None, errors_42)
+
     def test_works_with_validator_instances(self):
         # This is important if validators need some configuration in the 
         # constructor
@@ -94,13 +96,12 @@ class ForEachTest(ValidationTest):
         assert_equals((), validator.empty_value({}))
     
     def test_can_set_validator_arguments_for_constructor(self):
-        self.init_validator(ForEach(IntegerValidator, default=[], required=False))
-        self.assert_is_valid(None, expected=[])
+        self.init_validator(ForEach(IntegerValidator, default=(), required=False))
+        self.assert_is_valid(None, expected=())
 
     def test_can_return_results_from_subvalidators(self):
         validator = ForEach(
             IntegerValidator(exception_if_invalid=False),
-            exception_if_invalid=False
         )
         result = validator.process(('invalid',))
 
@@ -134,7 +135,7 @@ class ForEachTest(ValidationTest):
     def test_can_return_errors_from_subschemas(self):
         schema = SchemaValidator(exception_if_invalid=False)
         schema.add('foo', IntegerValidator(exception_if_invalid=False))
-        foreach = ForEach(schema, exception_if_invalid=False)
+        foreach = ForEach(schema)
 
         result = foreach.process([{'foo': 'invalid'}, ])
         assert_true(result.contains_errors())
@@ -146,7 +147,7 @@ class ForEachTest(ValidationTest):
     def test_can_return_exceptions_from_subschemas_as_errors(self):
         schema = SchemaValidator(exception_if_invalid=True)
         schema.add('foo', IntegerValidator(exception_if_invalid=True))
-        foreach = ForEach(schema, exception_if_invalid=False)
+        foreach = ForEach(schema)
 
         with assert_not_raises(message='foreach should be able to return results'):
             result = foreach.process([{'foo': 'invalid'}, ])
@@ -158,8 +159,7 @@ class ForEachTest(ValidationTest):
 
     def test_can_return_result_for_empty_input_value(self):
         validator = ForEach(
-            IntegerValidator(exception_if_invalid=False),
-            exception_if_invalid=False
+            IntegerValidator(exception_if_invalid=False)
         )
         result = validator.process(None)
 
