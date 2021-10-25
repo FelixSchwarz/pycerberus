@@ -144,9 +144,10 @@ class SchemaTest(ValidationTest):
         assert_length(2, result.errors)
 
     def test_exception_contains_information_about_all_errrors(self):
-        schema = self._schema(('id', 'key'))
-        exception = assert_raises(InvalidDataError, 
-            lambda: schema.process({'id': 'invalid', 'key': {}}))
+        schema = self._schema(('id', 'key'), exception_if_invalid=True)
+        with assert_raises(InvalidDataError) as c:
+            schema.process({'id': 'invalid', 'key': {}})
+        exception = c.caught_exception
         assert_equals(set(['id', 'key']), set(exception.error_dict().keys()))
         id_error = exception.error_for('id').details()
         assert_equals('invalid', id_error.value())

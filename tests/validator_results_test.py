@@ -16,7 +16,8 @@ from pycerberus.validators import StringValidator
 
 
 class ValidatorWithErrorResults(Validator):
-    exception_if_invalid = False
+    def __init__(self, exception_if_invalid=False, **kwargs):
+        super(ValidatorWithErrorResults, self).__init__(exception_if_invalid=exception_if_invalid, **kwargs)
 
     def messages(self):
         return {
@@ -60,16 +61,26 @@ class ValidatorWithErrorResultsTest(ValidationTest):
         assert_false(validator._exception_if_invalid)
 
     def test_custom_validators_can_switch_the_default(self):
-        assert_false(ValidatorWithErrorResults.exception_if_invalid,
-            message='validating the test scenario')
-        validator = ValidatorWithErrorResults()
-        assert_false(validator._exception_if_invalid)
+        validator = ValidatorWithErrorResults(exception_if_invalid=True)
+        # validate test setup - validator should raise exceptions
+        with assert_raises(InvalidDataError):
+            validator.process(2)
+
+        validator = ValidatorWithErrorResults(exception_if_invalid=False)
+        with assert_not_raises(InvalidDataError):
+            result = validator.process(2)
+        assert_true(result.contains_error())
 
     def test_can_reject_attempt_to_override_setting_for_custom_validators(self):
-        assert_false(ValidatorWithErrorResults.exception_if_invalid,
-            message='validating the test scenario')
+        # use RaisingValidator as that one should be hard-coded to use
+        # exceptions
+        validator = RaisingValidator()
+        # validate test setup - validator should raise exceptions
+        with assert_raises(InvalidDataError):
+            validator.process(2)
+
         with assert_raises(InvalidArgumentsError):
-            ValidatorWithErrorResults(exception_if_invalid=True)
+            RaisingValidator(exception_if_invalid=False)
 
     # --- validation returns results ------------------------------------------
     def test_can_return_result_for_valid_input(self):

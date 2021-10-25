@@ -133,13 +133,17 @@ class DefaultAndRequiredValuesTest(ValidationTest):
         self.init_validator(Validator(default=23, required=False))
         self.assert_is_valid(None, expected=23)
 
-    def test_raise_exception_if_required_value_is_missing(self):
-        assert_equals(42,  Validator(required=True).process(42))
-        assert_none(Validator(required=False).process(None))
-        with assert_raises(EmptyError):
-            Validator(required=True).process(None)
-        with assert_raises(EmptyError):
-            Validator().process(None)
+    def test_creates_error_if_required_value_is_missing(self):
+        self.init_validator(Validator(required=False))
+        self.assert_is_valid(None)
+
+        self.init_validator(Validator(required=True))
+        self.assert_is_valid(42)
+        self.assert_error_with_key('empty', None)
+
+        # validators are required by default
+        self.init_validator(Validator())
+        self.assert_error_with_key('empty', None)
 
     def test_raise_exception_if_value_is_required_but_default_is_set_to_prevent_errors(self):
         assert_raises(InvalidArgumentsError, lambda: Validator(required=True, default=12))
