@@ -111,8 +111,10 @@ class SchemaTest(ValidationTest):
     def test_can_process_multiple_values(self):
         schema = self._schema()
         schema.add('amount', IntegerValidator())
-        assert_equals({'id': 42, 'amount': 21},
-                      schema.process({'id': '42', 'amount': '21'}))
+
+        _input = {'id': '42', 'amount': '21'}
+        _expected = {'id': 42, 'amount': 21}
+        self.assert_is_valid(_input, expected=_expected, _validator=schema)
 
     def test_can_retrieve_information_about_error(self):
         self.init_validator()
@@ -124,7 +126,7 @@ class SchemaTest(ValidationTest):
     def test_use_empty_value_from_validator_for_missing_fields(self):
         schema = SchemaValidator()
         schema.add('id', IntegerValidator(required=False))
-        assert_equals({'id': None}, schema.process({}))
+        self.assert_is_valid({}, expected={'id': None}, _validator=schema)
     
     def test_missing_fields_are_validated_as_well(self):
         self.init_validator()
@@ -417,7 +419,7 @@ class SchemaTest(ValidationTest):
             def convert(self, fields, context):
                 return {'id': True, }
         schema = self._schema(formvalidators=(FormValidator(),))
-        assert_equals({'id': True}, schema.process({'id': '42'}))
+        self.assert_is_valid({'id': '42'}, expected={'id': True}, _validator=schema)
 
     def test_formvalidators_are_not_executed_if_field_validator_failed(self):
         schema = self._schema(formvalidators=(exploding_validator(), ))
