@@ -44,7 +44,7 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
         return {'additional_item': _('Unknown parameter "%(additional_item)s"')}
     
     def separator_pattern(self):
-        return '\s*,\s*'
+        return r'\s*,\s*'
     
     def split_parameters(self, value, context):
         arguments = []

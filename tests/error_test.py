@@ -56,7 +56,7 @@ class InvalidDataErrorTest(PythonicTestCase):
 # repr() returns u'...' for "unicode" strings in Python 2. We are using
 # "unicode_literals" from __future__ so all strings are treated as unicode.
 # As we also test "repr()" outputs let's strip the u'...' for assertions.
-_u_repr = lambda s: re.sub("([\=\{])u'", r"\1'", repr(s))
+_u_repr = lambda s: re.sub(r"([\=\{])u'", r"\1'", repr(s))
 
 class ErrorTest(PythonicTestCase):
     def test_can_store_attributes(self):

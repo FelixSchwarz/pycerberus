@@ -34,7 +34,7 @@ class DomainNameValidator(StringValidator):
         if '..' in value:
             self.raise_error('double_dot', value, context, domain=str(value))
         
-        match = re.search('([^a-zA-Z0-9\.\-])', value)
+        match = re.search(r'([^a-zA-Z0-9\.\-])', value)
         if match is not None:
             self.raise_error('invalid_domain_character', value, context, invalid_character=str(match.group(1)), domain=str(value))
 

@@ -17,7 +17,7 @@ class RegexTest(ValidationTest):
     validator_class = RegexValidator
 
     def setUp(self):
-        self.init_validator(regex='\d+')
+        self.init_validator(regex=r'\d+')
         super(RegexTest, self).setUp()
 
     def test_accepts_input_matching_the_pattern(self):
@@ -28,7 +28,7 @@ class RegexTest(ValidationTest):
 
     def test_can_return_error_results_from_convert(self):
         self.init_validator(
-            regex='\d+',
+            regex=r'\d+',
             exception_if_invalid=False,
             use_match_for_conversion=True
         )
@@ -42,7 +42,7 @@ class RegexTest(ValidationTest):
         # an error during ".convert()" - otherwise we will trigger exceptions
         # as the re module can only work on strings.
         self.init_validator(
-            regex='\d+',
+            regex=r'\d+',
             exception_if_invalid=False,
             use_match_for_conversion=True
         )
@@ -53,7 +53,7 @@ class RegexTest(ValidationTest):
 
     def test_can_return_error_results_from_validate(self):
         self.init_validator(
-            regex='\d+',
+            regex=r'\d+',
             exception_if_invalid=False,
             use_match_for_conversion=False
         )
@@ -62,7 +62,7 @@ class RegexTest(ValidationTest):
 
     def test_can_add_custom_errors_in_validate_even_if_superclass_already_found_errors(self):
         self.init_validator(
-            regex='\d+',
+            regex=r'\d+',
             # this is used to trigger a non-critical error in string ".validate()"
             min_length=5,
             # ensure RegexValidator runs its checks in ".validate()" as well
@@ -76,7 +76,7 @@ class RegexTest(ValidationTest):
 
     def test_can_return_translated_messages(self):
         self.init_validator(
-            regex='\d+',
+            regex=r'\d+',
             exception_if_invalid=False,
             use_match_for_conversion=False
         )
