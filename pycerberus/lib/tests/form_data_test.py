@@ -4,10 +4,47 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from pycerberus.errors import InvalidDataError
+import pytest
 from pythonic_testcase import *
 
+from pycerberus.errors import InvalidDataError
+from pycerberus.lib import AttrDict
 from ..form_data import FieldData, FormData
+
+
+@pytest.fixture
+def ctx():
+    form = FormData()
+    form.children.update({
+            'foo': FieldData(value='foo'),
+            'bar': FieldData(value=2, initial_value='2', meta={'quox': 'baz'}),
+        })
+
+    return AttrDict({
+        'form': form,
+    })
+
+
+def _error(message='bad input', value=None):
+    return InvalidDataError(message, value)
+
+
+def test_formdata_can_add_error_for_field(ctx):
+    error = _error('bad foo')
+
+    ctx.form.add_errors({'foo': error})
+    assert ctx.form.contains_errors()
+    assert not ctx.form.global_errors
+    assert ctx.form.errors == {'foo': (error, )}
+
+
+def test_formdata_can_add_global_error(ctx):
+    error = _error('global error')
+
+    ctx.form.add_errors((error, ))
+    assert ctx.form.contains_errors()
+    assert not ctx.form.errors
+    assert ctx.form.global_errors == (error, )
 
 
 class FormDataTest(PythonicTestCase):
@@ -233,4 +270,4 @@ class FormDataTest(PythonicTestCase):
     # --- helpers -------------------------------------------------------------
 
     def error(self, message='bad input', value=None):
-        return InvalidDataError(message, value)
+        return _error(message=message, value=value)

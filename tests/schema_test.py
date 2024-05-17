@@ -529,3 +529,26 @@ class SchemaTest(ValidationTest):
         user_input = {'user': {'first_name': 'Foo', 'last_name': 'Bar'}}
         self.assert_is_valid(user_input, expected=user_input)
 
+
+def test_formvalidator_in_schema_with_repeatable_field_can_set_global_error():
+    # Currently the schema will stop validation as soon as one form validator
+    # returns an error. Therefore we do not have to check that if
+    # ".set(errors=...)" resets errors set previously.
+    schema = SchemaValidator(exception_if_invalid=False)
+    # having a ForEach validator was important to trigger the regression
+    schema.add('numbers', ForEach(IntegerValidator()))
+
+    # Form validator which sets a "global" error
+    class NumbersValidator(Validator):
+        def validate(self, converted_value, context):
+            error = Error('bad_number', 'Service not available', 'foo', context, is_critical=False)
+            context['result'].add_errors((error,))
+    schema.add_formvalidator(NumbersValidator(exception_if_invalid=False))
+
+    result = schema.process({'numbers': ['1', '2']})
+
+    assert result.contains_error() is True
+    assert not result.children['numbers'].contains_error()
+    assert not result.errors
+    form_error, = result.global_errors
+    assert form_error.key == 'bad_number'

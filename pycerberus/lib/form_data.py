@@ -279,6 +279,16 @@ class FormData(object):
                 return True
         return False
 
+    def add_errors(self, errors):
+        is_dict_like = isinstance(errors, dict)
+        if is_dict_like:
+            for child_name, error in errors.items():
+                self.children[child_name].add_error(error)
+        else:
+            assert isinstance(errors, (list, tuple))
+            global_errors = list(errors) + list(self.global_errors)
+            self._set_global_errors(tuple(global_errors))
+
     @property
     def errors(self):
         errors_ = {}

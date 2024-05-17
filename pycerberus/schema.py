@@ -292,6 +292,9 @@ class SchemaValidator(Validator):
             if result.error_count > nr_previous_errors:
                 # do not execute additional form validators if one of them
                 # found an error
+                # LATER: Once the code does not stop on the first error anymore,
+                # we need to adapt the tests to check that setting a global
+                # error does not reset other errors.
                 break
 
     def _process_fields(self, fields, result, context):
