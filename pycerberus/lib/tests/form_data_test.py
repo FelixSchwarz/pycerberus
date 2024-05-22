@@ -38,13 +38,18 @@ def test_formdata_can_add_error_for_field(ctx):
     assert ctx.form.errors == {'foo': (error, )}
 
 
-def test_formdata_can_add_global_error(ctx):
-    error = _error('global error')
-
-    ctx.form.add_errors((error, ))
+def test_formdata_can_add_global_errors(ctx):
+    error1 = _error('global error 1')
+    ctx.form.add_errors((error1, ))
     assert ctx.form.contains_errors()
     assert not ctx.form.errors
-    assert ctx.form.global_errors == (error, )
+    assert ctx.form.global_errors == (error1, )
+
+    error2 = _error('global error 2')
+    ctx.form.add_errors((error2, ))
+    assert len(ctx.form.global_errors) == 2
+    assert ctx.form.global_errors == (error1, error2)
+
 
 
 class FormDataTest(PythonicTestCase):

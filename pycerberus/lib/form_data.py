@@ -286,7 +286,7 @@ class FormData(object):
                 self.children[child_name].add_error(error)
         else:
             assert isinstance(errors, (list, tuple))
-            global_errors = list(errors) + list(self.global_errors)
+            global_errors = list(self.global_errors) + list(errors)
             self._set_global_errors(tuple(global_errors))
 
     @property
