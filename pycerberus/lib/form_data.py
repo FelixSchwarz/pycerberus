@@ -10,7 +10,7 @@ import warnings
 from pycerberus.compat import OrderedDict
 
 
-__all__ = ['is_result', 'FieldData', 'FormData']
+__all__ = ['is_result', 'FieldData', 'FormData', 'RepeatingFieldData']
 
 def is_result(value):
     return (
