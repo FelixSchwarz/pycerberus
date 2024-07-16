@@ -1,7 +1,7 @@
 Changelog
 ******************************
 
-0.7dev (...)
+0.7 (2024-07-16)
 ====================
 
 pycerberus validators can now return validation errors as result values
