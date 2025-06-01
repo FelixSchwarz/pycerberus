@@ -1,4 +1,4 @@
-name: run
+name: run tests
 
 on:
   push:
@@ -11,74 +11,49 @@ on:
 
 
 jobs:
-  # --- Python 2 tests in separate container ----------------------------------
-  tests-py2:
+  tests-cpython:
     runs-on: ubuntu-latest
-    container:
-      image: python:2.7.18-buster
-    timeout-minutes: 10
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          pip install -e .[i18n,testing]
-          pybabel compile --domain=pycerberus --directory=pycerberus/locales
-
-      - name: Run test suite
-        run: |
-          pip install pytest
-          pytest
-
-
-  # --- tests running on Ubuntu 20.04 -----------------------------------------
-  tests-py36:
-    # "ubuntu-latest" does not have Python 3.6
-    runs-on: ubuntu-20.04
-    timeout-minutes: 10
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.6
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.6"
-
-      - name: Install dependencies
-        run: |
-          pip install -e .[i18n,testing]
-          pybabel compile --domain=pycerberus --directory=pycerberus/locales
-
-      - name: Run test suite
-        run: |
-          pip install pytest
-          pytest
-
-
-  # --- testing non-ancient versions ------------------------------------------
-  tests-py3:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12", pypy3.9]
+        python-version: ["2.7.18", 3.6, 3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
+    container:
+      image: python:${{ matrix.python-version }}
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
+    - name: Install dependencies and run tests
       run: |
+        set -eu
+        if [ "${{ matrix.python-version }}" = "2.7.18" ]; then
+          pip install -U pip setuptools virtualenv
+          virtualenv venv-test
+        else
+          python3 -m venv venv-test
+        fi
+        . venv-test/bin/activate
+        pip install -e .[testing]
+        pybabel compile --domain=pycerberus --directory=pycerberus/locales
+        pytest
+
+
+  tests_pypy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pypy-version: ["3.10", "3.11", "latest"]
+    container:
+        image: pypy:${{ matrix.pypy-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies and run tests
+      run: |
+        python3 -m venv venv-test
+        . venv-test/bin/activate
         pip install -e .[i18n,testing]
         pybabel compile --domain=pycerberus --directory=pycerberus/locales
-
-    - name: Run test suite
-      run: |
-        pip install pytest
         pytest
