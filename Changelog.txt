@@ -1,6 +1,13 @@
 Changelog
 ******************************
 
+0.7.1 (2025-06-01)
+====================
+
+- support Python 3.13
+- replace `pkg_resources` with `importlib.resources`
+
+
 0.7 (2024-07-16)
 ====================
 
