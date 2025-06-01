@@ -49,8 +49,8 @@ class PositionalArgumentsParsingSchema(SchemaValidator):
     def split_parameters(self, value, context):
         arguments = []
         if len(value) > 0:
-            nr_declared_fields = len(self.fieldvalidators())
-            arguments = re.split(self.separator_pattern(), value.strip(), nr_declared_fields)
+            num_declared_fields = len(self.fieldvalidators())
+            arguments = re.split(self.separator_pattern(), value.strip(), maxsplit=num_declared_fields)
         return arguments
     
     def _parameter_names(self):
