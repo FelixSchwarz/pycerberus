@@ -10,7 +10,15 @@ import gettext
 import os
 import sys
 
-from pkg_resources import resource_filename
+if sys.version_info >= (3, 9):
+    # `importlib.resources.files()` is available in Python 3.9+
+    import importlib.resources as importlib_resources
+else:
+    # Python 3.7 and 3.8 have `importlib.resources` but not `files()`,
+    # so we use the backport package `importlib_resources`.
+    import importlib_resources
+import six
+
 
 __all__ = ['_', 'GettextTranslation']
 
@@ -25,12 +33,12 @@ class GettextTranslation(object):
         return self._gettext_domain
     
     def _default_localedir(self):
-        locale_dir_in_egg = resource_filename(__name__, "/locales")
-        if os.path.exists(locale_dir_in_egg):
-            return locale_dir_in_egg
-        locale_dir_on_filesystem = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'locales')
-        if os.path.exists(locale_dir_on_filesystem):
-            return locale_dir_on_filesystem
+        if six.PY2:
+            locale_dir = os.path.join(os.path.dirname(__file__), 'locales')
+        else:
+            locale_dir = str(importlib_resources.files(__package__).joinpath('locales'))
+        if os.path.exists(locale_dir):
+            return locale_dir
         return os.path.normpath('/usr/share/locale')
     
     def _locale(self, context):
